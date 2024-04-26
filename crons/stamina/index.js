@@ -19,6 +19,8 @@ module.exports = {
 			}
 
 			const asset = app.Utils.assets(staminaData.platform);
+			const region = app.Utils.formattedAccountRegion(accountData.region);
+
 			if (app.Webhook && app.Webhook.active) {
 				const recoveryTime = app.Utils.formatTime(staminaData.recoveryTime);
 				const embed = {
@@ -40,18 +42,13 @@ module.exports = {
 							inline: true
 						},
 						{
-							name: "\u200b",
-							value: "\u200b",
+							name: "Region",
+							value: region,
 							inline: true
 						},
 						{
 							name: "Current Stamina",
-							value: `${staminaData.currentStamina}/${staminaData.maxStamina}`,
-							inline: true
-						},
-						{
-							name: "Recovery Time",
-							value: recoveryTime,
+							value: `${staminaData.currentStamina}/${staminaData.maxStamina} (${recoveryTime})`,
 							inline: true
 						}
 					],
