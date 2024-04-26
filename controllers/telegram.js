@@ -105,5 +105,11 @@ module.exports = class Telegram extends require("./template.js") {
 		}
 	}
 
+	prepareMessage (messageData) {
+		const escapedMessage = app.Utils.escapeCharacters(messageData);
+
+		return escapedMessage;
+	}
+
 	get active () { return this.#active; }
 };
