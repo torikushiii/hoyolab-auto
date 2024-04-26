@@ -3,14 +3,17 @@ module.exports = {
 	starrail: false, // Same as above but for Star Rail
 	webhook: {
 		// Enable this if you want to send notifications to a discord webhook
+		// You can follow this guide to create a webhook: https://github.com/torikushiii/hoyolab-auto/blob/main/setup/DISCORD_WEBHOOK.md
 		enabled: false,
 		token: "https://discord.com/api/webhooks/123456789012345678/ABC-DEF1234ghIkl-zyx57W2v1u123ew11"
 	},
 	telegram: {
 		// Enable this if you want to send notifications to a telegram chat
+		// You can follow this guide to create a bot: https://github.com/torikushiii/hoyolab-auto/blob/main/setup/TELEGRAM.md
 		enabled: false,
 		chatId: 123,
 		token: "123:ABC-DEF1234ghIkl-zyx57W2v1u123ew11",
+		// If this set to true, this will disable Telegram notifications (sounds, vibration, etc.)
 		disableNotification: false
 	},
 	accounts: [
