@@ -24,67 +24,106 @@ module.exports = {
 			});
 
 			const asset = app.Utils.assets(account.type);
-			if (account.type === "starrail") {
-				const region = app.Utils.formattedAccountRegion(accountData.region);
-				
-				if (app.Webhook && app.Webhook.active) {
-					const fields = app.Utils.fieldsBuilder({
-						UID: accountData.uid,
-						username: accountData.username,
-						region
-					});
+			const region = app.Utils.formattedAccountRegion(accountData.region);
 
-					const cocoonCompleted = (notes.weeklies.weeklyCocoonCount === 0);
-					const simCimpleted = (notes.weeklies.rogueScore === notes.weeklies.maxRogueScore);
-					const weeklyCompleted = (cocoonCompleted && simCimpleted);
+			if (app.Webhook && app.Webhook.active) {
+				const fields = app.Utils.fieldsBuilder({
+					UID: accountData.uid,
+					Username: accountData.username,
+					Region: region
+				});
+
+				if (account.type === "genshin") {
+					const weeklyCompleted = (notes.weeklies.resinDiscount === 0);
 					if (weeklyCompleted) {
 						continue;
 					}
 
-					if (cocoonCompleted === false) {
+					fields.push({
+						name: "Resin Discount",
+						value: `${notes.weeklies.resinDiscount}/${notes.weeklies.resinDiscountLimit}`,
+						inline: true
+					});
+				}
+				if (account.type === "starrail") {
+					const cocoonCompleted = (notes.weeklies.weeklyCocoonCount === 0);
+					const simCompleted = (notes.weeklies.rogueScore === notes.weeklies.maxRogueScore);
+					if (cocoonCompleted && simCompleted) {
+						continue;
+					}
+
+					if (!cocoonCompleted) {
 						fields.push({
 							name: "Echo of War",
 							value: `${notes.weeklies.weeklyCocoonCount}/${notes.weeklies.weeklyCocoonLimit}`,
-							inline: false
+							inline: true
 						});
 					}
-					if (simCimpleted === false) {
+					if (!simCompleted) {
 						fields.push({
 							name: "Simulated Universe",
 							value: `${notes.weeklies.rogueScore}/${notes.weeklies.maxRogueScore}`,
-							inline: false
+							inline: true
 						});
 					}
+				}
 
-					const embed = {
-						color: 0xBB0BB5,
-						title: `${asset.game} Weeklies Reminder`,
-						description: "👋 Hey! You still have weeklies to do!",
-						author: {
-							name: asset.author,
-							icon_url: asset.icon
-						},
-						fields,
-						timestamp: new Date()
-					};
+				const embed = {
+					color: 0xBB0BB5,
+					title: "Weeklies Reminder",
+					author: {
+						name: asset.author,
+						icon_url: asset.icon
+					},
+					description: `${asset.game} Weeklies Reminder`,
+					fields,
+					timestamp: new Date(),
+					footer: {
+						text: "Weeklies Reminder",
+						icon_url: asset.icon
+					}
+				};
 
-					const messageData = await app.Webhook.handleMessage(embed, { type: "weeklies" });
-					if (messageData) {
-						await app.Webhook.send(messageData);
+				const messageData = await app.Webhook.handleMessage(embed, { type: "weeklies" });
+				if (messageData) {
+					await app.Webhook.send(messageData);
+				}
+			}
+
+			if (app.Telegram && app.Telegram.active) {
+				const message = [
+					`📢 **Weeklies Reminder, Don't Forget to Do Your Weeklies**`,
+					`👤 **${accountData.username}**`,
+					`🔢 **UID**: ${accountData.uid}`,
+					`🌍 **Region**: ${region}`
+				];
+
+				if (account.type === "genshin") {
+					const weeklyCompleted = (notes.weeklies.resinDiscount === 0);
+					if (weeklyCompleted) {
+						continue;
+					}
+
+					message.push(`🔋 **Resin Discount**: ${notes.weeklies.resinDiscount}/${notes.weeklies.resinDiscountLimit}`);
+				}
+				if (account.type === "starrail") {
+					const cocoonCompleted = (notes.weeklies.weeklyCocoonCount === 0);
+					const simCompleted = (notes.weeklies.rogueScore === notes.weeklies.maxRogueScore);
+					if (cocoonCompleted && simCompleted) {
+						continue;
+					}
+
+					if (!cocoonCompleted) {
+						message.push(`👹 **Echo of War**: ${notes.weeklies.weeklyCocoonCount}/${notes.weeklies.weeklyCocoonLimit}`);
+					}
+					if (!simCompleted) {
+						message.push(`🌌 **Simulated Universe**: ${notes.weeklies.rogueScore}/${notes.weeklies.maxRogueScore}`);
 					}
 				}
-				
-				if (app.Telegram && app.Telegram.active) {
-					const message = [
-						`🎮 **${asset.game}**`,
-						`🎒 **${accountData.username}**'s (${accountData.uid})`,
-						`👋 Hey! You still have weeklies to do!`,
-						`👹 **Echo of War:** ${notes.weeklies.weeklyCocoonCount}/${notes.weeklies.weeklyCocoonLimit}`,
-						`🌌 **Simulated Universe:** ${notes.weeklies.rogueScore}/${notes.weeklies.maxRogueScore}`
-					].join("\n");
 
-					const escapedMessage = app.Utils.escapeCharacters(message);
-					await app.Telegram.send(escapedMessage);
+				const text = app.Telegram.prepareMessage(message.join("\n"));
+				if (text) {
+					await app.Telegram.send(text);
 				}
 			}
 		}
