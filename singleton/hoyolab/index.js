@@ -96,8 +96,8 @@ module.exports = class HoyoLab {
 		};
 
 		const dailies = {
-			totalTasks: data.total_task_num ?? data.current_train_score,
-			finishedTasks: data.finished_task_num ?? data.max_train_score
+			totalTasks: data.finished_task_num ?? data.current_train_score,
+			finishedTasks: data.total_task_num ?? data.max_train_score
 		};
 
 		const weeklies = {
