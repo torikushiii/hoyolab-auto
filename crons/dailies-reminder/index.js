@@ -23,48 +23,90 @@ module.exports = {
 				region: accountData.region
 			});
 
-			const asset = app.Utils.assets(account.type);
-			if (account.type === "starrail") {
-				const region = app.Utils.formattedAccountRegion(accountData.region);
-				
-				if (app.Webhook && app.Webhook.active) {
-					const delta = app.Utils.formatTime(notes.stamina.recoveryTime);
-					const fields = app.Utils.fieldsBuilder({
-						UID: accountData.uid,
-						username: accountData.username,
-						region,
-						comission: `${notes.dailies.totalTasks}/${notes.dailies.finishedTasks}`,
-						stamina: `${notes.stamina.currentStamina}/${notes.stamina.maxStamina} (${delta})`
-					}, { comission: false });
-	
-					const embed = {
-						color: 0xBB0BB5,
-						title: "Dailies Reminder",
-						author: {
-							name: asset.author,
-							icon_url: asset.icon
-						},
-						description: "👋 Hey! You still have dailies to complete!",
-						fields,
-						timestamp: new Date()
-					};
+			const isCompleted = (notes.dailies.finishedTasks === notes.dailies.totalTasks);
+			if (isCompleted) {
+				continue;
+			}
 
-					await app.Webhook.send(embed);
+			const asset = app.Utils.assets(account.type);
+			const region = app.Utils.formattedAccountRegion(accountData.region);
+
+			if (app.Webhook && app.Webhook.active) {
+				const fields = app.Utils.fieldsBuilder({
+					UID: accountData.uid,
+					Username: accountData.username,
+					Region: region
+				});
+
+				const delta = app.Utils.formatTime(notes.stamina.recoveryTime);
+				fields.push(
+					{
+						name: "Comission Completed",
+						value: `${notes.dailies.totalTasks}/${notes.dailies.finishedTasks}`,
+						inline: true
+					},
+					{
+						name: "Stamina Recovery",
+						value: `${notes.stamina.currentStamina}/${notes.stamina.maxStamina} (${delta})`,
+						inline: true
+					}
+				);
+
+				const embed = {
+					color: 0xBB0BB5,
+					title: "Dailies Reminder",
+					author: {
+						name: asset.author,
+						icon_url: asset.icon
+					},
+					description: "Don't forget to complete your dailies!",
+					fields,
+					timestamp: new Date(),
+					footer: {
+						text: "Dailies Reminder",
+						icon_url: asset.icon
+					}
+				};
+
+				if (account.type === "genshin") {
+					const discountExhausted = (notes.weeklies.resinDiscount === 0);
+					if (!discountExhausted) {
+						embed.fields.push({
+							name: "Resin Discount",
+							value: `${notes.weeklies.resinDiscount}/${notes.weeklies.resinDiscountLimit}`,
+							inline: true
+						});
+					}
 				}
 
-				if (app.Telegram && app.Telegram.active) {
-					const delta = app.Utils.formatTime(notes.stamina.recoveryTime);
-					const message = [
-						`👋 Hey! You still have dailies to complete!`,
-						`🆔 UID: ${accountData.uid}`,
-						`👤 Username: ${accountData.username}`,
-						`🌍 Region: ${region}`,
-						`📋 Comission: ${notes.dailies.totalTasks}/${notes.dailies.finishedTasks}`,
-						`⚡ Stamina: ${notes.stamina.currentStamina}/${notes.stamina.maxStamina} (${delta})`
-					].join("\n");
+				const message = app.Webhook.prepareMessage(embed, { type: "dailies" });
+				if (message) {
+					await app.Webhook.send(message);
+				}
+			}
 
-					const escapedMessage = app.Utils.escapeCharacters(message);
-					await app.Telegram.send(escapedMessage);
+			if (app.Telegram && app.Telegram.active) {
+				const message = [
+					`📢 **Dailies Reminder, Don't Forget to Do Your Dailies**`,
+					`👤 **${accountData.username}**`,
+					`🔢 **UID**: ${accountData.uid}`,
+					`🌍 **Region**: ${region}`,
+					`📋 **Comission Completed**: ${notes.dailies.totalTasks}/${notes.dailies.finishedTasks}`
+				];
+
+				if (account.type === "genshin") {
+					const discountExhausted = (notes.weeklies.resinDiscount === 0);
+					if (!discountExhausted) {
+						message.push(`🔋 **Resin Discount**: ${notes.weeklies.resinDiscount}/${notes.weeklies.resinDiscountLimit}`);
+					}
+				}
+
+				const delta = app.Utils.formatTime(notes.stamina.recoveryTime);
+				message.push(`🕒 **Stamina Recovery**: ${notes.stamina.currentStamina}/${notes.stamina.maxStamina} (${delta})`);
+
+				const text = app.Telegram.prepareMessage(message.join("\n"));
+				if (text) {
+					await app.Telegram.send(text);
 				}
 			}
 		}
