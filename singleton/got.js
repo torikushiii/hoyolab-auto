@@ -6,7 +6,7 @@ module.exports = (async () => {
 			limit: 3
 		},
 		timeout: {
-			request: 2500
+			request: 5000
 		},
 		mutableDefaults: true,
 		throwHttpErrors: true,
