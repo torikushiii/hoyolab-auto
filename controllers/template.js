@@ -14,6 +14,15 @@ module.exports = class Controller {
 			});
 		}
 
+		if (typeof messageData !== "object" && typeof messageData !== "string") {
+			throw new app.Error({
+				message: "Invalid message data provided.",
+				args: {
+					messageData
+				}
+			});
+		}
+
 		const types = [
 			"stamina",
 			"check-in",
