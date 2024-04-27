@@ -53,7 +53,7 @@ A multi-purpose tool for any supported Hoyoverse games. This tool is designed to
 6. Type "lt" in the "Filter" bar.
    ![image](https://github.com/torikushiii/hoyolab-auto/assets/21153445/38adf23a-161d-47ef-b11e-7e4fdc8e372c)
 6. Copy the required ltoken_v2 and ltuid_v2 and put it in your newly created `config.js` or `default.config.js` file.
-8. Run `index.js` with `npm start` to run the application.
+8. Run `index.js` with `npm start` to run the application. (You must run `npm start` specifically or you will not receive any console logs)
 
 # Notifications
 For Discord notifications or Telegram setup, refer to this folder: [setup](https://github.com/torikushiii/starrail-auto/tree/master/setup)
