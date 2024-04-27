@@ -17,62 +17,29 @@ module.exports = {
 			return app.Logger.warn("Cron:CheckIn", "No messages to send.");
 		}
 		
-		const checkInEmbed = (data) => ({
-			color: 0xBB0BB5,
-			title: data.game,
-			author: {
-				name: data.author,
-				icon_url: data.icon
-			},
-			thumbnail: {
-				url: data.award.icon
-			},
-			timestamp: new Date()
-		});
-
 		for (let i = 0; i < messages.length; i++) {
 			const asset = app.Utils.assets(messages[i].platform);
 			if (app.Webhook && app.Webhook.active) {
-				// for the love of god, rework this
 				const embed = {
-					...checkInEmbed({ ...messages[i], ...asset }),
+					color: 0xBB0BB5,
+					title: asset.game,
+					author: {
+						name: asset.author,
+						icon_url: asset.icon
+					},
+					thumbnail: {
+						url: messages[i].award.icon
+					},
 					fields: [
-						{
-							name: "Nickname",
-							value: messages[i].username,
-							inline: true
-						},
-						{
-							name: "UID",
-							value: messages[i].uid,
-							inline: true
-						},
-						{
-							name: "Rank",
-							value: messages[i].rank,
-							inline: true
-						},
-						{
-							name: "Region",
-							value: app.Utils.formattedAccountRegion(messages[i].region),
-							inline: true
-						},
-						{
-							name: "Today's Reward",
-							value: `${messages[i].award.name} x${messages[i].award.count}`,
-							inline: true
-						},
-						{
-							name: "Total Sign-Ins",
-							value: messages[i].total,
-							inline: true
-						},
-						{
-							name: "Result",
-							value: messages[i].result,
-							inline: true
-						}
+						{ name: "UID", value: messages[i].uid, inline: true },
+						{ name: "Username", value: messages[i].username, inline: true },
+						{ name: "Region", value: app.Utils.formattedAccountRegion(messages[i].region), inline: true },
+						{ name: "Rank", value: messages[i].rank, inline: true },
+						{ name: "Today's Reward", value: `${messages[i].award.name} x${messages[i].award.count}`, inline: true },
+						{ name: "Total Sign-Ins", value: messages[i].total, inline: true },
+						{ name: "Result", value: messages[i].result, inline: true }
 					],
+					timestamp: new Date(),
 					footer: {
 						text: `HoyoLab Auto Check-In (${i + 1} / ${messages.length} Executed)`,
 						icon_url: asset.icon
