@@ -49,13 +49,16 @@ module.exports = class UtilsSingleton {
 
 	formattedAccountRegion (region) {
 		switch (region) {
+			case "os_cht":
 			case "prod_official_cht":
 				return "TW";
 			case "os_asia":
 			case "prod_official_asia":
 				return "SEA";
+			case "os_euro":
 			case "prod_official_eur":
 				return "EU";
+			case "os_usa":
 			case "prod_official_usa":
 				return "NA";
 			default:
@@ -78,6 +81,11 @@ module.exports = class UtilsSingleton {
 				game: "Honkai: Star Rail",
 				author: "PomPom",
 				icon: "https://webstatic-sea.hoyolab.com/communityweb/business/starrail_hoyoverse.png"
+			},
+			honkai: {
+				game: "Honkai Impact 3rd",
+				author: "Kiana",
+				icon: "https://fastcdn.hoyoverse.com/static-resource-v2/2024/02/29/3d96534fd7a35a725f7884e6137346d1_3942255444511793944.png"
 			}
 		};
 
