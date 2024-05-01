@@ -19,6 +19,7 @@ A multi-purpose tool for any supported Hoyoverse games. This tool is designed to
 # Supported Games
 - [x] Genshin Impact
 - [x] Honkai: Star Rail
+- [x] Honkai Impact 3rd
 
 # Features
 - [x] Auto check-in (Runs every midnight your local time)
