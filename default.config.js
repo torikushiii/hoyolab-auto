@@ -1,6 +1,7 @@
 module.exports = {
 	genshin: false, // Enable this if you want to enable check-ins or any other genshin related features
 	starrail: false, // Same as above but for Star Rail
+	honkai: false, // for Honkai Impact 3rd
 	webhook: {
 		// Enable this if you want to send notifications to a discord webhook
 		// You can follow this guide to create a webhook: https://github.com/torikushiii/hoyolab-auto/blob/main/setup/DISCORD_WEBHOOK.md
@@ -17,6 +18,10 @@ module.exports = {
 		disableNotification: false
 	},
 	accounts: [
+		{
+			type: "honkai",
+			data: []
+		},
 		{
 			type: "genshin", // Account type, either genshin or starrail or any other game that will be supported in the future
 			data: [

@@ -4,7 +4,8 @@ module.exports = class CheckIn extends require("./template") {
 
 	static ACT_ID = {
 		genshin: "e202102251931481",
-		starrail: "e202303301540311"
+		starrail: "e202303301540311",
+		honkai: "e202110291205111"
 	};
 
 	static strings = {
@@ -15,6 +16,10 @@ module.exports = class CheckIn extends require("./template") {
 		starrail: {
 			success: "You have successfully checked in today, Trailblazer~",
 			signed: "You've already checked in today, Trailblazer~"
+		},
+		honkai: {
+			success: "You have successfully checked in today, Captain~",
+			signed: "You've already checked in today, Captain~"
 		}
 	};
 
@@ -28,6 +33,11 @@ module.exports = class CheckIn extends require("./template") {
 			info: "https://sg-public-api.hoyolab.com/event/luna/os/info",
 			home: "https://sg-public-api.hoyolab.com/event/luna/os/home",
 			sign: "https://sg-public-api.hoyolab.com/event/luna/os/sign"
+		},
+		honkai: {
+			info: "https://sg-public-api.hoyolab.com/event/mani/info",
+			home: "https://sg-public-api.hoyolab.com/event/mani/home",
+			sign: "https://sg-public-api.hoyolab.com/event/mani/sign"
 		}
 	};
 
