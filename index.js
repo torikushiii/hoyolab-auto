@@ -28,7 +28,7 @@ catch {
 		Logger: new Logger(),
 
 		Got: await Got,
-		Config: await Config,
+		Config,
 		Utils: new Utils()
 	};
 
