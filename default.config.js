@@ -49,6 +49,9 @@ module.exports = {
 			type: "starrail",
 			data: [
 				{
+					// If you have same account for both genshin and starrail
+					// You can copy the cookie values from the genshin account
+					// Same goes for any other game that will be supported in the future
 					cookie: {
 						ltoken: "",
 						ltuid: ""
