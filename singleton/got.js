@@ -24,7 +24,6 @@ module.exports = (async () => {
 
 					if (accounts.length >= 5) {
 						const delay = Math.floor(Math.random() * 2000) + 5000;
-						app.Logger.warn("Got", `Delaying request for ${delay}ms`);
 						return new Promise((resolve) => setTimeout(() => resolve(response), delay));
 					}
 
