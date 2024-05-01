@@ -88,6 +88,7 @@ module.exports = {
 			if (app.Telegram && app.Telegram.active) {
 				const message = [
 					`📢 **Dailies Reminder, Don't Forget to Do Your Dailies**`,
+					`🎮 **Game**: ${asset.name}`,
 					`👤 **${accountData.username}**`,
 					`🔢 **UID**: ${accountData.uid}`,
 					`🌍 **Region**: ${region}`,
