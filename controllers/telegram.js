@@ -4,6 +4,9 @@ module.exports = class Telegram extends require("./template.js") {
 	#disableNotification;
 	#active = false;
 
+	gotModule;
+	gotRequestErrors;
+
 	constructor () {
 		super();
 
@@ -87,8 +90,15 @@ module.exports = class Telegram extends require("./template.js") {
 			return true;
 		}
 		catch (e) {
-			app.Logger.error("Telegram", e);
-			return false;
+			const isGotRequestError = await this.isGotRequestError(e);
+			if (isGotRequestError) {
+				return app.Logger.error("Telegram", {
+					message: "Failed to send telegram message",
+					args: { error: e }
+				});
+			}
+
+			throw e;
 		}
 	}
 
@@ -109,6 +119,18 @@ module.exports = class Telegram extends require("./template.js") {
 		const escapedMessage = app.Utils.escapeCharacters(messageData);
 
 		return escapedMessage;
+	}
+
+	async isGotRequestError (error) {
+		this.gotModule ??= await import("got");
+		this.gotRequestErrors ??= [
+			this.gotModule.CancelError,
+			this.gotModule.HTTPError,
+			this.gotModule.RequestError,
+			this.gotModule.TimeoutError
+		];
+
+		return this.gotRequestErrors.some(err => error instanceof err);
 	}
 
 	get active () { return this.#active; }
