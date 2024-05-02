@@ -180,7 +180,7 @@ module.exports = class Account extends require("./template.js") {
 
 		const enabledAccounts = data.filter(i => this[i.type]);
 		for (const account of enabledAccounts) {
-			const validTypes = ["genshin", "starrail"];
+			const validTypes = ["genshin", "starrail", "honkai"];
 			if (!validTypes.includes(account.type)) {
 				throw new app.Error({ message: `Invalid account type: ${account.type}` });
 			}
