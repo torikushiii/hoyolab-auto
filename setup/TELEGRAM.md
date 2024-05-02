@@ -3,12 +3,12 @@ This is an **OPTIONAL** feature. If you want to receive a Telegram notification 
 
 1. Go to [@BotFather](https://t.me/BotFather) and type `/newbot`.
 2. Create a name for your bot
-    - Such as `Honkai Star-Rail`
+    - Such as `HoyoLab`
 3. Create a username for your bot. (Must end with `bot` or `_bot`)
-    - Such as `HonkaiStarRailBot` or `HonkaiStarRail_bot`
+    - Such as `HoyoLabBot` or `HoyoLab_bot`
 4. If all goes well, you should receive a message that will look like this:
     ```
-    Done! Congratulations on your new bot. You will find it at t.me/HonkaiStarRailBot. You can now add a description, about section and profile picture for your bot, see /help for a list of commands. By the way, when you've finished creating your cool bot, ping our Bot Support if you want a better username for it. Just make sure the bot is fully operational before you do this.
+    Done! Congratulations on your new bot. You will find it at t.me/HoyoLabBot. You can now add a description, about section and profile picture for your bot, see /help for a list of commands. By the way, when you've finished creating your cool bot, ping our Bot Support if you want a better username for it. Just make sure the bot is fully operational before you do this.
     ```
 5. On the same message, you will see a `token` that looks like this:
     ```

@@ -43,7 +43,7 @@ A multi-purpose tool for any supported Hoyoverse games. This tool is designed to
 1. Clone the repository.
 2. Run `npm install` to install the dependencies.
 3. Create a `config.js` or rename `default.config.js` to `config.js`.
-4. Follow the instructions in the `config.js` file.
+4. Follow the instructions in the `default.config.js` or `config.js` file.
 
 # Usage
 1. Go to the Daily Check-In page [here](https://act.hoyolab.com/bbs/event/signin/hkrpg/index.html?act_id=e202303301540311).
@@ -57,7 +57,7 @@ A multi-purpose tool for any supported Hoyoverse games. This tool is designed to
 8. Run `index.js` with `npm start` to run the application. (You must run `npm start` specifically or you will not receive any console logs)
 
 # Notifications
-For Discord notifications or Telegram setup, refer to this folder: [setup](https://github.com/torikushiii/starrail-auto/tree/master/setup)
+For Discord notifications or Telegram setup, refer to this folder: [setup](https://github.com/torikushiii/hoyolab-auto/tree/main/setup)
 
 # Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change. If there's any bugs, please open an issue.
