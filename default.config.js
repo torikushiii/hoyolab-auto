@@ -20,6 +20,7 @@ module.exports = {
 	accounts: [
 		{
 			type: "honkai",
+			// Same format as genshin and starrail
 			data: []
 		},
 		{
