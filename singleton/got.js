@@ -23,7 +23,7 @@ module.exports = (async () => {
 					}
 
 					if (accounts.length >= 5) {
-						const delay = Math.floor(Math.random() * 2000) + 5000;
+						const delay = 2500;
 						return new Promise((resolve) => setTimeout(() => resolve(response), delay));
 					}
 
