@@ -3,7 +3,8 @@
   "module": "index.js",
   "type": "commonjs",
   "scripts": {
-    "start": "DEBUG=* node index.js"
+    "start": "DEBUG=* node index.js",
+    "watch": "DEBUG=* nodemon index.js"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -21,6 +22,7 @@
   "dependencies": {
     "cron": "^3.1.6",
     "debug": "^4.3.4",
+    "discord.js": "^14.14.1",
     "got": "^14.2.1"
   }
 }
