@@ -163,7 +163,7 @@ module.exports = class Discord extends require("./template.js") {
 						channelID: channelData.id,
 						channelName: channelData.name ?? null,
 						guildID: channelData.guild.id ?? null,
-						guildName: channelData.guild.name ?? null,
+						guildName: channelData.guild.name ?? null
 					},
 					cause: e
 				});
