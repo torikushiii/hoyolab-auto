@@ -1,4 +1,5 @@
 const Account = require("./classes/account.js");
+const Command = require("./classes/command.js");
 const Config = require("./classes/config.js");
 
 const Error = require("./object/error.js");
@@ -27,14 +28,20 @@ catch {
 		Error,
 		Logger: new Logger(),
 
-		Got: await Got,
 		Config,
+		Command,
+		Got: await Got,
 		Utils: new Utils()
 	};
 
 	app.Logger.info("Client", "Loading configuration data");
 	Config.load(configData);
 	app.Logger.info("Client", `Loaded ${Config.data.size} configuration entries`);
+
+	const { loadCommands } = require("./commands/index.js");
+	const commands = await loadCommands();
+
+	await Command.importData(commands.definitions);
 
 	globalThis.app = {
 		...app,
