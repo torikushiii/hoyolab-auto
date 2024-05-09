@@ -2,7 +2,6 @@ const {
 	ChannelType,
 	Client,
 	DiscordAPIError,
-	GuildMember,
 	GatewayIntentBits,
 	Partials,
 	PermissionFlagsBits
