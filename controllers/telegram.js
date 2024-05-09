@@ -4,8 +4,16 @@ module.exports = class Telegram extends require("./template.js") {
 	#disableNotification;
 	#active = false;
 
+	firstRun = true;
+	lastUpdatedId = 0;
+
 	gotModule;
 	gotRequestErrors;
+
+	static possibleCommands = [
+		"/stamina",
+		"/expedition"
+	];
 
 	constructor () {
 		super();
@@ -42,10 +50,88 @@ module.exports = class Telegram extends require("./template.js") {
 		this.#token = token;
 		this.#chatId = chatId;
 		this.#disableNotification = disableNotification;
+
+		// If you received error message such as "409: Conflict", try to increase the interval
+		setInterval(() => this.listenMessages(), 5000);
+	}
+
+	async listenMessages () {
+		if (this.#active === false) {
+			return;
+		}
+
+		const res = await app.Got({
+			url: `https://api.telegram.org/bot${this.#token}/getUpdates`,
+			method: "POST",
+			responseType: "json",
+			throwHttpErrors: false,
+			json: {
+				offset: this.lastUpdatedId + 1
+			}
+		});
+
+		if (res.body.ok !== true) {
+			throw new app.Error({
+				message: "Failed to get telegram updates",
+				args: {
+					statusCode: res.statusCode,
+					statusMessage: res.statusMessage,
+					body: res.body
+				}
+			});
+		}
+
+		const { result } = res.body;
+		if (result.length === 0) {
+			this.firstRun = false;
+			return;
+		}
+
+		if (this.firstRun === true && result.length > 0) {
+			this.lastUpdatedId = result[result.length - 1].update_id;
+			this.firstRun = false;
+			return;
+		}
+
+		for (const update of result) {
+			const { message } = update;
+			if (!message) {
+				continue;
+			}
+
+			const { chat, text } = message;
+			if (chat.id !== this.#chatId) {
+				continue;
+			}
+
+			this.lastUpdatedId = update.update_id;
+
+			const command = text.split(" ")[0];
+			if (!Telegram.possibleCommands.includes(command)) {
+				continue;
+			}
+
+			const args = text.split(" ").slice(1);
+			const channelData = {
+				id: chat.id,
+				name: chat.title ?? null
+			};
+			const userData = {
+				id: message.from.id,
+				username: message.from.first_name ?? null
+			};
+
+			await this.handleCommand({
+				command: command.slice(1),
+				args,
+				channelData,
+				userData
+			});
+		}
 	}
 
 	async send (message) {
-		if (!this.active) {
+		if (!this.#active) {
 			throw new app.Error({
 				message: "Telegram is not active"
 			});
@@ -102,8 +188,35 @@ module.exports = class Telegram extends require("./template.js") {
 		}
 	}
 
+	async handleCommand (data) {
+		const {
+			command,
+			args,
+			channelData,
+			userData
+		} = data;
+
+		const execution = await app.Command.checkAndRun(command, args, channelData, userData, {
+			platform: {
+				id: 2,
+				name: "Telegram"
+			}
+		});
+
+		if (!execution) {
+			return;
+		}
+
+		const { reply } = execution;
+
+		const message = this.prepareMessage(reply);
+		if (message) {
+			await this.send(message);
+		}
+	}
+
 	async handleMessage (messageData, options = {}) {
-		if (!this.active) {
+		if (!this.#active) {
 			throw new app.Error({
 				message: "Telegram is not active"
 			});
