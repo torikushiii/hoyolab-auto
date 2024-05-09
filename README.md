@@ -10,16 +10,16 @@
 </p>
 
 > [!WARNING]
-> This project is still under early development and may does not work as intended. If you do use this and encounter any issues, please open an issue.
+> This project is still under early development and may does not work as intended. Codebase structure may change anytime without any notice. If you do use it and encounter any issues, please open an issue that would be very helpful.
 
 # HoyoLab Auto
 
 A multi-purpose tool for any supported Hoyoverse games. This tool is designed to help you with your daily check-in, stamina check, expedition check, automatic code-redemption, and more.
 
 # Supported Games
+- [x] Honkai Impact 3rd (Daily Check-In only)
 - [x] Genshin Impact
 - [x] Honkai: Star Rail
-- [x] Honkai Impact 3rd
 
 # Features
 - [x] Auto check-in (Runs every midnight your local time)
