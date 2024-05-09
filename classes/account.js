@@ -440,4 +440,19 @@ module.exports = class Account extends require("./template.js") {
 		const accounts = Array.from(Account.data.values());
 		return accounts.filter(i => i.type === platform);
 	}
+
+	static getActivePlatformsByType (type) {
+		if (typeof type !== "string") {
+			throw new app.Error({
+				message: "Type must be a string.",
+				args: {
+					type,
+					typeof: typeof type
+				}
+			});
+		}
+
+		const accounts = Array.from(Account.data.values());
+		return accounts.filter(i => i.type === type);
+	}
 };
