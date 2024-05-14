@@ -197,6 +197,6 @@ module.exports = class Command extends require("./template.js") {
 	}
 
 	static getPrefix () {
-		return app.Config.get("discord").prefix ?? null;
+		return app.Config.get("prefix") ?? null;
 	}
 };

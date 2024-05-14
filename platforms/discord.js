@@ -3,7 +3,6 @@ const {
 	Client,
 	DiscordAPIError,
 	GatewayIntentBits,
-	Partials,
 	PermissionFlagsBits
 } = require("discord.js");
 
@@ -15,60 +14,33 @@ const ignoredChannels = [
 	ChannelType.PublicThread
 ];
 
-module.exports = class Discord extends require("./template.js") {
-	constructor () {
-		super();
+module.exports = class DiscordController extends require("./template.js") {
+	constructor (config) {
+		super("discord", config);
 
-		const config = app.Config.get("discord");
-
-		if (config.enabled === false) {
-			app.Logger.warn("Discord", "Discord controller is disabled, skipping initialization");
-			return;
-		}
-		
-		this.id = config.id;
-		if (typeof this.id !== "string") {
+		if (!this.botId) {
 			throw new app.Error({
-				message: "Invalid Discord ID, expected string",
-				args: {
-					id: this.id,
-					type: typeof this.id
-				}
+				message: "No bot ID provided for Discord controller"
 			});
 		}
-
-		this.token = config.token;
-		if (typeof this.token !== "string") {
+		else if (!this.token) {
 			throw new app.Error({
-				message: "Invalid Discord token, expected string",
-				args: {
-					token: this.token,
-					type: typeof this.token
-				}
+				message: "Discord token has not been configured for the bot"
 			});
 		}
-
-		this.#initClient();
-
-		this.permissions = PermissionFlagsBits;
 	}
 
-	#initClient () {
+	connect () {
 		this.client = new Client({
 			intents: [
 				GatewayIntentBits.Guilds,
 				GatewayIntentBits.GuildMessages,
 				GatewayIntentBits.MessageContent
-			],
-			partials: [
-				Partials.Channel
 			]
 		});
 
 		this.initListeners();
 		this.client.login(this.token);
-
-		app.Logger.info("Discord", "Client initialized");
 	}
 
 	initListeners () {

@@ -1,36 +1,16 @@
 module.exports = class Webhook extends require("./template.js") {
-	#token;
-	#active = false;
+	constructor (config) {
+		super("webhook", config);
 
-	static webhookRegex = /https:\/\/discord.com\/api\/webhooks\/\d+\/[\w-]+/;
-
-	constructor () {
-		super();
-
-		const config = app.Config.get("webhook");
-		if (config.enabled !== true) {
-			app.Logger.warn("Webhook", "Webhook is disabled, skipping webhook notifications");
-			return;
-		}
-		else if (config.token === null) {
-			app.Logger.warn("Webhook", "Webhook token is not set, skipping webhook notifications");
-			return;
-		}
-
-		const token = config.token;
-		if (!Webhook.webhookRegex.test(token)) {
+		if (!this.url) {
 			throw new app.Error({
-				message: "Invalid webhook token provided",
-				args: { token }
+				message: "No webhook URL provided"
 			});
 		}
-
-		this.#active = true;
-		this.#token = token;
-
-		app.Logger.info("Webhook", "Webhook initialized");
 	}
 
+	connect () {}
+	
 	async send (message) {
 		if (!this.active) {
 			throw new app.Error({
@@ -50,7 +30,7 @@ module.exports = class Webhook extends require("./template.js") {
 		}
 
 		const res = await app.Got({
-			url: this.#token,
+			url: this.token,
 			method: "POST",
 			responseType: "json",
 			throwHttpErrors: false,
@@ -87,6 +67,4 @@ module.exports = class Webhook extends require("./template.js") {
 			return messages;
 		}
 	}
-
-	get active () { return this.#active; }
 };

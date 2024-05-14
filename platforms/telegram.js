@@ -1,12 +1,6 @@
 module.exports = class Telegram extends require("./template.js") {
-	#token;
-	#chatId;
-	#disableNotification;
-	#active = false;
-
-	firstRun = true;
 	lastUpdatedId = 0;
-
+	
 	gotModule;
 	gotRequestErrors;
 
@@ -15,53 +9,27 @@ module.exports = class Telegram extends require("./template.js") {
 		"/expedition"
 	];
 
-	constructor () {
-		super();
+	constructor (config) {
+		super("telegram", config);
 
-		const config = app.Config.get("telegram");
-		if (config.enabled !== true) {
-			app.Logger.warn("Telegram", "Telegram is disabled, skipping telegram notifications");
-			return;
-		}
-		
-		const { chatId, token, disableNotification } = config;
-		if (typeof chatId !== "number") {
+		if (!this.chatId) {
 			throw new app.Error({
-				message: "Invalid chatId provided",
-				args: { chatId }
+				message: "No chat ID provided for Telegram controller"
 			});
 		}
-		else if (typeof token !== "string") {
+		else if (!this.token) {
 			throw new app.Error({
-				message: "Invalid token provided",
-				args: { token }
+				message: "Telegram token has not been configured for the bot"
 			});
 		}
-		else if (typeof disableNotification !== "boolean") {
-			throw new app.Error({
-				message: "Invalid disableNotification provided",
-				args: { disableNotification }
-			});
-		}
-
-		app.Logger.info("Telegram", "Telegram initialized");
-
-		this.#active = true;
-		this.#token = token;
-		this.#chatId = chatId;
-		this.#disableNotification = disableNotification;
 
 		// If you received error message such as "409: Conflict", try to increase the interval
-		setInterval(() => this.listenMessages(), 5000);
+		setInterval(() => this.connect(), 5000);
 	}
 
-	async listenMessages () {
-		if (this.#active === false) {
-			return;
-		}
-
+	async connect () {
 		const res = await app.Got({
-			url: `https://api.telegram.org/bot${this.#token}/getUpdates`,
+			url: `https://api.telegram.org/bot${this.token}/getUpdates`,
 			method: "POST",
 			responseType: "json",
 			throwHttpErrors: false,
@@ -100,7 +68,7 @@ module.exports = class Telegram extends require("./template.js") {
 			}
 
 			const { chat, text } = message;
-			if (chat.id !== this.#chatId) {
+			if (chat.id !== this.chatId) {
 				continue;
 			}
 
@@ -131,12 +99,7 @@ module.exports = class Telegram extends require("./template.js") {
 	}
 
 	async send (message) {
-		if (!this.#active) {
-			throw new app.Error({
-				message: "Telegram is not active"
-			});
-		}
-		else if (typeof message !== "string") {
+		if (typeof message !== "string") {
 			throw new app.Error({
 				message: "Provided message is not a string",
 				args: {
@@ -150,15 +113,15 @@ module.exports = class Telegram extends require("./template.js") {
 
 		try {
 			const res = await app.Got({
-				url: `https://api.telegram.org/bot${this.#token}/sendMessage`,
+				url: `https://api.telegram.org/bot${this.token}/sendMessage`,
 				method: "POST",
 				responseType: "json",
 				throwHttpErrors: false,
 				json: {
-					chat_id: this.#chatId,
+					chat_id: this.chatId,
 					text: message,
 					parse_mode: "MarkdownV2",
-					disable_notification: this.#disableNotification
+					disable_notification: this.disableNotification
 				}
 			});
 	
@@ -216,12 +179,6 @@ module.exports = class Telegram extends require("./template.js") {
 	}
 
 	async handleMessage (messageData, options = {}) {
-		if (!this.#active) {
-			throw new app.Error({
-				message: "Telegram is not active"
-			});
-		}
-		
 		const message = this.prepareMessage(messageData, options);
 		if (message) {
 			return message;
@@ -245,6 +202,4 @@ module.exports = class Telegram extends require("./template.js") {
 
 		return this.gotRequestErrors.some(err => error instanceof err);
 	}
-
-	get active () { return this.#active; }
 };
