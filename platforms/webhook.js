@@ -11,13 +11,8 @@ module.exports = class Webhook extends require("./template.js") {
 
 	connect () {}
 	
-	async send (message) {
-		if (!this.active) {
-			throw new app.Error({
-				message: "Webhook is not active"
-			});
-		}
-		else if (typeof message !== "object") {
+	async send (message, options = {}) {
+		if (typeof message !== "object") {
 			throw new app.Error({
 				message: "Provided message is not an object",
 				args: {
@@ -30,7 +25,7 @@ module.exports = class Webhook extends require("./template.js") {
 		}
 
 		const res = await app.Got({
-			url: this.token,
+			url: this.url,
 			method: "POST",
 			responseType: "json",
 			throwHttpErrors: false,
@@ -39,8 +34,8 @@ module.exports = class Webhook extends require("./template.js") {
 			},
 			json: {
 				embeds: [message],
-				username: message.author?.name ?? "HoyoLab",
-				avatar_url: message.author.icon_url
+				username: options.author,
+				avatar_url: options.icon
 			}
 		});
 
