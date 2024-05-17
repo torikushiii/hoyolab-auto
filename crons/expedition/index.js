@@ -3,65 +3,84 @@ module.exports = {
 	expression: "0 */30 * * * *",
 	description: "Check for ongoing expeditions every 30 minutes and send a notification if all expeditions are completed.",
 	code: (async function expedition () {
-		const accounts = app.Account.getActivePlatforms();
+		// eslint-disable-next-line object-curly-spacing
+		const accountList = app.HoyoLab.getAllActiveAccounts({ blacklist: ["honkai"] });
+		if (accountList.length === 0) {
+			app.Logger.warn("Cron:Expedition", "No active accounts found to run expedition check for.");
+			return;
+		}
 
-		for (const account of accounts) {
-			const accountData = app.Account.get(account.id);
-			
-			const { config: { expedition } } = accountData;
-			if (expedition.check === false) {
-				continue;
-			}
+		const activeGameAccounts = app.HoyoLab.getActivePlatform();
+		for (const name of activeGameAccounts) {
+			const platform = app.HoyoLab.get(name);
+			const accounts = accountList.filter(account => account.platform === name);
 
-			const expeditionData = await app.HoyoLab.expedition(account, account.type, expedition);
-			if (expeditionData.length === 0) {
-				continue;
-			}
-
-			const asset = app.Utils.assets(expeditionData.platform);
-			if (app.Webhook && app.Webhook.active) {
-				const embed = {
-					color: 0xBB0BB5,
-					title: `${asset.game} Expedition Notification`,
-					author: {
-						name: asset.author,
-						icon_url: asset.icon
-					},
-					description: `${asset.game} Expedition is Completed`,
-					fields: [
-						{
-							name: "UID",
-							value: expeditionData.uid,
-							inline: true
-						},
-						{
-							name: "Username",
-							value: expeditionData.username,
-							inline: true
-						}
-					],
-					timestamp: new Date(),
-					footer: {
-						text: `${asset.game} Expedition Check`,
-						icon_url: asset.icon
-					}
-				};
-				
-				const messageData = await app.Webhook.handleMessage(embed, { type: "expedition" });
-				if (messageData) {
-					await app.Webhook.send(messageData);
+			for (const account of accounts) {
+				const expeditionCheck = account.expedition.check;
+				if (expeditionCheck === false) {
+					continue;
 				}
-			}
 
-			if (app.Telegram && app.Telegram.active) {
-				const message = [
-					`🎮 **${asset.game}**`,
-					`👤 **${accountData.username}**'s (${accountData.uid})`,
-					`🎉 **Expedition Completed**`
-				].join("\n");
+				const { fired, persistent } = account.expedition;
+				if (fired && !persistent) {
+					continue;
+				}
 
-				const escapedMessage = app.Utils.escapeCharacters(message);
-				await app.Telegram.send(escapedMessage);
+				const notes = await platform.notes(account);
+				if (notes.success === false) {
+					continue;
+				}
+
+				account.expedition.fired = true;
+				platform.update(account);
+
+				const { data } = notes;
+				const expeditions = data.expedition;
+				if (expeditions.completed === false) {
+					account.expedition.fired = false;
+					platform.update(account);
+					continue;
+				}
+
+				const webhook = app.Platform.get(3);
+				if (webhook) {
+					const embed = {
+						color: data.assets.color,
+						title: "Expedition Reminder",
+						author: {
+							name: data.assets.author,
+							icon_url: data.assets.logo
+						},
+						description: "All expeditions are completed!",
+						fields: [
+							{ name: "UID", value: account.uid, inline: true },
+							{ name: "Username", value: account.nickname, inline: true },
+							{ name: "Region", value: app.Utils.formattedAccountRegion(account.region), inline: true }
+						],
+						timestamp: new Date(),
+						footer: {
+							text: "Expedition Reminder",
+							icon_url: data.assets.logo
+						}
+					};
+
+					await webhook.send(embed, {
+						author: data.assets.author,
+						icon: data.assets.logo
+					});
+				}
+
+				const telegram = app.Platform.get(2);
+				if (telegram) {
+					const messageText = [
+						`📢 Expedition Reminder, All Expeditions are Completed!`,
+						`🎮 **Game**: ${data.assets.game}`,
+						`🆔 **UID**: ${account.uid} ${account.username}`
+					].join("\n");
+
+					const escapedMessage = app.Utils.escapeCharacters(messageText);
+					await telegram.send(escapedMessage);
+				}
 			}
 		}
 	})

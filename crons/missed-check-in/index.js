@@ -3,13 +3,16 @@ module.exports = {
 	expression: "0 0 23 * * *",
 	description: "This check if all accounts successfully checked in today before daily reset",
 	code: (async function missedCheckIn () {
-		const accounts = app.Account.getActivePlatforms();
-
-		app.Logger.log("Cron:MissedCheckIn", `Running missed check-in checker for ${accounts.length} accounts.`);
-		for (const account of accounts) {
-			await app.HoyoLab.checkIn(account, account.type);
+		const accounts = app.HoyoLab.getAllActiveAccounts();
+		if (accounts.length === 0) {
+			app.Logger.warn("Cron:MissedCheckIn", "No active accounts found for HoyoLab");
+			return;
 		}
 
-		app.Logger.log("Cron:MissedCheckIn", "Job finished.");
+		const activeGameAccounts = app.HoyoLab.getActivePlatform();
+		for (const name of activeGameAccounts) {
+			const platform = app.HoyoLab.get(name);
+			await platform.checkAndExecute();
+		}
 	})
 };

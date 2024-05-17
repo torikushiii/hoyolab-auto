@@ -3,127 +3,138 @@ module.exports = {
 	expression: "0 0 21 * * 0",
 	description: "Reminds you to complete your weeklies.",
 	code: (async function weekliesReminder () {
-		const accounts = app.Account.getActivePlatforms();
-		
-		if (accounts.length === 0) {
-			app.Logger.warn("Cron:WeekliesReminder", "No active accounts found");
+		// eslint-disable-next-line object-curly-spacing
+		const accountsList = app.HoyoLab.getAllActiveAccounts({ blacklist: ["honkai"] });
+		if (accountsList.length === 0) {
+			app.Logger.warn("Cron:WeekliesReminder", "No active accounts found to run weeklies check for.");
 			return;
 		}
 
-		for (const account of accounts) {
-			const accountData = app.Account.get(account.id);
+		const activeGameAccounts = app.HoyoLab.getActivePlatform();
+		for (const name of activeGameAccounts) {
+			const platform = app.HoyoLab.get(name);
+			const accounts = accountsList.filter(account => account.platform === name);
 
-			const { weekliesCheck } = accountData.config;
-			if (weekliesCheck === false) {
-				continue;
-			}
+			for (const account of accounts) {
+				const weekliesCheck = account.weekliesCheck;
+				if (weekliesCheck === false) {
+					continue;
+				}
 
-			const notes = await app.HoyoLab.getNotes(account, account.type, {
-				uid: accountData.uid,
-				region: accountData.region
-			});
+				const notes = await platform.notes(account);
+				if (notes.success === false) {
+					continue;
+				}
 
-			const asset = app.Utils.assets(account.type);
-			const region = app.Utils.formattedAccountRegion(accountData.region);
+				const { data } = notes;
+				const weeklies = data.weeklies;
 
-			if (app.Webhook && app.Webhook.active) {
-				const fields = app.Utils.fieldsBuilder({
-					UID: accountData.uid,
-					Username: accountData.username,
-					Region: region
-				});
+				const webhook = app.Platform.get(3);
+				if (webhook) {
+					const embed = {
+						color: data.assets.color,
+						title: "Weeklies Reminder",
+						author: {
+							name: data.assets.author,
+							icon_url: data.assets.logo
+						},
+						description: "Don't forget to complete your weeklies!",
+						fields: [
+							{ name: "UID", value: account.uid, inline: true },
+							{ name: "Username", value: account.nickname, inline: true },
+							{ name: "Region", value: app.Utils.formattedAccountRegion(account.region), inline: true }
+						],
+						timestamp: new Date(),
+						footer: {
+							text: "Weeklies Reminder",
+							icon_url: data.assets.logo
+						}
+					};
 
-				if (account.type === "genshin") {
-					const weeklyCompleted = (notes.weeklies.resinDiscount === 0);
-					if (weeklyCompleted) {
-						continue;
+					if (platform.type === "genshin") {
+						const resin = weeklies.resinDiscount;
+						const limit = weeklies.resinDiscountLimit;
+
+						// This means you've already did the weekly boss using the resin discount.
+						if (resin === 0) {
+							continue;
+						}
+
+						embed.fields.push({
+							name: "Resin Discount",
+							value: `${resin}/${limit} Available`,
+							inline: true
+						});
+					}
+					if (platform.type === "starrail") {
+						const bossCompleted = (weeklies.weeklyBoss === 0);
+						const simCompleted = (weeklies.rogueScore === weeklies.maxScore);
+						if (bossCompleted && simCompleted) {
+							continue;
+						}
+
+						if (!bossCompleted) {
+							embed.fields.push({
+								name: "Weekly Boss",
+								value: `${weeklies.weeklyBoss}/${weeklies.weeklyBossLimit} Completed`,
+								inline: true
+							});
+						}
+						if (!simCompleted) {
+							embed.fields.push({
+								name: "Simulated Universe",
+								value: `${weeklies.rogueScore}/${weeklies.maxScore}`,
+								inline: true
+							});
+						}
 					}
 
-					fields.push({
-						name: "Resin Discount",
-						value: `${notes.weeklies.resinDiscount}/${notes.weeklies.resinDiscountLimit}`,
-						inline: true
+					await webhook.send(embed, {
+						author: data.assets.author,
+						icon: data.assets.logo
 					});
 				}
-				if (account.type === "starrail") {
-					const cocoonCompleted = (notes.weeklies.weeklyCocoonCount === 0);
-					const simCompleted = (notes.weeklies.rogueScore === notes.weeklies.maxRogueScore);
-					if (cocoonCompleted && simCompleted) {
-						continue;
+
+				const telegram = app.Platform.get(2);
+				if (telegram) {
+					const message = [
+						"📅 **Weeklies Reminder**",
+						"",
+						"👤 **Account**",
+						`- **UID**: ${account.uid}`,
+						`- **Username**: ${account.nickname}`,
+						`- **Region**: ${account.region}`,
+						"",
+						"📊 **Progress**"
+					];
+
+					if (platform.type === "genshin") {
+						const resin = weeklies.resinDiscount;
+						const limit = weeklies.resinDiscountLimit;
+
+						if (resin === 0) {
+							continue;
+						}
+
+						message.push(`- **Resin Discount**: ${resin}/${limit} Available`);
+					}
+					if (platform.type === "starrail") {
+						const bossCompleted = (weeklies.weeklyBoss === 0);
+						const simCompleted = (weeklies.rogueScore === weeklies.maxScore);
+						if (bossCompleted && simCompleted) {
+							continue;
+						}
+
+						if (!bossCompleted) {
+							message.push(`- **Weekly Boss**: ${weeklies.weeklyBoss}/${weeklies.weeklyBossLimit} Completed`);
+						}
+						if (!simCompleted) {
+							message.push(`- **Simulated Universe**: ${weeklies.rogueScore}/${weeklies.maxScore}`);
+						}
 					}
 
-					if (!cocoonCompleted) {
-						fields.push({
-							name: "Echo of War",
-							value: `${notes.weeklies.weeklyCocoonCount}/${notes.weeklies.weeklyCocoonLimit}`,
-							inline: true
-						});
-					}
-					if (!simCompleted) {
-						fields.push({
-							name: "Simulated Universe",
-							value: `${notes.weeklies.rogueScore}/${notes.weeklies.maxRogueScore}`,
-							inline: true
-						});
-					}
-				}
-
-				const embed = {
-					color: 0xBB0BB5,
-					title: "Weeklies Reminder",
-					author: {
-						name: asset.author,
-						icon_url: asset.icon
-					},
-					description: `${asset.game} Weeklies Reminder`,
-					fields,
-					timestamp: new Date(),
-					footer: {
-						text: "Weeklies Reminder",
-						icon_url: asset.icon
-					}
-				};
-
-				const messageData = await app.Webhook.handleMessage(embed, { type: "weeklies" });
-				if (messageData) {
-					await app.Webhook.send(messageData);
-				}
-			}
-
-			if (app.Telegram && app.Telegram.active) {
-				const message = [
-					`📢 **Weeklies Reminder, Don't Forget to Do Your Weeklies**`,
-					`👤 **${accountData.username}**`,
-					`🔢 **UID**: ${accountData.uid}`,
-					`🌍 **Region**: ${region}`
-				];
-
-				if (account.type === "genshin") {
-					const weeklyCompleted = (notes.weeklies.resinDiscount === 0);
-					if (weeklyCompleted) {
-						continue;
-					}
-
-					message.push(`🔋 **Resin Discount**: ${notes.weeklies.resinDiscount}/${notes.weeklies.resinDiscountLimit}`);
-				}
-				if (account.type === "starrail") {
-					const cocoonCompleted = (notes.weeklies.weeklyCocoonCount === 0);
-					const simCompleted = (notes.weeklies.rogueScore === notes.weeklies.maxRogueScore);
-					if (cocoonCompleted && simCompleted) {
-						continue;
-					}
-
-					if (!cocoonCompleted) {
-						message.push(`👹 **Echo of War**: ${notes.weeklies.weeklyCocoonCount}/${notes.weeklies.weeklyCocoonLimit}`);
-					}
-					if (!simCompleted) {
-						message.push(`🌌 **Simulated Universe**: ${notes.weeklies.rogueScore}/${notes.weeklies.maxRogueScore}`);
-					}
-				}
-
-				const text = app.Telegram.prepareMessage(message.join("\n"));
-				if (text) {
-					await app.Telegram.send(text);
+					const escapedMessage = app.Utils.escapeCharacters(message.join("\n"));
+					await telegram.send(escapedMessage);
 				}
 			}
 		}

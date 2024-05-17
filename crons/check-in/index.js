@@ -3,68 +3,82 @@ module.exports = {
 	expression: "0 0 0 * * *",
 	description: "Run daily check-in every day at midnight or your specified time",
 	code: (async function checkIn () {
-		const accounts = app.Account.getActivePlatforms();
-		
-		const messages = [];
-		for (const account of accounts) {
-			const checkIn = await app.HoyoLab.checkIn(account, account.type);
-			messages.push(checkIn);
+		const accounts = app.HoyoLab.getAllActiveAccounts();
+		if (accounts.length === 0) {
+			app.Logger.warn("Cron:CheckIn", "No active accounts found for HoyoLab");
+			return;
 		}
 
-		app.Logger.log("Cron:CheckIn", `Ran check-in for ${accounts.length} accounts.`);
+		const messages = [];
+		const activeGameAccounts = app.HoyoLab.getActivePlatform();
+		for (const name	of activeGameAccounts) {
+			const platform = app.HoyoLab.get(name);
+			
+			const execution = await platform.checkAndExecute();
+			if (execution.length === 0) {
+				app.Logger.info("Cron:CheckIn", "All accounts either signed in or failed to sign in");
+				continue;
+			}
+
+			messages.push(...execution);
+		}
 
 		if (messages.length === 0) {
-			return app.Logger.warn("Cron:CheckIn", "No messages to send.");
+			app.Logger.info("Cron:CheckIn", "No accounts to run check-in for");
+			return;
 		}
-		
+
 		for (let i = 0; i < messages.length; i++) {
-			const asset = app.Utils.assets(messages[i].platform);
-			if (app.Webhook && app.Webhook.active) {
+			const message = messages[i];
+			
+			const webhook = app.Platform.get(3);
+			if (webhook) {
 				const embed = {
-					color: 0xBB0BB5,
-					title: asset.game,
+					color: message.assets.color,
+					title: message.assets.game,
 					author: {
-						name: asset.author,
-						icon_url: asset.icon
+						name: message.assets.author,
+						icon_url: message.assets.logo
 					},
 					thumbnail: {
-						url: messages[i].award.icon
+						url: message.award.icon
 					},
 					fields: [
-						{ name: "UID", value: messages[i].uid, inline: true },
-						{ name: "Username", value: messages[i].username, inline: true },
-						{ name: "Region", value: app.Utils.formattedAccountRegion(messages[i].region), inline: true },
-						{ name: "Rank", value: messages[i].rank, inline: true },
-						{ name: "Today's Reward", value: `${messages[i].award.name} x${messages[i].award.count}`, inline: true },
-						{ name: "Total Sign-Ins", value: messages[i].total, inline: true },
-						{ name: "Result", value: messages[i].result, inline: true }
+						{ name: "UID", value: message.uid, inline: true },
+						{ name: "Username", value: message.username, inline: true },
+						{ name: "Region", value: message.region, inline: true },
+						{ name: "Rank", value: message.rank, inline: true },
+						{ name: "Today's Reward", value: `${message.award.name} x${message.award.count}`, inline: true },
+						{ name: "Total Sign-ins", value: message.total, inline: true },
+						{ name: "Result", value: message.result, inline: true }
 					],
 					timestamp: new Date(),
 					footer: {
-						text: `HoyoLab Auto Check-In (${i + 1} / ${messages.length} Executed)`,
-						icon_url: asset.icon
+						text: `HoyoLab Auto Check-In (${i + 1}/${messages.length}) Excecuted`,
+						icon_url: message.assets.logo
 					}
 				};
 
-				const messageData = await app.Webhook.handleMessage(embed, { type: "check-in" });
-				if (messageData) {
-					await app.Webhook.send(messageData);
-				}
+				await webhook.send(embed, {
+					author: message.assets.author,
+					icon: message.assets.logo
+				});
 			}
 
-			if (app.Telegram && app.Telegram.active) {
-				const message = [
-					`🎮 *${asset.game} Daily Check-In*`,
-					`👤 *${messages[i].username}* (${messages[i].uid})`,
-					`🏅 *Rank:* ${messages[i].rank}`,
-					`🌍 *Region:* ${app.Utils.formattedAccountRegion(messages[i].region)}`,
-					`🎁 *Today's Reward:* ${messages[i].award.name} x${messages[i].award.count}`,
-					`📅 *Total Sign-Ins:* ${messages[i].total}`,
-					`📝 *Result:* ${messages[i].result}`
+			const telegram = app.Platform.get(2);
+			if (telegram) {
+				const messageText = [
+					`🎮 **${message.assets.game}** Daily Check-In`,
+					`🆔 **(${message.uid})** ${message.username}`,
+					`🌍 **Region:** ${message.region}`,
+					`🏆 **Rank:** ${message.rank}`,
+					`🎁 **Today's Reward:** ${message.award.name} x${message.award.count}`,
+					`📅 **Total Sign-ins:** ${message.total}`,
+					`📝 **Result:** ${message.result}`
 				].join("\n");
 
-				const escapedMessage = app.Utils.escapeCharacters(message);
-				await app.Telegram.send(escapedMessage);
+				const escapedMessage = app.Utils.escapeCharacters(messageText);
+				await telegram.send(escapedMessage);
 			}
 		}
 	})

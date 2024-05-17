@@ -3,111 +3,77 @@ module.exports = {
 	expression: "0 0 21 * * *",
 	description: "Reminds you to complete your dailies.",
 	code: (async function dailiesReminder () {
-		const accounts = app.Account.getActivePlatforms();
-		
-		if (accounts.length === 0) {
-			app.Logger.warn("Cron:DailiesReminder", "No active accounts found");
+		// eslint-disable-next-line object-curly-spacing
+		const accountsList = app.HoyoLab.getAllActiveAccounts({ blacklist: ["honkai"] });
+		if (accountsList.length === 0) {
+			app.Logger.warn("Cron:DailiesReminder", "No active accounts found to run dailies reminder for.");
 			return;
 		}
 
-		for (const account of accounts) {
-			const accountData = app.Account.get(account.id);
+		const activeGameAccounts = app.HoyoLab.getActivePlatform();
+		for (const name of activeGameAccounts) {
+			const platform = app.HoyoLab.get(name);
+			const accounts = accountsList.filter(account => account.platform === name);
 
-			const { dailiesCheck } = accountData.config;
-			if (dailiesCheck === false) {
-				continue;
-			}
-
-			const notes = await app.HoyoLab.getNotes(account, account.type, {
-				uid: accountData.uid,
-				region: accountData.region
-			});
-
-			const isCompleted = (notes.dailies.finishedTasks === notes.dailies.totalTasks);
-			if (isCompleted) {
-				continue;
-			}
-
-			const asset = app.Utils.assets(account.type);
-			const region = app.Utils.formattedAccountRegion(accountData.region);
-
-			if (app.Webhook && app.Webhook.active) {
-				const fields = app.Utils.fieldsBuilder({
-					UID: accountData.uid,
-					Username: accountData.username,
-					Region: region
-				});
-
-				const delta = app.Utils.formatTime(notes.stamina.recoveryTime);
-				fields.push(
-					{
-						name: "Comission Completed",
-						value: `${notes.dailies.totalTasks}/${notes.dailies.finishedTasks}`,
-						inline: true
-					},
-					{
-						name: "Stamina Recovery",
-						value: `${notes.stamina.currentStamina}/${notes.stamina.maxStamina} (${delta})`,
-						inline: true
-					}
-				);
-
-				const embed = {
-					color: 0xBB0BB5,
-					title: "Dailies Reminder",
-					author: {
-						name: asset.author,
-						icon_url: asset.icon
-					},
-					description: "Don't forget to complete your dailies!",
-					fields,
-					timestamp: new Date(),
-					footer: {
-						text: "Dailies Reminder",
-						icon_url: asset.icon
-					}
-				};
-
-				if (account.type === "genshin") {
-					const discountExhausted = (notes.weeklies.resinDiscount === 0);
-					if (!discountExhausted) {
-						embed.fields.push({
-							name: "Resin Discount",
-							value: `${notes.weeklies.resinDiscount}/${notes.weeklies.resinDiscountLimit}`,
-							inline: true
-						});
-					}
+			for (const account of accounts) {
+				const dailiesCheck = account.dailiesCheck;
+				if (dailiesCheck === false) {
+					continue;
 				}
 
-				const message = app.Webhook.prepareMessage(embed, { type: "dailies" });
-				if (message) {
-					await app.Webhook.send(message);
-				}
-			}
-
-			if (app.Telegram && app.Telegram.active) {
-				const message = [
-					`📢 **Dailies Reminder, Don't Forget to Do Your Dailies**`,
-					`🎮 **Game**: ${asset.game}`,
-					`👤 **${accountData.username}**`,
-					`🔢 **UID**: ${accountData.uid}`,
-					`🌍 **Region**: ${region}`,
-					`📋 **Comission Completed**: ${notes.dailies.totalTasks}/${notes.dailies.finishedTasks}`
-				];
-
-				if (account.type === "genshin") {
-					const discountExhausted = (notes.weeklies.resinDiscount === 0);
-					if (!discountExhausted) {
-						message.push(`🔋 **Resin Discount**: ${notes.weeklies.resinDiscount}/${notes.weeklies.resinDiscountLimit}`);
-					}
+				const notes = await platform.notes(account);
+				if (notes.success === false) {
+					continue;
 				}
 
-				const delta = app.Utils.formatTime(notes.stamina.recoveryTime);
-				message.push(`🕒 **Stamina Recovery**: ${notes.stamina.currentStamina}/${notes.stamina.maxStamina} (${delta})`);
+				const { data } = notes;
+				const current = data.stamina.currentStamina;
+				const max = data.stamina.maxStamina;
+				const delta = app.Utils.formatTime(data.stamina.recoveryTime);
 
-				const text = app.Telegram.prepareMessage(message.join("\n"));
-				if (text) {
-					await app.Telegram.send(text);
+				const webhook = app.Platform.get(3);
+				if (webhook) {
+					const embed = {
+						color: data.assets.color,
+						title: "Dalies Reminder",
+						author: {
+							name: data.assets.author,
+							icon_url: data.assets.logo
+						},
+						description: "Don't forget to complete your dailies!",
+						fields: [
+							{ name: "UID", value: account.uid, inline: true },
+							{ name: "Username", value: account.nickname, inline: true },
+							{ name: "Region", value: app.Utils.formattedAccountRegion(account.region), inline: true },
+							{ name: "Completed Dailies", value: `${data.dailies.task}/${data.dailies.maxTask}`, inline: true },
+							{ name: "Current Stamina", value: `${current}/${max} (${delta})`, inline: true }
+						],
+						timestamp: new Date(),
+						footer: {
+							text: "Dailies Reminder",
+							icon_url: data.assets.logo
+						}
+					};
+
+					await webhook.send(embed, {
+						author: data.assets.author,
+						icon: data.assets.logo
+					});
+				}
+
+				const telegram = app.Platform.get(2);
+				if (telegram) {
+					const messageText = [
+						`📢 Dailies Reminder, Don't Forget to Do Your Dailies!`,
+						`🎮 **Game**: ${data.assets.game}`,
+						`🆔 **UID**: ${account.uid} ${account.username}`,
+						`🌍 **Region**: ${app.Utils.formattedAccountRegion(account.region)}`,
+						`📅 **Completed Dailies**: ${data.dailies.task}/${data.dailies.maxTask}`,
+						`🔋 **Current Stamina**: ${current}/${max} (${delta})`
+					].join("\n");
+
+					const escapedMessage = app.Utils.escapeCharacters(messageText);
+					await telegram.send(escapedMessage);
 				}
 			}
 		}
