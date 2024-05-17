@@ -62,7 +62,7 @@ catch {
 	await Command.importData(commands.definitions);
 
 	const { initCrons } = require("./crons/index.js");
-	// initCrons();
+	initCrons();
 
 	const accountsConfig = config.accounts;
 	if (!accountsConfig || accountsConfig.length === 0) {
