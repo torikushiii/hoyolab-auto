@@ -1,63 +1,72 @@
 module.exports = {
-	genshin: false, // Enable this if you want to enable check-ins or any other genshin related features
-	starrail: false, // Same as above but for Star Rail
-	honkai: false, // for Honkai Impact 3rd
-	webhook: {
-		// Enable this if you want to send notifications to a discord webhook
-		// You can follow this guide to create a webhook: https://github.com/torikushiii/hoyolab-auto/blob/main/setup/DISCORD_WEBHOOK.md
-		enabled: false,
-		token: "https://discord.com/api/webhooks/123456789012345678/ABC-DEF1234ghIkl-zyx57W2v1u123ew11"
-	},
-	telegram: {
-		// Enable this if you want to send notifications to a telegram chat
-		// You can follow this guide to create a bot: https://github.com/torikushiii/hoyolab-auto/blob/main/setup/TELEGRAM.md
-		enabled: false,
-		chatId: 123,
-		token: "123:ABC-DEF1234ghIkl-zyx57W2v1u123ew11",
-		// If this set to true, this will disable Telegram notifications (sounds, vibration, etc.)
-		disableNotification: false
-	},
+	prefix: "-", // Command prefix, if you enable and have Discord bot
+	platforms: [
+		{
+			id: 1,
+			active: true,
+			type: "discord", // This platform is optional, only use this if you have want to access commands via Discord bot
+			botId: "123", // Your Discord bot ID
+			token: "(YOUR_DISCORD_BOT_TOKEN)"
+		},
+		{
+			id: 2,
+			active: false, // Set to true if you want to enable Telegram bot
+			type: "telegram",
+			chatId: 123, // You can follow this guide to create a bot: https://github.com/torikushiii/hoyolab-auto/blob/main/setup/TELEGRAM.md
+			token: "123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11",
+			disableNotification: false // Set to true if you want to disable notification for Telegram bot (sounds, vibration, etc.)
+		},
+		{
+			id: 3,
+			active: true, // Set to true if you want to send notification to Discord webhook
+			type: "webhook",
+			url: "(YOUR_WEBHOOK_URL)" // You can follow this guide to create a webhook: https://github.com/torikushiii/hoyolab-auto/blob/main/setup/DISCORD_WEBHOOK.md
+		}
+	],
 	accounts: [
 		{
+			id: 1,
+			active: false, // Set to true if you want to enable Honkai Impact 3rd
 			type: "honkai",
-			// Same format as genshin and starrail
 			data: []
 		},
 		{
-			type: "genshin", // Account type, either genshin or starrail or any other game that will be supported in the future
+			id: 2,
+			active: true, // Set to true if you want to enable Genshin Impact
+			type: "genshin",
 			data: [
 				{
 					cookie: {
-						// Your "ltoken" and "ltuid" cookie values
+						// Your "ltoken" and "ltuid" cookies value
 						ltoken: "",
 						ltuid: ""
 					},
-					dailiesCheck: false, // Enable this if you want to be reminded to do your dailies
-					weekliesCheck: false, // Enable this if you want to be reminded to do your weeklies
+					dailiesCheck: true, // Enable this if you want to get reminded to do your daily commissions
+					weekliesCheck: true, // Enable this if you want to get reminded to do your weeklies
 					stamina: {
-						// Enable this if you want to be notified if your stamina is above the threshold
-						check: false,
-						// The threshold value
-						threshold: 0,
-						// Set this to true to keep getting notifications until your stamina is above the threshold
-						persistent: false
+						check: false, // Enable this if you want to get notified when your stamina is above the threshold
+						threshold: 150, // Your stamina threshold, only fires notification when your stamina is above this value
+						persistent: false // Set to true if you want to get notified every time your stamina is above the threshold
 					},
 					expedition: {
-						// Enable this if you want to be notified if your expeditions are done
-						check: false,
-						// Set this to true to keep getting notifications until you collect your expeditions
-						persistent: false
+						check: false, // Enable this if you want to get notified when your expedition is done
+						persistent: false // Set to true if you want to get notified every time your expedition is done
 					}
 				}
 			]
 		},
 		{
+			id: 3,
+			active: true, // Set to true if you want to enable Honkai: Star Rail
 			type: "starrail",
 			data: [
+				// If you have same account for both genshin and starrail
+				// You can copy the cookie values from the genshin account
+				// Same goes for any other game that will be supported in the future
+				// Support multi-account for every type of game
+				// Just add another object inside the data array
+				// Account #1
 				{
-					// If you have same account for both genshin and starrail
-					// You can copy the cookie values from the genshin account
-					// Same goes for any other game that will be supported in the future
 					cookie: {
 						ltoken: "",
 						ltuid: ""
@@ -66,7 +75,7 @@ module.exports = {
 					weekliesCheck: true,
 					stamina: {
 						check: true,
-						threshold: 220,
+						threshold: 230,
 						persistent: true
 					},
 					expedition: {
@@ -74,6 +83,7 @@ module.exports = {
 						persistent: false
 					}
 				},
+				// Account #2
 				{
 					cookie: {
 						ltoken: "",
@@ -83,7 +93,7 @@ module.exports = {
 					weekliesCheck: false,
 					stamina: {
 						check: false,
-						threshold: 0,
+						threshold: 150,
 						persistent: false
 					},
 					expedition: {
