@@ -70,28 +70,6 @@ module.exports = class UtilsSingleton {
 		return string.replace(/[_[\]()~`>#+\-=|{}.!]/g, "\\$&");
 	}
 
-	assets (platform) {
-		const assets = {
-			genshin: {
-				game: "Genshin Impact",
-				author: "Paimon",
-				icon: "https://fastcdn.hoyoverse.com/static-resource-v2/2023/11/08/9db76fb146f82c045bc276956f86e047_6878380451593228482.png"
-			},
-			starrail: {
-				game: "Honkai: Star Rail",
-				author: "PomPom",
-				icon: "https://webstatic-sea.hoyolab.com/communityweb/business/starrail_hoyoverse.png"
-			},
-			honkai: {
-				game: "Honkai Impact 3rd",
-				author: "Kiana",
-				icon: "https://fastcdn.hoyoverse.com/static-resource-v2/2024/02/29/3d96534fd7a35a725f7884e6137346d1_3942255444511793944.png"
-			}
-		};
-
-		return assets[platform];
-	}
-
 	generateDS () {
 		const time = (Date.now() / 1000).toFixed(0);
 		const random = this.randomString();
