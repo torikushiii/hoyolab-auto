@@ -19,7 +19,8 @@ module.exports = {
 
 		game = game.toLowerCase();
 
-		const accounts = app.Account.getActivePlatformsByType(game);
+		// eslint-disable-next-line object-curly-spacing
+		const accounts = app.HoyoLab.getAllActiveAccounts({ whitelist: [game] });
 		if (accounts.length === 0) {
 			return {
 				success: false,
@@ -29,17 +30,17 @@ module.exports = {
 
 		const data = [];
 		for (const account of accounts) {
-			const { type, uid, username, region } = account;
-			const notes = await app.HoyoLab.getNotes(account, type, { uid, region });
+			const platform = app.HoyoLab.get(game);
+			const notes = await platform.notes(account);
 			if (notes.success === false) {
 				continue;
 			}
 
 			data.push({
-				uid,
-				region,
-				username,
-				...notes.stamina
+				uid: account.uid,
+				region: account.region,
+				username: account.nickname,
+				...notes.data.stamina
 			});
 		}
 
@@ -76,7 +77,7 @@ module.exports = {
 					`Recovery Time: ${delta}`
 				];
 
-				if (reserveStamina !== null) {
+				if (reserveStamina !== null && typeof reserveStamina !== "undefined") {
 					description.push(`Reserve Stamina: ${reserveStamina}`);
 				}
 
