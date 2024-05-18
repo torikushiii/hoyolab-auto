@@ -9,9 +9,6 @@
    <img src="https://img.shields.io/github/stars/torikushiii/hoyolab-auto">
 </p>
 
-> [!WARNING]
-> This project is still under early development and may does not work as intended. Codebase structure may change anytime without any notice. If you do use it and encounter any issues, please open an issue that would be very helpful.
-
 # HoyoLab Auto
 
 A multi-purpose tool for any supported Hoyoverse games. This tool is designed to help you with your daily check-in, stamina check, expedition check, automatic code-redemption, and more.
