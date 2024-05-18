@@ -1,4 +1,4 @@
-const crypto = require("crypto");
+const crypto = require("node:crypto");
 
 module.exports = class UtilsSingleton {
 	static DS_SALT = "6s25p5ox5y14umn1p61aqyyvbvvl3lrt";

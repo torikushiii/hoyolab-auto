@@ -1,6 +1,6 @@
 const loadCommands = (async function () {
-	const fs = require("fs/promises");
-	const path = require("path");
+	const fs = require("node:fs/promises");
+	const path = require("node:path");
 
 	const commandList = await fs.readdir(__dirname, {
 		withFileTypes: true
