@@ -163,6 +163,8 @@ module.exports = class HoyoLab {
 	
 			return accounts;
 		}
+
+		return HoyoLab.list.flatMap(platform => platform.accounts);
 	}
 
 	static getActivePlatform () {
