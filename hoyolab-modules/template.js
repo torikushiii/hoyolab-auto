@@ -134,16 +134,35 @@ module.exports = class HoyoLab {
 	}
 
 	static getAllActiveAccounts (options = {}) {
-		const { blacklist } = options;
-		const accounts = HoyoLab.list.flatMap(platform => {
-			if (blacklist && blacklist.includes(platform.name)) {
-				return null;
-			}
+		const { whitelist, blacklist } = options;
+		if (whitelist && blacklist) {
+			throw new app.Error({
+				message: "Cannot have both a whitelist and blacklist."
+			});
+		}
 
-			return platform.accounts;
-		}).filter(account => account !== null);
-
-		return accounts;
+		if (whitelist) {
+			const accounts = HoyoLab.list.flatMap(platform => {
+				if (whitelist && !whitelist.includes(platform.name)) {
+					return null;
+				}
+	
+				return platform.accounts;
+			}).filter(account => account !== null);
+	
+			return accounts;
+		}
+		if (blacklist) {
+			const accounts = HoyoLab.list.flatMap(platform => {
+				if (blacklist && blacklist.includes(platform.name)) {
+					return null;
+				}
+	
+				return platform.accounts;
+			}).filter(account => account !== null);
+	
+			return accounts;
+		}
 	}
 
 	static getActivePlatform () {
