@@ -117,10 +117,17 @@ module.exports = class Genshin extends require("./template.js") {
 				nickname: data.nickname,
 				region: data.region,
 				level: data.level,
+				redeemCode: account.redeemCode,
 				dailiesCheck: account.dailiesCheck,
 				weekliesCheck: account.weekliesCheck,
-				stamina: account.stamina,
-				expedition: account.expedition,
+				stamina: {
+					...account.stamina,
+					fired: false
+				},
+				expedition: {
+					...account.expedition,
+					fired: false
+				},
 				cookie: cookieData
 			});
 		}

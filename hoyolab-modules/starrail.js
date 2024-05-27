@@ -117,6 +117,7 @@ module.exports = class StarRail extends require("./template.js") {
 				nickname: data.nickname,
 				region: data.region,
 				level: data.level,
+				redeemCode: account.redeemCode,
 				dailiesCheck: account.dailiesCheck,
 				weekliesCheck: account.weekliesCheck,
 				stamina: {
