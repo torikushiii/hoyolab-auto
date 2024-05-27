@@ -55,8 +55,12 @@ module.exports = class HoyoLab {
 				});
 			}
 
-			const { dailiesCheck, weekliesCheck } = account;
-			if (typeof dailiesCheck !== "boolean" || typeof weekliesCheck !== "boolean") {
+			if (this.#name === "honkai") {
+				break;
+			}
+
+			const { redeemCode, dailiesCheck, weekliesCheck } = account;
+			if (typeof dailiesCheck !== "boolean" || typeof weekliesCheck !== "boolean" || typeof redeemCode !== "boolean") {
 				throw new app.Error({
 					message: "Invalid check provided for HoyoLab expected boolean.",
 					args: {
@@ -131,6 +135,14 @@ module.exports = class HoyoLab {
 		}
 
 		this.accounts[index] = account;
+	}
+
+	static supportedGames () {
+		return [
+			"honkai",
+			"genshin",
+			"starrail"
+		];
 	}
 
 	static getAllActiveAccounts (options = {}) {
