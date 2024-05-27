@@ -28,7 +28,14 @@ module.exports = {
 			id: 1,
 			active: false, // Set to true if you want to enable Honkai Impact 3rd
 			type: "honkai",
-			data: []
+			data: [
+				{
+					cookie: {
+						ltoken: "",
+						ltuid: ""
+					}
+				}
+			]
 		},
 		{
 			id: 2,
@@ -41,6 +48,11 @@ module.exports = {
 						ltoken: "",
 						ltuid: ""
 					},
+					// Enable this if you want to automatically redeem codes
+					// Please note that if you have multiple accounts in the different regions
+					// the code will be redeemed but you won't get the reward
+					// so please be careful when enabling this
+					redeemCode: false,
 					dailiesCheck: true, // Enable this if you want to get reminded to do your daily commissions
 					weekliesCheck: true, // Enable this if you want to get reminded to do your weeklies
 					stamina: {
@@ -71,6 +83,7 @@ module.exports = {
 						ltoken: "",
 						ltuid: ""
 					},
+					redeemCode: false,
 					dailiesCheck: true,
 					weekliesCheck: true,
 					stamina: {
