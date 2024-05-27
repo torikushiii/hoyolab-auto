@@ -3,14 +3,14 @@ module.exports = {
 	description: "Check your specified game stamina",
 	params: null,
 	run: (async function stamina (context, game) {
-		const validGames = ["honkai", "genshin", "starrail"];
+		const validGames = app.HoyoLab.supportedGames();
 		if (!game) {
 			return {
 				success: false,
 				reply: `Please specify a game. Valid games are: ${validGames.join(", ")}`
 			};
 		}
-		else if (!validGames.includes(game.toLowerCase())) {
+		if (!validGames.includes(game.toLowerCase())) {
 			return {
 				success: false,
 				reply: `Invalid game. Valid games are: ${validGames.join(", ")}`
