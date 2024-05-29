@@ -51,7 +51,7 @@ module.exports = {
 					// Enable this if you want to automatically redeem codes
 					// Please note that if you have multiple accounts in the different regions
 					// the code will be redeemed but you won't get the reward
-					// so please be careful when enabling this
+					// so please be careful when enabling this, and only enable it on the account that you want to redeem the code
 					redeemCode: false,
 					dailiesCheck: true, // Enable this if you want to get reminded to do your daily commissions
 					weekliesCheck: true, // Enable this if you want to get reminded to do your weeklies
