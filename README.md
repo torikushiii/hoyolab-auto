@@ -43,7 +43,10 @@ A multi-purpose tool for any supported Hoyoverse games. This tool is designed to
 4. Follow the instructions in the `default.config.js` or `config.js` file.
 
 # Usage
-1. Go to the Daily Check-In page [here](https://act.hoyolab.com/bbs/event/signin/hkrpg/index.html?act_id=e202303301540311).
+1. Go to the Daily Check-In page of the game you want to use.
+    - [Genshin Impact](https://webstatic-sea.mihoyo.com/ys/event/signin-sea/index.html?act_id=e202102251931481)
+    - [Honkai Impact 3rd](https://act.hoyolab.com/bbs/event/signin-bh3/index.html?act_id=e202110291205111)
+    - [Honkai: Star Rail](https://act.hoyolab.com/bbs/event/signin/hkrpg/index.html?act_id=e202303301540311)
 2. Log in with your Hoyoverse account.
 3. Open the browser console (F12).
 4. Click on the "Application" tab.
