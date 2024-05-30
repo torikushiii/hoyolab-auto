@@ -166,6 +166,8 @@ module.exports = class HonkaiImpact extends require("./template.js") {
 				continue;
 			}
 
+			app.Logger.info("HonkaiImpact:CheckIn", `(${account.uid}) ${account.nickname} Today's Reward: ${awardObject.name} x${awardObject.count}`);
+
 			success.push({
 				uid: account.uid,
 				platform: this.name,

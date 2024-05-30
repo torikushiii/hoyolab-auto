@@ -178,6 +178,8 @@ module.exports = class StarRail extends require("./template.js") {
 				continue;
 			}
 
+			app.Logger.info("StarRail:CheckIn", `(${account.uid}) ${account.nickname} Today's Reward: ${awardObject.name} x${awardObject.count}`);
+
 			success.push({
 				uid: account.uid,
 				platform: this.name,
