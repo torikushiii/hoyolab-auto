@@ -58,8 +58,8 @@ module.exports = class HoyoLab {
 		}
 
 		for (const account of this.#data) {
-			const { ltuid, ltoken } = account.cookie;
-			if (!ltuid || !ltoken) {
+			const { token, mid, ltuid } = account.cookie;
+			if (!token || !mid || !ltuid) {
 				throw new app.Error({
 					message: "Invalid cookie provided for HoyoLab.",
 					args: {
