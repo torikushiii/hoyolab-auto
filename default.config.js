@@ -31,8 +31,11 @@ module.exports = {
 			data: [
 				{
 					cookie: {
-						ltoken: "",
-						ltuid: ""
+						// If there's and extra space at the end of the cookie value, please remove it
+						// e.g. "token: "testxdxd123    " -> "token: "testxdxd123"
+						token: "", // cookie_token_v2
+						mid: "", // account_mid_v2
+						ltuid: "" // ltuid_v2
 					}
 				}
 			]
@@ -44,9 +47,11 @@ module.exports = {
 			data: [
 				{
 					cookie: {
-						// Your "ltoken" and "ltuid" cookies value
-						ltoken: "",
-						ltuid: ""
+						// If there's and extra space at the end of the cookie value, please remove it
+						// e.g. "token: "testxdxd123    " -> "token: "testxdxd123"
+						token: "", // cookie_token_v2
+						mid: "", // account_mid_v2
+						ltuid: "" // ltuid_v2
 					},
 					// Enable this if you want to automatically redeem codes
 					// Please note that if you have multiple accounts in the different regions
@@ -80,8 +85,11 @@ module.exports = {
 				// Account #1
 				{
 					cookie: {
-						ltoken: "",
-						ltuid: ""
+						// If there's and extra space at the end of the cookie value, please remove it
+						// e.g. "token: "testxdxd123    " -> "token: "testxdxd123"
+						token: "", // cookie_token_v2
+						mid: "", // account_mid_v2
+						ltuid: "" // ltuid_v2
 					},
 					redeemCode: false,
 					dailiesCheck: true,
@@ -97,10 +105,12 @@ module.exports = {
 					}
 				},
 				// Account #2
+				// Delete this if you only have one account
 				{
 					cookie: {
-						ltoken: "",
-						ltuid: ""
+						token: "", // cookie_token_v2
+						mid: "", // account_mid_v2
+						ltuid: "" // ltuid_v2
 					},
 					dailiesCheck: false,
 					weekliesCheck: false,
