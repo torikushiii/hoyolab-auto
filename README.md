@@ -43,18 +43,19 @@ A multi-purpose tool for any supported Hoyoverse games. This tool is designed to
 4. Follow the instructions in the `default.config.js` or `config.js` file.
 
 # Usage
-1. Go to the Daily Check-In page of the game you want to use.
-    - [Genshin Impact](https://webstatic-sea.mihoyo.com/ys/event/signin-sea/index.html?act_id=e202102251931481)
-    - [Honkai Impact 3rd](https://act.hoyolab.com/bbs/event/signin-bh3/index.html?act_id=e202110291205111)
-    - [Honkai: Star Rail](https://act.hoyolab.com/bbs/event/signin/hkrpg/index.html?act_id=e202303301540311)
+1. Go to your HoyoLab profile [here](https://www.hoyolab.com/accountCenter/postList).
 2. Log in with your Hoyoverse account.
 3. Open the browser console (F12).
-4. Click on the "Application" tab.
-5. Click on "Cookies" > "https://act.hoyolab.com".
-6. Type "lt" in the "Filter" bar.
-   ![image](https://github.com/torikushiii/hoyolab-auto/assets/21153445/38adf23a-161d-47ef-b11e-7e4fdc8e372c)
-6. Copy the required ltoken_v2 and ltuid_v2 and put it in your newly created `config.js` or `default.config.js` file.
-8. Run `index.js` with `npm start` to run the application. (You must run `npm start` specifically or you will not receive any console logs)
+4. Click on the "Network" tab.
+5. Refresh the page.
+6. Search for `getGameRecordCard` and click on it.
+    ![](https://github.com/torikushiii/hoyolab-auto/assets/21153445/e0c37bb0-e1ff-4fda-8584-5b51e9b89c6c)
+7. Click on the "Cookies" tab.
+8. Look for `account_mid_v2`, `cookie_token_v2`, and `ltuid_v2`.
+    ![](https://github.com/torikushiii/hoyolab-auto/assets/21153445/eaa1c456-0fce-4143-90c4-b7dfe4d146c0)
+9. Double click the value of each cookie and copy it.
+10. Paste the values in your `default.config.js` or `config.js` file.
+11. To run the script you must use `npm start` or you will not recieve any console logs (for windows users, you can use either `npm start` or `set DEBUG=* & node index.js`)
 
 # Notifications
 For Discord notifications or Telegram setup, refer to this folder: [setup](https://github.com/torikushiii/hoyolab-auto/tree/main/setup)
