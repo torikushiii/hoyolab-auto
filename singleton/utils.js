@@ -55,9 +55,11 @@ module.exports = class UtilsSingleton {
 			case "os_asia":
 			case "prod_official_asia":
 				return "SEA";
+			case "eur01":
 			case "os_euro":
 			case "prod_official_eur":
 				return "EU";
+			case "usa01":
 			case "os_usa":
 			case "prod_official_usa":
 				return "NA";
