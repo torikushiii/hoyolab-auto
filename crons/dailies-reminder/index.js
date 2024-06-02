@@ -66,7 +66,7 @@ module.exports = {
 					const messageText = [
 						`📢 Dailies Reminder, Don't Forget to Do Your Dailies!`,
 						`🎮 **Game**: ${data.assets.game}`,
-						`🆔 **UID**: ${account.uid} ${account.username}`,
+						`🆔 **UID**: ${account.uid} ${account.nickname}`,
 						`🌍 **Region**: ${app.Utils.formattedAccountRegion(account.region)}`,
 						`📅 **Completed Dailies**: ${data.dailies.task}/${data.dailies.maxTask}`,
 						`🔋 **Current Stamina**: ${current}/${max} (${delta})`
