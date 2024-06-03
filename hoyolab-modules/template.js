@@ -14,6 +14,16 @@ const RequestError = [
 	{ retcode: -2016, message: "Redemption is in cooldown" }
 ];
 
+/**
+ * This error indicates that a Geetest was triggered drung the request.
+ */
+const CatpchaCodes = [
+	10035,
+	5003,
+	10041,
+	1034
+];
+
 module.exports = class HoyoLab {
 	#id;
 	#name;
@@ -134,6 +144,17 @@ module.exports = class HoyoLab {
 	get config () { return this.#config; }
 	get type () { return this.#name; }
 	get RequestError () { return RequestError; }
+	get CatpchaCodes () { return CatpchaCodes; }
+
+	get fullName () {
+		const nameMap = {
+			honkai: "HonkaiImpact",
+			genshin: "GenshinImpact",
+			starrail: "StarRail"
+		};
+
+		return nameMap[this.name] || this.name;
+	}
 
 	destroy () {}
 
