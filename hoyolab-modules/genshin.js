@@ -131,7 +131,7 @@ module.exports = class Genshin extends require("./template.js") {
 			});
 		}
 
-		app.Logger.info("Genshin", `Logged into ${this.accounts.length} account(s)`);
+		app.Logger.info(this.fullName, `Logged into ${this.accounts.length} account(s)`);
 	}
 
 	async checkAndExecute () {
@@ -161,7 +161,7 @@ module.exports = class Genshin extends require("./template.js") {
 			};
 
 			if (data.isSigned) {
-				app.Logger.info("Genshin:CheckIn", `${account.nickname} already signed in today`);
+				app.Logger.info(`${this.fullName}:CheckIn`, `${account.nickname} already signed in today`);
 				continue;
 			}
 
@@ -177,7 +177,7 @@ module.exports = class Genshin extends require("./template.js") {
 				continue;
 			}
 
-			app.Logger.info("Genshin:CheckIn", `(${account.uid}) ${account.nickname} Today's Reward: ${awardObject.name} x${awardObject.count}`);
+			app.Logger.info(`${this.fullName}:CheckIn`, `(${account.uid}) ${account.nickname} Today's Reward: ${awardObject.name} x${awardObject.count}`);
 
 			success.push({
 				uid: account.uid,
@@ -257,7 +257,7 @@ module.exports = class Genshin extends require("./template.js") {
 		});
 
 		if (res.statusCode !== 200) {
-			app.Logger.error(`${this.name}`, {
+			app.Logger.error(this.fullName, {
 				message: "Failed to get sign info",
 				args: {
 					status: res.statusCode,
@@ -270,7 +270,7 @@ module.exports = class Genshin extends require("./template.js") {
 			};
 		}
 		if (res.body.retcode !== 0) {
-			app.Logger.error(`${this.name}`, {
+			app.Logger.error(this.fullName, {
 				message: "Info returned non-zero retcode",
 				args: {
 					status: res.body.retcode,
@@ -307,7 +307,7 @@ module.exports = class Genshin extends require("./template.js") {
 		});
 
 		if (res.statusCode !== 200) {
-			app.Logger.error(`${this.name}`, {
+			app.Logger.error(this.fullName, {
 				message: "Failed to get awards data",
 				args: {
 					status: res.statusCode,
@@ -320,7 +320,7 @@ module.exports = class Genshin extends require("./template.js") {
 			};
 		}
 		if (res.body.retcode !== 0) {
-			app.Logger.error(`${this.name}`, {
+			app.Logger.error(this.fullName, {
 				message: "Failed to get awards data",
 				args: {
 					status: res.body.retcode,
@@ -369,7 +369,7 @@ module.exports = class Genshin extends require("./template.js") {
 		});
 
 		if (res.statusCode !== 200) {
-			app.Logger.error("Genshin:Notes", {
+			app.Logger.error(`${this.fullName}:Notes`, {
 				message: "Failed to fetch data from hoyolab",
 				args: {
 					platform: this.name,
@@ -382,7 +382,7 @@ module.exports = class Genshin extends require("./template.js") {
 			return { success: false };
 		}
 		if (res.body.retcode !== 0) {
-			app.Logger.error("Genshin:Notes", {
+			app.Logger.error(`${this.fullName}:Notes`, {
 				message: "HoyoLab returned non-zero retcode",
 				args: {
 					platform: this.name,

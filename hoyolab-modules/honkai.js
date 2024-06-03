@@ -119,7 +119,7 @@ module.exports = class HonkaiImpact extends require("./template.js") {
 			});
 		}
 
-		app.Logger.info("HonkaiImpact", `Logged into ${this.accounts.length} account(s)`);
+		app.Logger.info(this.fullName, `Logged into ${this.accounts.length} account(s)`);
 	}
 
 	async checkAndExecute () {
@@ -149,7 +149,7 @@ module.exports = class HonkaiImpact extends require("./template.js") {
 			};
 
 			if (data.isSigned) {
-				app.Logger.info("HonkaiImpact:CheckIn", `${account.nickname} already signed in today`);
+				app.Logger.info(`${this.fullName}:CheckIn`, `${account.nickname} already signed in today`);
 				continue;
 			}
 
@@ -165,7 +165,7 @@ module.exports = class HonkaiImpact extends require("./template.js") {
 				continue;
 			}
 
-			app.Logger.info("HonkaiImpact:CheckIn", `(${account.uid}) ${account.nickname} Today's Reward: ${awardObject.name} x${awardObject.count}`);
+			app.Logger.info(`${this.fullName}:CheckIn`, `(${account.uid}) ${account.nickname} Today's Reward: ${awardObject.name} x${awardObject.count}`);
 
 			success.push({
 				uid: account.uid,
@@ -201,7 +201,7 @@ module.exports = class HonkaiImpact extends require("./template.js") {
 		});
 
 		if (res.statusCode !== 200) {
-			app.Logger.error(`${this.name}`, {
+			app.Logger.error(this.fullName, {
 				message: "Failed to sign in",
 				args: {
 					status: res.statusCode,
@@ -214,7 +214,7 @@ module.exports = class HonkaiImpact extends require("./template.js") {
 			};
 		}
 		if (res.body.retcode !== 0) {
-			app.Logger.error(`${this.name}`, {
+			app.Logger.error(this.fullName, {
 				message: "Failed to sign in",
 				args: {
 					status: res.body.retcode,
@@ -245,7 +245,7 @@ module.exports = class HonkaiImpact extends require("./template.js") {
 		});
 
 		if (res.statusCode !== 200) {
-			app.Logger.error(`${this.name}`, {
+			app.Logger.error(this.fullName, {
 				message: "Failed to get sign info",
 				args: {
 					status: res.statusCode,
@@ -258,7 +258,7 @@ module.exports = class HonkaiImpact extends require("./template.js") {
 			};
 		}
 		if (res.body.retcode !== 0) {
-			app.Logger.error(`${this.name}`, {
+			app.Logger.error(this.fullName, {
 				message: "Info returned non-zero retcode",
 				args: {
 					status: res.body.retcode,
@@ -295,7 +295,7 @@ module.exports = class HonkaiImpact extends require("./template.js") {
 		});
 
 		if (res.statusCode !== 200) {
-			app.Logger.error(`${this.name}`, {
+			app.Logger.error(this.fullName, {
 				message: "Failed to get awards data",
 				args: {
 					status: res.statusCode,
@@ -308,7 +308,7 @@ module.exports = class HonkaiImpact extends require("./template.js") {
 			};
 		}
 		if (res.body.retcode !== 0) {
-			app.Logger.error(`${this.name}`, {
+			app.Logger.error(this.fullName, {
 				message: "Failed to get awards data",
 				args: {
 					status: res.body.retcode,
