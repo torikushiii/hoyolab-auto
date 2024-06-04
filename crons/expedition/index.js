@@ -75,7 +75,7 @@ module.exports = {
 					const messageText = [
 						`📢 Expedition Reminder, All Expeditions are Completed!`,
 						`🎮 **Game**: ${data.assets.game}`,
-						`🆔 **UID**: ${account.uid} ${account.username}`
+						`🆔 **UID**: ${account.uid} ${account.nickname}`
 					].join("\n");
 
 					const escapedMessage = app.Utils.escapeCharacters(messageText);
