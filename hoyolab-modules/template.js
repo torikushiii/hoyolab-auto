@@ -1,4 +1,4 @@
-const GENSHIN_MAX_STAMINA = 160;
+const GENSHIN_MAX_STAMINA = 200;
 const STARRAIL_MAX_STAMINA = 240;
 
 const RequestError = [
