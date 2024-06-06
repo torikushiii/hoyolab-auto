@@ -252,26 +252,13 @@ module.exports = class HoyoLab {
 	}
 
 	static create (type, config) {
-		let HoyoLabInstance;
-		switch (type) {
-			case "honkai":
-				HoyoLabInstance = require("./honkai.js");
-				break;
-			case "genshin":
-				HoyoLabInstance = require("./genshin.js");
-				break;
-			case "starrail":
-				HoyoLabInstance = require("./starrail.js");
-				break;
-			default:
-				throw new app.Error({
-					message: "Invalid type provided.",
-					args: {
-						type
-					}
-				});
+		try {
+			const InstancePlatform = require(`./${type}.js`);
+			return new InstancePlatform(config);
 		}
-
-		return new HoyoLabInstance(config);
+		catch (e) {
+			console.log(`Failed to create platform ${type}.`);
+			console.error(e);
+		}
 	}
 };
