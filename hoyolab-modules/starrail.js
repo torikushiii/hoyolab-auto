@@ -10,7 +10,8 @@ const DEFAULT_CONSTANTS = {
 		info: "https://sg-public-api.hoyolab.com/event/luna/os/info",
 		home: "https://sg-public-api.hoyolab.com/event/luna/os/home",
 		sign: "https://sg-public-api.hoyolab.com/event/luna/os/sign",
-		notes: "https://bbs-api-os.hoyolab.com/game_record/hkrpg/api/note"
+		notes: "https://bbs-api-os.hoyolab.com/game_record/hkrpg/api/note",
+		redemption: "https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey"
 	}
 };
 
@@ -347,6 +348,61 @@ module.exports = class StarRail extends require("./template.js") {
 		return {
 			success: true,
 			data: data.awards
+		};
+	}
+
+	async redeemCode (accountData, code) {
+		const res = await app.Got({
+			url: this.config.url.redemption,
+			responseType: "json",
+			throwHttpErrors: false,
+			searchParams: {
+				cdkey: code,
+				game_biz: "hkrpg_global",
+				lang: "en",
+				region: accountData.region,
+				t: Date.now(),
+				uid: accountData.uid
+			},
+			headers: {
+				Cookie: accountData.cookie
+			}
+		});
+
+		if (res.statusCode !== 200) {
+			app.Logger.error(`${this.fullName}:RedeemCode`, {
+				message: "Request threw non-200 status code",
+				args: {
+					code,
+					status: res.statusCode,
+					body: res.body
+				}
+			});
+
+			return {
+				success: false
+			};
+		}
+		if (res.body.retcode !== 0) {
+			app.Logger.error(`${this.fullName}:RedeemCode`, {
+				message: "Failed to redeem code",
+				args: {
+					code,
+					status: res.body.retcode,
+					body: res.body
+				}
+			});
+
+			return {
+				success: false,
+				message: res.body.message
+			};
+		}
+
+		app.Logger.info(`${this.fullName}:RedeemCode`, `(${accountData.uid}) ${accountData.nickname} redeemed code: ${code}`);
+
+		return {
+			success: true
 		};
 	}
 
