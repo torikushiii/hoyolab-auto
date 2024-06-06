@@ -4,7 +4,7 @@ module.exports = {
 	description: "Reminds you to complete your weeklies.",
 	code: (async function weekliesReminder () {
 		// eslint-disable-next-line object-curly-spacing
-		const accountsList = app.HoyoLab.getAllActiveAccounts({ blacklist: ["honkai"] });
+		const accountsList = app.HoyoLab.getActiveAccounts({ blacklist: ["honkai"] });
 		if (accountsList.length === 0) {
 			app.Logger.warn("Cron:WeekliesReminder", "No active accounts found to run weeklies check for.");
 			return;

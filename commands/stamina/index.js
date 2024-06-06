@@ -20,7 +20,7 @@ module.exports = {
 		game = game.toLowerCase();
 
 		// eslint-disable-next-line object-curly-spacing
-		const accounts = app.HoyoLab.getAllActiveAccounts({ whitelist: [game] });
+		const accounts = app.HoyoLab.getActiveAccounts({ whitelist: [game] });
 		if (accounts.length === 0) {
 			return {
 				success: false,
