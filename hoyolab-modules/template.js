@@ -172,20 +172,99 @@ module.exports = class HoyoLab {
 		this.accounts[index] = account;
 	}
 
-	static supportedGames () {
-		return [
-			"honkai",
-			"genshin",
-			"starrail"
-		];
-	}
-
-	static getAllActiveAccounts (options = {}) {
+	static supportedGames (options = {}) {
 		const { whitelist, blacklist } = options;
 		if (whitelist && blacklist) {
 			throw new app.Error({
 				message: "Cannot have both a whitelist and blacklist."
 			});
+		}
+
+		if (whitelist) {
+			return HoyoLab.list.flatMap(platform => {
+				if (whitelist && !whitelist.includes(platform.name)) {
+					return null;
+				}
+
+				return platform.name;
+			}).filter(game => game !== null);
+		}
+		if (blacklist) {
+			return HoyoLab.list.flatMap(platform => {
+				if (blacklist && blacklist.includes(platform.name)) {
+					return null;
+				}
+
+				return platform.name;
+			}).filter(game => game !== null);
+		}
+
+		return HoyoLab.list.map(platform => platform.name);
+	}
+
+	static async redeemCode (game, codes) {
+		const accountData = HoyoLab.getActiveAccounts({ whitelist: game });
+		if (accountData.length === 0) {
+			return {
+				success: false,
+				reply: "No active accounts found for this type of game."
+			};
+		}
+
+		if (!Array.isArray(codes)) {
+			throw new app.Error({
+				message: "Invalid codes provided for redeemCode expected array.",
+				args: {
+					codes,
+					type: typeof codes
+				}
+			});
+		}
+
+		const success = [];
+		const failed = [];
+
+		const platform = HoyoLab.get(game);
+		for (const account of accountData) {
+			if (account.redeemCode === false) {
+				continue;
+			}
+
+			for (const code of codes) {
+				const res = await platform.redeemCode(account, code);
+				if (res.success) {
+					success.push({ uid: account.uid });
+				}
+				else {
+					failed.push({
+						uid: account.uid,
+						reason: res.message
+					});
+				}
+			}
+		}
+
+		return {
+			success,
+			failed
+		};
+	}
+
+	static getActiveAccounts (options = {}) {
+		const { whitelist, blacklist } = options;
+		if (whitelist && blacklist) {
+			throw new app.Error({
+				message: "Cannot have both a whitelist and blacklist."
+			});
+		}
+
+		if (!Array.isArray(options.whitelist)) {
+			const accounts = HoyoLab.list.flatMap(platform => platform.accounts);
+			return accounts;
+		}
+		if (!Array.isArray(options.blacklist)) {
+			const accounts = HoyoLab.list.flatMap(platform => platform.accounts);
+			return accounts;
 		}
 
 		if (whitelist) {
