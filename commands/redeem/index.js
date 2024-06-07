@@ -33,24 +33,15 @@ module.exports = {
 			};
 		}
 
-		if (res.success.length === 0) {
-			const message = [
-				`\`\`\`Failed Code Redemption(s):\n${res.failed.map(i => `${i.uid} - ${i.reason}`).join("\n")}\`\`\``
-			].join("\n");
-
-			return {
-				success: false,
-				reply: `No codes were successfully redeemed.\n${message}`
-			};
+		let reply = "";
+		if (res.success.length > 0) {
+			reply += "**Successfully redeemed codes:**\n";
+			reply += `\`\`\`\n${res.success.map(i => `${i.uid} - ${i.reason}`).join("\n")}\`\`\``;
 		}
 
-		let reply = "Successfully redeemed codes";
 		if (res.failed.length > 0) {
-			const message = [
-				`\`\`\`Failed Code Redemption(s):\n${res.failed.map(i => `${i.uid} - ${i.reason}`).join("\n")}\`\`\``
-			].join("\n");
-
-			reply = `${reply}, with ${res.failed.length} failed redemption(s).\n${message}`;
+			reply += "\n**Failed Code Redemption(s):**\n";
+			reply += `\`\`\`\n${res.failed.map(i => `${i.uid} - ${i.reason}`).join("\n")}\`\`\``;
 		}
 
 		return {
