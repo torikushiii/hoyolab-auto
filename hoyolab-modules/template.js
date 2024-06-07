@@ -203,7 +203,8 @@ module.exports = class HoyoLab {
 	}
 
 	static async redeemCode (game, codes) {
-		const accountData = HoyoLab.getActiveAccounts({ whitelist: game });
+		// eslint-disable-next-line object-curly-spacing
+		const accountData = HoyoLab.getActiveAccounts({ whitelist: [game] });
 		if (accountData.length === 0) {
 			return {
 				success: false,
@@ -256,25 +257,6 @@ module.exports = class HoyoLab {
 			throw new app.Error({
 				message: "Cannot have both a whitelist and blacklist."
 			});
-		}
-
-		if (!Array.isArray(options.whitelist)) {
-			return HoyoLab.list.flatMap(platform => {
-				if (whitelist && !whitelist.includes(platform.name)) {
-					return null;
-				}
-
-				return platform.accounts;
-			}).filter(account => account !== null);
-		}
-		if (!Array.isArray(options.blacklist)) {
-			return HoyoLab.list.flatMap(platform => {
-				if (blacklist && blacklist.includes(platform.name)) {
-					return null;
-				}
-
-				return platform.accounts;
-			}).filter(account => account !== null);
 		}
 
 		if (whitelist) {
