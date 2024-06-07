@@ -259,12 +259,22 @@ module.exports = class HoyoLab {
 		}
 
 		if (!Array.isArray(options.whitelist)) {
-			const accounts = HoyoLab.list.flatMap(platform => platform.accounts);
-			return accounts;
+			return HoyoLab.list.flatMap(platform => {
+				if (whitelist && !whitelist.includes(platform.name)) {
+					return null;
+				}
+
+				return platform.accounts;
+			}).filter(account => account !== null);
 		}
 		if (!Array.isArray(options.blacklist)) {
-			const accounts = HoyoLab.list.flatMap(platform => platform.accounts);
-			return accounts;
+			return HoyoLab.list.flatMap(platform => {
+				if (blacklist && blacklist.includes(platform.name)) {
+					return null;
+				}
+
+				return platform.accounts;
+			}).filter(account => account !== null);
 		}
 
 		if (whitelist) {
