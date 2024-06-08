@@ -51,7 +51,10 @@ module.exports = {
 						// e.g. "token: "testxdxd123    " -> "token: "testxdxd123"
 						token: "", // cookie_token_v2
 						mid: "", // account_mid_v2
-						ltuid: "" // ltuid_v2
+						ltuid: "", // ltuid_v2
+						// Not required, but you can add it to hopefully avoid captcha if you have multiple accounts
+						deviceId: "",
+						deviceFp: ""
 					},
 					// Enable this if you want to automatically redeem codes
 					// Please note that if you have multiple accounts in the different regions
@@ -89,7 +92,10 @@ module.exports = {
 						// e.g. "token: "testxdxd123    " -> "token: "testxdxd123"
 						token: "", // cookie_token_v2
 						mid: "", // account_mid_v2
-						ltuid: "" // ltuid_v2
+						ltuid: "", // ltuid_v2
+						// Not required, but you can add it to hopefully avoid captcha if you have multiple accounts
+						deviceId: "",
+						deviceFp: ""
 					},
 					redeemCode: false,
 					dailiesCheck: true,
@@ -110,7 +116,9 @@ module.exports = {
 					cookie: {
 						token: "", // cookie_token_v2
 						mid: "", // account_mid_v2
-						ltuid: "" // ltuid_v2
+						ltuid: "", // ltuid_v2
+						deviceId: "",
+						deviceFp: ""
 					},
 					dailiesCheck: false,
 					weekliesCheck: false,

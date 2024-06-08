@@ -128,10 +128,13 @@ module.exports = class StarRail extends require("./template.js") {
 					...account.expedition,
 					fired: false
 				},
-				cookie: cookieData
+				cookie: cookieData,
+				deviceId: account.cookie.deviceId ?? "",
+				deviceFp: account.cookie.deviceFp ?? ""
 			});
 		}
 
+		console.log(this.accounts);
 		app.Logger.info(this.fullName, `Logged into ${this.accounts.length} account(s)`);
 	}
 
@@ -407,6 +410,9 @@ module.exports = class StarRail extends require("./template.js") {
 	}
 
 	async notes (accountData) {
+		const timeout = Math.random() * 2 + 5;
+		await new Promise(resolve => setTimeout(resolve, timeout * 1000));
+
 		const res = await app.Got({
 			url: this.config.url.notes,
 			responseType: "json",
@@ -416,9 +422,8 @@ module.exports = class StarRail extends require("./template.js") {
 				role_id: accountData.uid
 			},
 			headers: {
-				"x-rpc-app_version": "1.5.0",
-				"x-rpc-client_type": 5,
-				"x-rpc-language": "en-us",
+				"x-rpc-device_id": accountData.deviceId,
+				"x-rpc-device_fp": accountData.deviceFp,
 				Cookie: accountData.cookie,
 				DS: app.Utils.generateDS()
 			}
