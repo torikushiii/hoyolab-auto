@@ -134,7 +134,6 @@ module.exports = class StarRail extends require("./template.js") {
 			});
 		}
 
-		console.log(this.accounts);
 		app.Logger.info(this.fullName, `Logged into ${this.accounts.length} account(s)`);
 	}
 
