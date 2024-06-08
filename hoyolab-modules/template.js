@@ -27,7 +27,7 @@ const CatpchaCodes = [
 module.exports = class HoyoLab {
 	#id;
 	#name;
-	#data;
+	#data = [];
 	#gameId;
 	#config;
 
@@ -50,24 +50,24 @@ module.exports = class HoyoLab {
 			});
 		}
 
-		this.#data = config.data;
-		if (!Array.isArray(this.#data)) {
+		const accounts = config.data;
+		if (!Array.isArray(accounts)) {
 			throw new app.Error({
 				message: "Invalid data provided for HoyoLab must be an array.",
 				args: {
-					data: this.#data,
-					type: typeof this.#data
+					data: accounts,
+					type: typeof accounts
 				}
 			});
 		}
 
-		if (this.#data.length === 0) {
+		if (accounts === 0) {
 			throw new app.Error({
 				message: `No accounts provided for ${name}, please provide at least one account or disable the platform.`
 			});
 		}
 
-		for (const account of this.#data) {
+		for (const account of accounts) {
 			const { token, mid, ltuid } = account.cookie;
 			if (!token || !mid || !ltuid) {
 				throw new app.Error({
@@ -79,6 +79,13 @@ module.exports = class HoyoLab {
 			}
 
 			if (this.#name === "honkai") {
+				this.#data.push({
+					cookie: {
+						token: token.trim(),
+						mid: mid.trim(),
+						ltuid: ltuid.trim()
+					}
+				});
 				break;
 			}
 
@@ -129,6 +136,19 @@ module.exports = class HoyoLab {
 					}
 				});
 			}
+
+			this.#data.push({
+				cookie: {
+					token: token.trim(),
+					mid: mid.trim(),
+					ltuid: ltuid.trim()
+				},
+				redeemCode,
+				dailiesCheck,
+				weekliesCheck,
+				stamina,
+				expedition
+			});
 		}
 
 		this.#gameId = defaults.gameId;
