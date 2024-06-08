@@ -46,16 +46,22 @@ A multi-purpose tool for any supported Hoyoverse games. This tool is designed to
 1. Go to your HoyoLab profile [here](https://www.hoyolab.com/accountCenter/postList).
 2. Log in with your Hoyoverse account.
 3. Open the browser console (F12).
-4. Click on the "Network" tab.
-5. Refresh the page.
-6. Search for `getGameRecordCard` and click on it.
-    ![](https://github.com/torikushiii/hoyolab-auto/assets/21153445/e0c37bb0-e1ff-4fda-8584-5b51e9b89c6c)
-7. Click on the "Cookies" tab.
-8. Look for `account_mid_v2`, `cookie_token_v2`, and `ltuid_v2`.
-    ![](https://github.com/torikushiii/hoyolab-auto/assets/21153445/eaa1c456-0fce-4143-90c4-b7dfe4d146c0)
-9. Double click the value of each cookie and copy it.
-10. Paste the values in your `default.config.js` or `config.js` file.
-11. To run the script you must use `npm start` or you will not recieve any console logs (for windows users, you can use either `npm start` or `set DEBUG=* & node index.js`)
+4. Go to the Application tab.
+   ![Application tab](https://github.com/torikushiii/starrail-auto/assets/21153445/b7b9d211-beda-4c54-98b8-e293b6f130a8)
+5. Look for the `Storage` tab in the left column, then go to Cookies > https://www.hoyolab.com.
+   ![Storage tab](https://github.com/torikushiii/starrail-auto/assets/21153445/a67fe81c-1945-49c2-9d0f-fa971f22a904)
+6. Find the required cookies: `account_mid_v2`, `cookie_token_v2`, and `ltuid_v2` using the Filter box.
+   > [!NOTE]
+   > For `cookie_token_v2`, choose the one with the bigger size. If they have the same size, select the one with the longer value.
+   
+   ![Cookies](https://github.com/torikushiii/starrail-auto/assets/21153445/692447ab-0925-4a27-8861-6c10c5410520)
+7. Copy the token from the bottom box.
+   ![Copy token](https://github.com/torikushiii/starrail-auto/assets/21153445/a24060a5-7195-4a3e-866f-9f2be17d3c8b)
+   > [!NOTE]
+   > Repeat this step for each required cookie mentioned above.
+   
+8. Paste the values into your `default.config.js` or `config.js` file.
+9. To run the script, use `npm start`. For Windows users, you can use either `npm start` or `set DEBUG=* & node index.js` to receive console logs.
 
 # Notifications
 For Discord notifications or Telegram setup, refer to this folder: [setup](https://github.com/torikushiii/hoyolab-auto/tree/main/setup)
