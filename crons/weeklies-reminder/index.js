@@ -103,7 +103,7 @@ module.exports = {
 						"👤 **Account**",
 						`- **UID**: ${account.uid}`,
 						`- **Username**: ${account.nickname}`,
-						`- **Region**: ${account.region}`,
+						`- **Region**: ${app.Utils.formattedAccountRegion(account.region)}`,
 						"",
 						"📊 **Progress**"
 					];
