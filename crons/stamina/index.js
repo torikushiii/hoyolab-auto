@@ -82,7 +82,7 @@ module.exports = {
 					const messageText = [
 						`📢 Stamina Reminder, Your Stamina is Within the Set Threshold!`,
 						`🎮 **Game**: ${data.assets.game}`,
-						`🆔 **UID**: ${account.uid} ${account.username}`,
+						`🆔 **UID**: ${account.uid} ${account.nickname}`,
 						`🌍 **Region**: ${app.Utils.formattedAccountRegion(account.region)}`,
 						`🔋 **Stamina**: ${current}/${max}`,
 						`🕒 **Recovery Time**: ${delta}`
