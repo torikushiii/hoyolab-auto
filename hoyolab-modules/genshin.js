@@ -132,9 +132,10 @@ module.exports = class Genshin extends require("./template.js") {
 				deviceId: account.cookie.deviceId ?? "",
 				deviceFp: account.cookie.deviceFp ?? ""
 			});
-		}
 
-		app.Logger.info(this.fullName, `Logged into ${this.accounts.length} account(s)`);
+			const region = app.Utils.formattedAccountRegion(data.region);
+			app.Logger.info(this.fullName, `Logged into (${data.game_role_id}) ${data.nickname} (${region})`);
+		}
 	}
 
 	async checkAndExecute () {

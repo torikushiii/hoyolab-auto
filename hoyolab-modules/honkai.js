@@ -117,9 +117,10 @@ module.exports = class HonkaiImpact extends require("./template.js") {
 				level: data.level,
 				cookie: cookieData
 			});
-		}
 
-		app.Logger.info(this.fullName, `Logged into ${this.accounts.length} account(s)`);
+			const region = app.Utils.formattedAccountRegion(data.region);
+			app.Logger.info(this.fullName, `Logged into (${data.game_role_id}) ${data.nickname} (${region})`);
+		}
 	}
 
 	async checkAndExecute () {
