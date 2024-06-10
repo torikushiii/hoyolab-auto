@@ -43,6 +43,10 @@ A multi-purpose tool for any supported Hoyoverse games. This tool is designed to
 4. Follow the instructions in the `default.config.js` or `config.js` file.
 
 # Usage
+
+> [!WARNING]
+> If you want to run this with multiple different accounts, log-in using incognito then do this step to avoid cookies overlapping.
+
 1. Go to your HoyoLab profile [here](https://www.hoyolab.com/accountCenter/postList).
 2. Log in with your Hoyoverse account.
 3. Open the browser console (F12).
