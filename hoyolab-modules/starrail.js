@@ -354,6 +354,9 @@ module.exports = class StarRail extends require("./template.js") {
 	}
 
 	async redeemCode (accountData, code) {
+		const timeout = Math.random() * 3 + 7;
+		await new Promise(resolve => setTimeout(resolve, timeout * 1000));
+
 		const res = await app.Got({
 			url: this.config.url.redemption,
 			responseType: "json",
