@@ -10,7 +10,8 @@ const DEFAULT_CONSTANTS = {
 		info: "https://sg-hk4e-api.hoyolab.com/event/sol/info",
 		home: "https://sg-hk4e-api.hoyolab.com/event/sol/home",
 		sign: "https://sg-hk4e-api.hoyolab.com/event/sol/sign",
-		notes: "https://bbs-api-os.mihoyo.com/game_record/genshin/api/dailyNote"
+		notes: "https://bbs-api-os.mihoyo.com/game_record/genshin/api/dailyNote",
+		redemption: "https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey"
 	}
 };
 
@@ -139,7 +140,7 @@ module.exports = class Genshin extends require("./template.js") {
 	async checkAndExecute () {
 		const accounts = this.accounts;
 		if (accounts.length === 0) {
-			app.Logger.warn("No active accounts found for StarRail");
+			app.Logger.warn("No active accounts found for Genshin Impact");
 			return;
 		}
 
@@ -349,6 +350,65 @@ module.exports = class Genshin extends require("./template.js") {
 		return {
 			success: true,
 			data: data.awards
+		};
+	}
+
+	async redeemCode (accountData, code) {
+		const timeout = Math.random() * 3 + 7;
+		await new Promise(resolve => setTimeout(resolve, timeout * 1000));
+
+		const res = await app.Got({
+			url: this.config.url.redemption,
+			responseType: "json",
+			throwHttpErrors: false,
+			searchParams: {
+				uid: accountData.uid,
+				region: accountData.region,
+				lang: "en",
+				cdkey: code,
+				game_biz: "hk4e_global",
+				sLangKey: "en-us"
+			},
+			headers: {
+				Cookie: accountData.cookie
+			}
+		});
+
+		if (res.statusCode !== 200) {
+			app.Logger.error(`${this.fullName}:RedeemCode`, {
+				message: "Request threw non-200 status code",
+				args: {
+					code,
+					status: res.statusCode,
+					body: res.body
+				}
+			});
+
+			return {
+				success: false
+			};
+		}
+		if (res.body.retcode !== 0) {
+			app.Logger.error(`${this.fullName}:RedeemCode`, {
+				message: "Failed to redeem code",
+				args: {
+					code,
+					status: res.body.retcode,
+					body: res.body
+				}
+			});
+
+			return {
+				success: false,
+				message: res.body.message
+			};
+		}
+
+		app.Logger.info(`${this.fullName}:RedeemCode`, `(${accountData.uid}) ${accountData.nickname} redeemed code: ${code}`);
+
+		return {
+			success: true,
+			message: "Code redeemed successfully!"
 		};
 	}
 

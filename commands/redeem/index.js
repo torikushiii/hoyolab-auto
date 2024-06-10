@@ -17,11 +17,6 @@ module.exports = {
 				reply: "No codes provided."
 			};
 		}
-		if (game === "genshin") {
-			return {
-				reply: "Not yet implemented."
-			};
-		}
 
 		codes = codes.map(code => code.toUpperCase());
 
