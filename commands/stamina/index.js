@@ -7,7 +7,9 @@ module.exports = {
 		if (!game) {
 			return {
 				success: false,
-				reply: `Please specify a game. Valid games are: ${validGames.join(", ")}`
+				reply: `Please specify a game. Valid games are: ${app.HoyoLab.supportedGames({
+					blacklist: ["honkai"]
+				})}`
 			};
 		}
 		if (!validGames.includes(game.toLowerCase())) {
@@ -30,6 +32,10 @@ module.exports = {
 
 		const data = [];
 		for (const account of accounts) {
+			if (account.stamina.check === false) {
+				continue;
+			}
+
 			const platform = app.HoyoLab.get(game);
 			const notes = await platform.notes(account);
 			if (notes.success === false) {
