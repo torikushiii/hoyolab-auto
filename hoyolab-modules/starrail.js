@@ -19,11 +19,6 @@ module.exports = class StarRail extends require("./template.js") {
 	#logo;
 	#color;
 
-	static mapCacheExpiration = 3_600_000;
-	static mapExpirationInterval = setInterval(() => StarRail.dataCache.clear(), StarRail.mapCacheExpiration);
-
-	static dataCache = new Map();
-
 	constructor (config) {
 		super("starrail", config, {
 			gameId: 6,
@@ -532,9 +527,4 @@ module.exports = class StarRail extends require("./template.js") {
 
 	get logo () { return this.#logo; }
 	get color () { return this.#color; }
-
-	static destroy () {
-		clearInterval(StarRail.mapExpirationInterval);
-		StarRail.dataCache.clear();
-	}
 };
