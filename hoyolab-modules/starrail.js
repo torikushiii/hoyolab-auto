@@ -418,40 +418,12 @@ module.exports = class StarRail extends require("./template.js") {
 	}
 
 	async notes (accountData) {
-		const cache = StarRail.dataCache.get(accountData.uid);
-		if (cache) {
-			const now = Date.now();
-			const secondsSinceLastUpdate = (now - cache.lastUpdate) / 1000;
-
-			const recoveredStamina = Math.floor(secondsSinceLastUpdate / 360);
-
-			const isMaxStamina = cache.stamina.currentStamina === cache.stamina.maxStamina;
-			if (!isMaxStamina) {
-				cache.stamina.currentStamina = Math.min(
-					cache.stamina.maxStamina,
-					cache.stamina.currentStamina + recoveredStamina
-				);
-
-				cache.stamina.recoveryTime -= Math.round(secondsSinceLastUpdate);
-			}
-
-			for (const expedition of cache.expedition.list) {
-				expedition.remained_time = Number(expedition.remained_time);
-				if (expedition.remained_time === 0) {
-					expedition.status = "Finished";
-					expedition.remained_time = "0";
-				}
-				else {
-					expedition.remained_time -= Math.round(secondsSinceLastUpdate);
-				}
-			}
-
-			cache.lastUpdate = now;
-
+		const cachedData = this.dataCache.get(accountData.uid);
+		if (cachedData) {
 			return {
 				success: true,
 				data: {
-					...cache,
+					...cachedData,
 					assets: {
 						...this.config.assets,
 						logo: this.#logo,
@@ -526,7 +498,7 @@ module.exports = class StarRail extends require("./template.js") {
 			maxScore: data.max_rogue_score
 		};
 
-		StarRail.dataCache.set(accountData.uid, {
+		this.dataCache.set(accountData.uid, {
 			uid: accountData.uid,
 			nickname: accountData.nickname,
 			lastUpdate: Date.now(),

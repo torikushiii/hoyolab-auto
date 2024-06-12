@@ -24,12 +24,93 @@ const CatpchaCodes = [
 	1034
 ];
 
+class DataCache {
+	constructor (expiration = 3_600_000, interval = null) {
+		this.dataCache = new Map();
+		this.expiration = expiration;
+		this.interval = interval;
+	}
+
+	set (key, value, lastUpdate = Date.now()) {
+		this.dataCache.set(key, { ...value, lastUpdate });
+	}
+
+	get (key) {
+		const cachedData = this.dataCache.get(key);
+		if (!cachedData) {
+			return null;
+		}
+
+		const now = Date.now();
+		if (now - cachedData.lastUpdate > this.expiration) {
+			this.dataCache.delete(key);
+			return null;
+		}
+
+		this.updateCachedData(cachedData);
+
+		return cachedData;
+	}
+
+	updateCachedData (cachedData) {
+		const now = Date.now();
+		const secondsSinceLastUpdate = (now - cachedData.lastUpdate) / 1000;
+
+		const recoveredStamina = Math.floor(secondsSinceLastUpdate / 360);
+
+		const isMaxStamina = cachedData.stamina.currentStamina === cachedData.stamina.maxStamina;
+		if (!isMaxStamina) {
+			cachedData.stamina.currentStamina = Math.min(
+				cachedData.stamina.maxStamina,
+				cachedData.stamina.currentStamina + recoveredStamina
+			);
+
+			cachedData.stamina.recoveryTime -= Math.round(secondsSinceLastUpdate);
+		}
+
+		for (const expedition of cachedData.expedition.list) {
+			expedition.remained_time = Number(expedition.remained_time);
+			if (expedition.remained_time === 0) {
+				expedition.status = "Finished";
+				expedition.remained_time = "0";
+			}
+			else {
+				expedition.remained_time -= Math.round(secondsSinceLastUpdate);
+			}
+		}
+
+		cachedData.lastUpdate = now;
+	}
+
+	clear () {
+		this.dataCache.clear();
+	}
+
+	startExpirationInterval () {
+		if (this.interval) {
+			return;
+		}
+
+		this.interval = setInterval(() => this.clear(), this.expiration);
+	}
+
+	stopExpirationInterval () {
+		if (!this.interval) {
+			return;
+		}
+
+		clearInterval(this.interval);
+		this.interval = null;
+	}
+}
+
 module.exports = class HoyoLab {
 	#id;
 	#name;
 	#data = [];
 	#gameId;
 	#config;
+	#dataCache;
 
 	accounts = [];
 
@@ -153,6 +234,7 @@ module.exports = class HoyoLab {
 
 		this.#gameId = defaults.gameId;
 		this.#config = defaults.config ?? {};
+		this.#dataCache = new DataCache(3_600_000);
 
 		HoyoLab.list.push(this);
 	}
@@ -165,6 +247,7 @@ module.exports = class HoyoLab {
 	get type () { return this.#name; }
 	get RequestError () { return RequestError; }
 	get CatpchaCodes () { return CatpchaCodes; }
+	get dataCache () { return this.#dataCache; }
 
 	get fullName () {
 		const nameMap = {

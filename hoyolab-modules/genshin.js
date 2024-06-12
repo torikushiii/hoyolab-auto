@@ -19,11 +19,6 @@ module.exports = class Genshin extends require("./template.js") {
 	#logo;
 	#color;
 
-	static mapCacheExpiration = 3_600_000;
-	static mapExpirationInterval = setInterval(() => Genshin.dataCache.clear(), Genshin.mapCacheExpiration);
-
-	static dataCache = new Map();
-
 	constructor (config) {
 		super("genshin", config, {
 			gameId: 2,
@@ -40,6 +35,8 @@ module.exports = class Genshin extends require("./template.js") {
 				message: "No Genshin accounts provided"
 			});
 		}
+
+		this.dataCache.startExpirationInterval();
 	}
 
 	async login () {
@@ -419,40 +416,12 @@ module.exports = class Genshin extends require("./template.js") {
 	}
 
 	async notes (accountData) {
-		const cache = Genshin.dataCache.get(accountData.uid);
-		if (cache) {
-			const now = Date.now();
-			const secondsSinceLastUpdate = (now - cache.lastUpdate) / 1000;
-
-			const recoveredStamina = Math.floor(secondsSinceLastUpdate / 360);
-
-			const isMaxStamina = cache.stamina.currentStamina === cache.stamina.maxStamina;
-			if (!isMaxStamina) {
-				cache.stamina.currentStamina = Math.min(
-					cache.stamina.maxStamina,
-					cache.stamina.currentStamina + recoveredStamina
-				);
-
-				cache.stamina.recoveryTime -= Math.round(secondsSinceLastUpdate);
-			}
-
-			for (const expedition of cache.expedition.list) {
-				expedition.remained_time = Number(expedition.remained_time);
-				if (expedition.remained_time === 0) {
-					expedition.status = "Finished";
-					expedition.remained_time = "0";
-				}
-				else {
-					expedition.remained_time -= Math.round(secondsSinceLastUpdate);
-				}
-			}
-
-			cache.lastUpdate = now;
-
+		const cachedData = this.dataCache.get(accountData.uid);
+		if (cachedData) {
 			return {
 				success: true,
 				data: {
-					...cache,
+					...cachedData,
 					assets: {
 						...this.config.assets,
 						logo: this.#logo,
@@ -523,9 +492,10 @@ module.exports = class Genshin extends require("./template.js") {
 			resinDiscountLimit: data.resin_discount_num_limit
 		};
 
-		Genshin.dataCache.set(accountData.uid, {
+		this.dataCache.set(accountData.uid, {
 			uid: accountData.uid,
 			nickname: accountData.nickname,
+			lastUpdated: Date.now(),
 			stamina,
 			dailies,
 			weeklies,
@@ -556,9 +526,4 @@ module.exports = class Genshin extends require("./template.js") {
 
 	get logo () { return this.#logo; }
 	get color () { return this.#color; }
-
-	static destroy () {
-		clearInterval(this.mapExpirationInterval);
-		this.dataCache.clear();
-	}
 };
