@@ -11,6 +11,7 @@ module.exports = (async () => {
 		mutableDefaults: true,
 		throwHttpErrors: true,
 		headers: {
+			Referer: "https://act.hoyolab.com",
 			"x-rpc-app_version": "1.5.0",
 			"x-rpc-client_type": 5,
 			"x-rpc-language": "en-us",
