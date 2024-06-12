@@ -19,6 +19,11 @@ module.exports = class Genshin extends require("./template.js") {
 	#logo;
 	#color;
 
+	static mapCacheExpiration = 3_600_000;
+	static mapExpirationInterval = setInterval(() => Genshin.dataCache.clear(), Genshin.mapCacheExpiration);
+
+	static dataCache = new Map();
+
 	constructor (config) {
 		super("genshin", config, {
 			gameId: 2,
@@ -414,8 +419,48 @@ module.exports = class Genshin extends require("./template.js") {
 	}
 
 	async notes (accountData) {
-		const timeout = Math.random() * 2 + 5;
-		await new Promise(resolve => setTimeout(resolve, timeout * 1000));
+		const cache = Genshin.dataCache.get(accountData.uid);
+		if (cache) {
+			const now = Date.now();
+			const secondsSinceLastUpdate = (now - cache.lastUpdate) / 1000;
+
+			const recoveredStamina = Math.floor(secondsSinceLastUpdate / 360);
+
+			const isMaxStamina = cache.stamina.currentStamina === cache.stamina.maxStamina;
+			if (!isMaxStamina) {
+				cache.stamina.currentStamina = Math.min(
+					cache.stamina.maxStamina,
+					cache.stamina.currentStamina + recoveredStamina
+				);
+
+				cache.stamina.recoveryTime -= Math.round(secondsSinceLastUpdate);
+			}
+
+			for (const expedition of cache.expedition.list) {
+				expedition.remained_time = Number(expedition.remained_time);
+				if (expedition.remained_time === 0) {
+					expedition.status = "Finished";
+					expedition.remained_time = "0";
+				}
+				else {
+					expedition.remained_time -= Math.round(secondsSinceLastUpdate);
+				}
+			}
+
+			cache.lastUpdate = now;
+
+			return {
+				success: true,
+				data: {
+					...cache,
+					assets: {
+						...this.config.assets,
+						logo: this.#logo,
+						color: this.#color
+					}
+				}
+			};
+		}
 
 		const res = await app.Got({
 			url: this.config.url.notes,
@@ -478,6 +523,18 @@ module.exports = class Genshin extends require("./template.js") {
 			resinDiscountLimit: data.resin_discount_num_limit
 		};
 
+		Genshin.dataCache.set(accountData.uid, {
+			uid: accountData.uid,
+			nickname: accountData.nickname,
+			stamina,
+			dailies,
+			weeklies,
+			expedition: {
+				completed: data.expeditions.every(i => i.status.toLowerCase() === "finished"),
+				list: data.expeditions
+			}
+		});
+
 		return {
 			success: true,
 			data: {
@@ -499,4 +556,9 @@ module.exports = class Genshin extends require("./template.js") {
 
 	get logo () { return this.#logo; }
 	get color () { return this.#color; }
+
+	static destroy () {
+		clearInterval(this.mapExpirationInterval);
+		this.dataCache.clear();
+	}
 };
