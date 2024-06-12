@@ -1,6 +1,6 @@
 module.exports = {
 	name: "expedition",
-	expression: "0 */30 * * * *",
+	expression: "0 */35 * * * *",
 	description: "Check for ongoing expeditions every 30 minutes and send a notification if all expeditions are completed.",
 	code: (async function expedition () {
 		// eslint-disable-next-line object-curly-spacing
