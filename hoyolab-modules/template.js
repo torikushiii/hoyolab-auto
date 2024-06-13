@@ -1,29 +1,6 @@
 const GENSHIN_MAX_STAMINA = 200;
 const STARRAIL_MAX_STAMINA = 240;
 
-const RequestError = [
-	{ retcode: -100, message: "The provided cookie is either invalid or expired." },
-	{ retcode: -10001, message: "The provided cookie is either invalid or expired." },
-	{ retcode: -10101, message: "Cannot get data after more than 30 accounts per cookie per day." },
-	{ retcode: -1071, message: "The provided cookie is either invalid or expired." },
-	{ retcode: -1048, message: "API system is busy, please try again later." },
-	{ retcode: 1009, message: "The account does not exist" },
-	{ retcode: -2017, message: "The code has been used" },
-	{ retcode: -2001, message: "The code has expired" },
-	{ retcode: -2003, message: "The code is invalid" },
-	{ retcode: -2016, message: "Redemption is in cooldown" }
-];
-
-/**
- * This error indicates that a Geetest was triggered during the request.
- */
-const CatpchaCodes = [
-	10035,
-	5003,
-	10041,
-	1034
-];
-
 class DataCache {
 	constructor (expiration = 3_600_000, interval = null) {
 		this.dataCache = new Map();
@@ -245,8 +222,6 @@ module.exports = class HoyoLab {
 	get gameId () { return this.#gameId; }
 	get config () { return this.#config; }
 	get type () { return this.#name; }
-	get RequestError () { return RequestError; }
-	get CatpchaCodes () { return CatpchaCodes; }
 	get dataCache () { return this.#dataCache; }
 
 	get fullName () {

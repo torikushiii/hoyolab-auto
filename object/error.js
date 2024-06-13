@@ -57,6 +57,10 @@ class Error extends globalThis.Error {
 	static get GenericRequest () {
 		return GenericRequestError;
 	}
+
+	static get HoyoLabRequest () {
+		return HoyoLabRequestError;
+	}
 }
 
 class GenericRequestError extends Error {
@@ -75,6 +79,48 @@ class GenericRequestError extends Error {
 
 	static get name () {
 		return "GenericRequestError";
+	}
+}
+
+class HoyoLabRequestError extends Error {
+	constructor (obj = {}) {
+		const errorMessages = {
+			1009: "The account does not exist",
+			"-100": "The provided cookie is either invalid or expired.",
+			"-10001": "The provided cookie is either invalid or expired.",
+			"-10101": "Cannot get data after more than 30 accounts per cookie per day.",
+			"-1048": "API system is busy, please try again later.",
+			"-1071": "The provided cookie is either invalid or expired.",
+			"-2001": "The code has expired",
+			"-2003": "The code is invalid",
+			"-2016": "Redemption is in cooldown",
+			"-2017": "The code has been used"
+		};
+
+		const CaptchaCodes = [
+			10035,
+			5003,
+			10041,
+			1034
+		];
+
+		const isCaptchaCode = CaptchaCodes.includes(obj.retcode);
+		const message = (isCaptchaCode)
+			? "A captcha challenge was requested. Please solve it and try again."
+			: errorMessages[obj.retcode] ?? "Unknown error";
+
+		super({
+			message,
+			name: "HoyoLabRequestError",
+			args: {
+				...(obj.args ?? {}),
+				retcode: obj.retcode ?? null
+			}
+		});
+	}
+
+	static get name () {
+		return "HoyoLabRequestError";
 	}
 }
 
