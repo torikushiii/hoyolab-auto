@@ -17,6 +17,7 @@ A multi-purpose tool for any supported Hoyoverse games. This tool is designed to
 - [x] Honkai Impact 3rd (Daily Check-In only)
 - [x] Genshin Impact
 - [x] Honkai: Star Rail
+- [ ] Zenless Zone  (Coming soon)
 
 # Features
 - [x] Auto check-in (Runs every midnight your local time)
@@ -24,10 +25,10 @@ A multi-purpose tool for any supported Hoyoverse games. This tool is designed to
     - This feature will reminds you to do your dailies, such as completing your daily commissions. Defaulted to 09:00 your local time.
 - [x] Weeklies check
     - This feature will reminds you to do your weeklies, such as completing your weekly bosses, use your discounted resin, simulated universe, etc. Defaulted to 09:00 your local time.
-- [x] Stamina check (Check your Resin/Stamina every 30 minutes)
+- [x] Stamina check (Check your Resin/Stamina every 35 minutes)
     - [x] Customizable threshold
         - This feature will notify you when your stamina is above your set threshold.
-- [x] Expedition check (Check your expedition every 30 minutes)
+- [x] Expedition check (Check your expedition every 35 minutes)
 - [x] Notification
     - [x] Discord
     - [x] Telegram
@@ -56,17 +57,16 @@ A multi-purpose tool for any supported Hoyoverse games. This tool is designed to
    ![Storage tab](https://github.com/torikushiii/starrail-auto/assets/21153445/a67fe81c-1945-49c2-9d0f-fa971f22a904)
 6. Find the required cookies: `account_mid_v2`, `cookie_token_v2`, and `ltuid_v2` using the Filter box.
 > [!NOTE]
-> For `cookie_token_v2`, choose the one with the bigger size. If they have the same size, select the one with the longer value.
+> For `cookie_token_v2`, choose the one with the bigger size. If they have the same size, select the one with the longer value, if both are the same, choose whichever.
    
    ![Cookies](https://github.com/torikushiii/starrail-auto/assets/21153445/692447ab-0925-4a27-8861-6c10c5410520)
 7. Copy the token from the bottom box.
    ![Copy token](https://github.com/torikushiii/starrail-auto/assets/21153445/a24060a5-7195-4a3e-866f-9f2be17d3c8b)
+8. Paste the values into your `default.config.js` or `config.js` file.
+9. To run the script, use `npm start`. For Windows users, you can use either `npm start` or `set DEBUG=* & node index.js` to receive console logs.
 
 > [!NOTE]
 > Repeat this step for each required cookie mentioned above.
-   
-8. Paste the values into your `default.config.js` or `config.js` file.
-9. To run the script, use `npm start`. For Windows users, you can use either `npm start` or `set DEBUG=* & node index.js` to receive console logs.
 
 # Notifications
 For Discord notifications or Telegram setup, refer to this folder: [setup](https://github.com/torikushiii/hoyolab-auto/tree/main/setup)
