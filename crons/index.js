@@ -1,6 +1,7 @@
 const { CronJob } = require("cron");
 
 const CheckIn = require("./check-in/index.js");
+const CodeRedeem = require("./code-redeem/index.js");
 const DailiesReminder = require("./dailies-reminder/index.js");
 const Expedition = require("./expedition/index.js");
 const Stamina = require("./stamina/index.js");
@@ -8,6 +9,7 @@ const WeekliesReminder = require("./weeklies-reminder/index.js");
 
 const definitions = [
 	CheckIn,
+	CodeRedeem,
 	DailiesReminder,
 	Expedition,
 	Stamina,
