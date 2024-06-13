@@ -1,3 +1,4 @@
+const { setTimeout } = require("node:timers/promises");
 const DEFAULT_CONSTANTS = {
 	ACT_ID: "e202303301540311",
 	successMessage: "You have successfully checked in today, Trailblazer~",
@@ -355,9 +356,6 @@ module.exports = class StarRail extends require("./template.js") {
 	}
 
 	async redeemCode (accountData, code) {
-		const timeout = Math.random() * 3 + 7;
-		await new Promise(resolve => setTimeout(resolve, timeout * 1000));
-
 		const res = await app.Got({
 			url: this.config.url.redemption,
 			responseType: "json",
@@ -374,6 +372,8 @@ module.exports = class StarRail extends require("./template.js") {
 				Cookie: accountData.cookie
 			}
 		});
+
+		await setTimeout(5000);
 
 		if (res.statusCode !== 200) {
 			app.Logger.error(`${this.fullName}:RedeemCode`, {
