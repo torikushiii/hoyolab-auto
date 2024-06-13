@@ -15,7 +15,7 @@ const RequestError = [
 ];
 
 /**
- * This error indicates that a Geetest was triggered drung the request.
+ * This error indicates that a Geetest was triggered during the request.
  */
 const CatpchaCodes = [
 	10035,
