@@ -12,7 +12,7 @@ class DataCache {
 		this.dataCache.set(key, { ...value, lastUpdate });
 	}
 
-	get (key) {
+	async get (key) {
 		const cachedData = this.dataCache.get(key);
 		if (!cachedData) {
 			return null;
@@ -24,19 +24,29 @@ class DataCache {
 			return null;
 		}
 
-		this.updateCachedData(cachedData);
+		await this.updateCachedData(cachedData);
 
 		return cachedData;
 	}
 
-	updateCachedData (cachedData) {
+	async updateCachedData (cachedData) {
 		const now = Date.now();
 		const secondsSinceLastUpdate = (now - cachedData.lastUpdate) / 1000;
 
 		const recoveredStamina = Math.floor(secondsSinceLastUpdate / 360);
 
 		const isMaxStamina = cachedData.stamina.currentStamina === cachedData.stamina.maxStamina;
-		if (!isMaxStamina) {
+		if (isMaxStamina) {
+			this.dataCache.delete(cachedData.uid);
+			return null;
+		}
+		else {
+			const account = app.HoyoLab.getAccountById(cachedData.uid);
+			if (cachedData.stamina.currentStamina > account.stamina.threshold) {
+				this.dataCache.delete(cachedData.uid);
+				return null;
+			}
+
 			cachedData.stamina.currentStamina = Math.min(
 				cachedData.stamina.maxStamina,
 				cachedData.stamina.currentStamina + recoveredStamina
@@ -374,6 +384,21 @@ module.exports = class HoyoLab {
 
 	static getActivePlatform () {
 		return HoyoLab.list.map(platform => platform.name);
+	}
+
+	static getAccountById (uid) {
+		if (typeof uid !== "string") {
+			throw new app.Error({
+				message: "Invalid UID provided for getAccountById expected number.",
+				args: {
+					uid,
+					type: typeof uid
+				}
+			});
+		}
+
+		const accounts = HoyoLab.list.flatMap(platform => platform.accounts);
+		return accounts.find(account => account.uid === uid) ?? null;
 	}
 
 	static get (identifier) {

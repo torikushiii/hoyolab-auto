@@ -416,7 +416,7 @@ module.exports = class Genshin extends require("./template.js") {
 	}
 
 	async notes (accountData) {
-		const cachedData = this.dataCache.get(accountData.uid);
+		const cachedData = await this.dataCache.get(accountData.uid);
 		if (cachedData) {
 			return {
 				success: true,
