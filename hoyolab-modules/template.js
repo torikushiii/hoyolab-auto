@@ -2,7 +2,7 @@ const GENSHIN_MAX_STAMINA = 200;
 const STARRAIL_MAX_STAMINA = 240;
 
 class DataCache {
-	constructor (expiration = 3_600_000, interval = null) {
+	constructor (expiration = 3_650_000, interval = null) {
 		this.dataCache = new Map();
 		this.expiration = expiration;
 		this.interval = interval;
@@ -221,7 +221,7 @@ module.exports = class HoyoLab {
 
 		this.#gameId = defaults.gameId;
 		this.#config = defaults.config ?? {};
-		this.#dataCache = new DataCache(3_600_000);
+		this.#dataCache = new DataCache(3_650_000);
 
 		HoyoLab.list.push(this);
 	}
