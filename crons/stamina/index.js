@@ -1,6 +1,6 @@
 module.exports = {
 	name: "stamina",
-	expression: "0 */35 * * * *",
+	expression: "0 */30 * * * *",
 	description: "Check for your stamina and notify you when it's within the set threshold.",
 	code: (async function stamina () {
 		// eslint-disable-next-line object-curly-spacing

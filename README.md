@@ -25,10 +25,10 @@ A multi-purpose tool for any supported Hoyoverse games. This tool is designed to
     - This feature will reminds you to do your dailies, such as completing your daily commissions. Defaulted to 09:00 your local time.
 - [x] Weeklies check
     - This feature will reminds you to do your weeklies, such as completing your weekly bosses, use your discounted resin, simulated universe, etc. Defaulted to 09:00 your local time.
-- [x] Stamina check (Check your Resin/Stamina every 35 minutes)
+- [x] Stamina check (Check your Resin/Stamina every 30 minutes)
     - [x] Customizable threshold
         - This feature will notify you when your stamina is above your set threshold.
-- [x] Expedition check (Check your expedition every 35 minutes)
+- [x] Expedition check (Check your expedition every 30 minutes)
 - [x] Notification
     - [x] Discord
     - [x] Telegram
