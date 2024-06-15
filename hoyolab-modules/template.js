@@ -49,6 +49,11 @@ class DataCache {
 		);
 		cachedData.stamina.recoveryTime -= Math.round(secondsSinceLastUpdate);
 
+		if (cachedData.stamina.recoveryTime <= 0) {
+			this.dataCache.delete(cachedData.uid);
+			return null;
+		}
+
 		for (const expedition of cachedData.expedition.list) {
 			expedition.remained_time = Number(expedition.remained_time);
 			if (expedition.remained_time === 0) {
