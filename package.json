@@ -4,13 +4,14 @@
   "type": "commonjs",
   "scripts": {
     "start": "DEBUG=* node index.js",
-    "watch": "DEBUG=* nodemon index.js"
+    "watch": "DEBUG=* nodemon index.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "@babel/core": "^7.18.10",
     "@babel/eslint-parser": "^7.18.9",
-    "eslint": "^8.21.0",
     "eslint-plugin-unicorn": "^43.0.2"
   },
   "peerDependencies": {
