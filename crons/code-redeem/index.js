@@ -1,6 +1,25 @@
 const cachedCodes = [];
 const { setTimeout } = require("node:timers/promises");
 
+const pictureHash = [
+	{
+		hash: "77cb5426637574ba524ac458fa963da0_6409817950389238658",
+		name: "Stellar Jade"
+	},
+	{
+		hash: "7cb0e487e051f177d3f41de8d4bbc521_2556290033227986328",
+		name: "Refined Aether"
+	},
+	{
+		hash: "508229a94e4fa459651f64c1cd02687a_6307505132287490837",
+		name: "Traveler's Guide"
+	},
+	{
+		hash: "0b12bdf76fa4abc6b4d1fdfc0fb4d6f5_4521150989210768295",
+		name: "Credit"
+	}
+];
+
 module.exports = {
 	name: "code-redeem",
 	expression: "0 0 * * *",
@@ -49,25 +68,6 @@ module.exports = {
 			if (!exchangeGroup) {
 				continue;
 			}
-
-			const pictureHash = [
-				{
-					hash: "77cb5426637574ba524ac458fa963da0_6409817950389238658",
-					name: "Stellar Jade"
-				},
-				{
-					hash: "7cb0e487e051f177d3f41de8d4bbc521_2556290033227986328",
-					name: "Refined Aether"
-				},
-				{
-					hash: "508229a94e4fa459651f64c1cd02687a_6307505132287490837",
-					name: "Traveler's Guide"
-				},
-				{
-					hash: "0b12bdf76fa4abc6b4d1fdfc0fb4d6f5_4521150989210768295",
-					name: "Credit"
-				}
-			];
 	
 			const pendingCodes = [];
 			const bonuses = (exchangeGroup && exchangeGroup.exchange_group && exchangeGroup.exchange_group.bonuses) ?? [];
@@ -134,6 +134,36 @@ module.exports = {
 				app.Logger.info("CodeRedeem", `Successfully redeemed code ${code.code}. Rewards: ${code.rewards.join(", ")}`);
 
 				cachedCodes.push(code.code);
+			}
+
+			const webhook = app.Platform.get(3);
+			if (webhook) {
+				const embed = {
+					color: 0x00FF00,
+					title: "Code Redeem",
+					description: "Successfully redeemed the following codes:",
+					fields: pendingCodes.map(i => ({
+						name: i.code,
+						value: i.rewards.join(", ")
+					})),
+					timestamp: new Date()
+				};
+
+				await webhook.send(embed);
+			}
+
+			const telegram = app.Platform.get(2);
+			if (telegram) {
+				const messageText = [
+					"📢 Code Redeem, Successfully redeemed the following codes:",
+					...pendingCodes.map(i => [
+						`🎮 **Code**: ${i.code}`,
+						`🎁 **Rewards**: ${i.rewards.join(", ")}`
+					].join("\n"))
+				].join("\n");
+
+				const escapedMessage = app.Utils.escapeCharacters(messageText);
+				await telegram.send(escapedMessage);
 			}
 		}
 	})
