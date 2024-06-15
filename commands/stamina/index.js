@@ -3,13 +3,14 @@ module.exports = {
 	description: "Check your specified game stamina",
 	params: null,
 	run: (async function stamina (context, game) {
-		const validGames = app.HoyoLab.supportedGames();
+		const validGames = app.HoyoLab.supportedGames({
+			blacklist: ["honkai"]
+		});
+
 		if (!game) {
 			return {
 				success: false,
-				reply: `Please specify a game. Valid games are: ${app.HoyoLab.supportedGames({
-					blacklist: ["honkai"]
-				})}`
+				reply: `Please specify a game. Valid games are: ${validGames.join(", ")}`
 			};
 		}
 		if (!validGames.includes(game.toLowerCase())) {
@@ -21,8 +22,10 @@ module.exports = {
 
 		game = game.toLowerCase();
 
-		// eslint-disable-next-line object-curly-spacing
-		const accounts = app.HoyoLab.getActiveAccounts({ whitelist: [game] });
+		const accounts = app.HoyoLab.getActiveAccounts({
+			whitelist: [game]
+		});
+
 		if (accounts.length === 0) {
 			return {
 				success: false,
