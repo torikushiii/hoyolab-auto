@@ -32,28 +32,22 @@ class DataCache {
 	async updateCachedData (cachedData) {
 		const now = Date.now();
 		const secondsSinceLastUpdate = (now - cachedData.lastUpdate) / 1000;
-
 		const recoveredStamina = Math.floor(secondsSinceLastUpdate / 360);
 
+		const account = app.HoyoLab.getAccountById(cachedData.uid);
 		const isMaxStamina = cachedData.stamina.currentStamina === cachedData.stamina.maxStamina;
-		if (isMaxStamina) {
+		const isAboveThreshold = cachedData.stamina.currentStamina > account.stamina.threshold;
+
+		if (isMaxStamina || isAboveThreshold) {
 			this.dataCache.delete(cachedData.uid);
 			return null;
 		}
-		else {
-			const account = app.HoyoLab.getAccountById(cachedData.uid);
-			if (cachedData.stamina.currentStamina > account.stamina.threshold) {
-				this.dataCache.delete(cachedData.uid);
-				return null;
-			}
 
-			cachedData.stamina.currentStamina = Math.min(
-				cachedData.stamina.maxStamina,
-				cachedData.stamina.currentStamina + recoveredStamina
-			);
-
-			cachedData.stamina.recoveryTime -= Math.round(secondsSinceLastUpdate);
-		}
+		cachedData.stamina.currentStamina = Math.min(
+			cachedData.stamina.maxStamina,
+			cachedData.stamina.currentStamina + recoveredStamina
+		);
+		cachedData.stamina.recoveryTime -= Math.round(secondsSinceLastUpdate);
 
 		for (const expedition of cachedData.expedition.list) {
 			expedition.remained_time = Number(expedition.remained_time);
