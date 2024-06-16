@@ -3,10 +3,7 @@ module.exports = {
 	description: "Check your specified game stamina",
 	params: null,
 	run: (async function stamina (context, game) {
-		const validGames = app.HoyoLab.supportedGames({
-			blacklist: ["honkai"]
-		});
-
+		const validGames = app.HoyoLab.supportedGames({ blacklist: "honkai" });
 		if (!game) {
 			return {
 				success: false,
@@ -22,10 +19,7 @@ module.exports = {
 
 		game = game.toLowerCase();
 
-		const accounts = app.HoyoLab.getActiveAccounts({
-			whitelist: [game]
-		});
-
+		const accounts = app.HoyoLab.getActiveAccounts({ whitelist: game });
 		if (accounts.length === 0) {
 			return {
 				success: false,

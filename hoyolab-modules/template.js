@@ -259,38 +259,37 @@ module.exports = class HoyoLab {
 	}
 
 	static supportedGames (options = {}) {
-		const { whitelist, blacklist } = options;
+		let { whitelist, blacklist } = options;
 		if (whitelist && blacklist) {
 			throw new app.Error({
 				message: "Cannot have both a whitelist and blacklist."
 			});
 		}
 
-		if (whitelist) {
-			return HoyoLab.list.flatMap(platform => {
-				if (whitelist && !whitelist.includes(platform.name)) {
-					return null;
-				}
-
-				return platform.name;
-			}).filter(game => game !== null);
+		if (whitelist && !Array.isArray(whitelist)) {
+			whitelist = [whitelist];
 		}
-		if (blacklist) {
-			return HoyoLab.list.flatMap(platform => {
-				if (blacklist && blacklist.includes(platform.name)) {
-					return null;
-				}
-
-				return platform.name;
-			}).filter(game => game !== null);
+		if (blacklist && !Array.isArray(blacklist)) {
+			blacklist = [blacklist];
 		}
 
-		return HoyoLab.list.map(platform => platform.name);
+		const platforms = HoyoLab.list.flatMap(i => {
+			if (whitelist && !whitelist.includes(i.name)) {
+				return null;
+			}
+			else if (blacklist && blacklist.includes(i.name)) {
+				return null;
+			}
+
+			return i.name;
+		}).filter(i => i !== null);
+
+		return platforms;
 	}
 
 	static async redeemCode (game, codes) {
 		// eslint-disable-next-line object-curly-spacing
-		const accountData = HoyoLab.getActiveAccounts({ whitelist: [game] });
+		const accountData = HoyoLab.getActiveAccounts({ whitelist: game });
 		if (accountData.length === 0) {
 			return {
 				success: false,
@@ -346,37 +345,33 @@ module.exports = class HoyoLab {
 	}
 
 	static getActiveAccounts (options = {}) {
-		const { whitelist, blacklist } = options;
+		let { whitelist, blacklist } = options;
+
 		if (whitelist && blacklist) {
 			throw new app.Error({
 				message: "Cannot have both a whitelist and blacklist."
 			});
 		}
 
-		if (whitelist) {
-			const accounts = HoyoLab.list.flatMap(platform => {
-				if (whitelist && !whitelist.includes(platform.name)) {
-					return null;
-				}
-	
-				return platform.accounts;
-			}).filter(account => account !== null);
-	
-			return accounts;
+		if (whitelist && !Array.isArray(whitelist)) {
+			whitelist = [whitelist];
 		}
-		if (blacklist) {
-			const accounts = HoyoLab.list.flatMap(platform => {
-				if (blacklist && blacklist.includes(platform.name)) {
-					return null;
-				}
-	
-				return platform.accounts;
-			}).filter(account => account !== null);
-	
-			return accounts;
+		if (blacklist && !Array.isArray(blacklist)) {
+			blacklist = [blacklist];
 		}
 
-		return HoyoLab.list.flatMap(platform => platform.accounts);
+		const accounts = HoyoLab.list.flatMap(i => {
+			if (whitelist && !whitelist.includes(i.name)) {
+				return null;
+			}
+			else if (blacklist && blacklist.includes(i.name)) {
+				return null;
+			}
+
+			return i.accounts;
+		}).filter(i => i !== null);
+
+		return accounts;
 	}
 
 	static getActivePlatform () {

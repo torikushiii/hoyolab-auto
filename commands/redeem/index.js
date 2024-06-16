@@ -3,12 +3,11 @@ module.exports = {
 	description: "Redeem provided codes for the specified game.",
 	params: null,
 	run: (async function redeem (context, game, ...codes) {
+		const validGames = app.HoyoLab.supportedGames({ blacklist: "honkai" });
 		if (!game) {
 			return {
 				success: false,
-				reply: `No game provided. Valid games are: ${app.HoyoLab.supportedGames({
-					blacklist: ["honkai"]
-				})}`
+				reply: `No game provided. Valid games are: ${validGames.join(", ")}`
 			};
 		}
 		if (codes.length === 0) {
