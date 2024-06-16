@@ -64,8 +64,6 @@ class DataCache {
 				expedition.remained_time -= Math.round(secondsSinceLastUpdate);
 			}
 		}
-
-		cachedData.lastUpdate = now;
 	}
 
 	clear () {
