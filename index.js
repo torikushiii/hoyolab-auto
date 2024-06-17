@@ -39,7 +39,7 @@ catch {
 		Command,
 
 		Got: await Got,
-		Logger: new Logger(),
+		Logger: new Logger(config.loglevel),
 		Utils: new Utils()
 	};
 
@@ -107,7 +107,7 @@ catch {
 			return;
 		}
 
-		app.Logger.error("Client", {
+		app.Logger.json("Client", {
 			message: "Unhandled promise rejection",
 			args: { reason }
 		});
