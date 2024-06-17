@@ -25,7 +25,7 @@ module.exports = class Command extends require("./template.js") {
 				}
 				catch (e) {
 					this.params = null;
-					app.Logger.json("Command", {
+					app.Logger.log("Command", {
 						message: "Command parameters are not valid JSON",
 						data: {
 							name: this.name,
@@ -162,7 +162,7 @@ module.exports = class Command extends require("./template.js") {
 				}
 			};
 
-			app.Logger.json("Command", logObject);
+			app.Logger.log("Command", logObject);
 
 			execution = {
 				success: false,

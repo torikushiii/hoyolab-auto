@@ -119,7 +119,7 @@ module.exports = class DiscordController extends require("./template.js") {
 		}
 		catch (e) {
 			if (e instanceof DiscordAPIError) {
-				app.Logger.json("Discord", {
+				app.Logger.log("Discord", {
 					message: sendTarget,
 					channelID: channelData.id,
 					channelName: channelData.name ?? null,

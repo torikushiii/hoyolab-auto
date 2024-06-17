@@ -107,7 +107,7 @@ catch {
 			return;
 		}
 
-		app.Logger.json("Client", {
+		app.Logger.log("Client", {
 			message: "Unhandled promise rejection",
 			args: { reason }
 		});

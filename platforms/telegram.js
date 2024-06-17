@@ -141,7 +141,7 @@ module.exports = class Telegram extends require("./template.js") {
 		catch (e) {
 			const isGotRequestError = await this.isGotRequestError(e);
 			if (isGotRequestError) {
-				return app.Logger.json("Telegram", {
+				return app.Logger.log("Telegram", {
 					message: "Failed to send telegram message",
 					args: { error: e }
 				});

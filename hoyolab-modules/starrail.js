@@ -218,7 +218,7 @@ module.exports = class StarRail extends require("./template.js") {
 		});
 
 		if (res.statusCode !== 200) {
-			app.Logger.json(`${this.fullName}`, {
+			app.Logger.log(`${this.fullName}`, {
 				message: "Failed to sign in",
 				args: {
 					status: res.statusCode,
@@ -231,7 +231,7 @@ module.exports = class StarRail extends require("./template.js") {
 			};
 		}
 		if (res.body.retcode !== 0) {
-			app.Logger.json(`${this.fullName}`, {
+			app.Logger.log(`${this.fullName}`, {
 				message: "Failed to sign in",
 				args: {
 					status: res.body.retcode,
@@ -262,7 +262,7 @@ module.exports = class StarRail extends require("./template.js") {
 		});
 
 		if (res.statusCode !== 200) {
-			app.Logger.json(`${this.fullName}`, {
+			app.Logger.log(`${this.fullName}`, {
 				message: "Failed to get sign info",
 				args: {
 					status: res.statusCode,
@@ -275,7 +275,7 @@ module.exports = class StarRail extends require("./template.js") {
 			};
 		}
 		if (res.body.retcode !== 0) {
-			app.Logger.json(`${this.fullName}`, {
+			app.Logger.log(`${this.fullName}`, {
 				message: "Info returned non-zero retcode",
 				args: {
 					status: res.body.retcode,
@@ -312,7 +312,7 @@ module.exports = class StarRail extends require("./template.js") {
 		});
 
 		if (res.statusCode !== 200) {
-			app.Logger.json(`${this.fullName}`, {
+			app.Logger.log(`${this.fullName}`, {
 				message: "Failed to get awards data",
 				args: {
 					status: res.statusCode,
@@ -325,7 +325,7 @@ module.exports = class StarRail extends require("./template.js") {
 			};
 		}
 		if (res.body.retcode !== 0) {
-			app.Logger.json(`${this.fullName}`, {
+			app.Logger.log(`${this.fullName}`, {
 				message: "Failed to get awards data",
 				args: {
 					status: res.body.retcode,
@@ -376,7 +376,7 @@ module.exports = class StarRail extends require("./template.js") {
 		await setTimeout(5000);
 
 		if (res.statusCode !== 200) {
-			app.Logger.json(`${this.fullName}:RedeemCode`, {
+			app.Logger.log(`${this.fullName}:RedeemCode`, {
 				message: "Request threw non-200 status code",
 				args: {
 					code,
@@ -390,7 +390,7 @@ module.exports = class StarRail extends require("./template.js") {
 			};
 		}
 		if (res.body.retcode !== 0) {
-			app.Logger.json(`${this.fullName}:RedeemCode`, {
+			app.Logger.log(`${this.fullName}:RedeemCode`, {
 				message: "Failed to redeem code",
 				args: {
 					code,
@@ -445,7 +445,7 @@ module.exports = class StarRail extends require("./template.js") {
 		});
 
 		if (res.statusCode !== 200) {
-			app.Logger.json(`${this.fullName}:Notes`, {
+			app.Logger.log(`${this.fullName}:Notes`, {
 				message: "Failed to fetch data from hoyolab",
 				args: {
 					platform: this.name,
@@ -458,7 +458,7 @@ module.exports = class StarRail extends require("./template.js") {
 			return { success: false };
 		}
 		if (res.body.retcode !== 0) {
-			app.Logger.json(`${this.fullName}:Notes`, {
+			app.Logger.log(`${this.fullName}:Notes`, {
 				message: "HoyoLab returned non-zero retcode",
 				args: {
 					platform: this.name,
