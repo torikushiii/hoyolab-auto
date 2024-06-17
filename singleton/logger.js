@@ -1,31 +1,80 @@
-const debug = require("debug");
+const { createLogger, format, transports, addColors } = require("winston");
+const { combine, colorize, timestamp, printf } = format;
+const chalk = require("chalk");
+const util = require("node:util");
 
-module.exports = class LoggerSingleton {
-	log (namespace, message, options = {}) {
-		const logger = debug(`[${namespace}]`);
+class Logger {
+	constructor (config) {
+		this.loggerLevels = {
+			colors: {
+				info: "green",
+				error: "underline bold red",
+				debug: "bold magenta",
+				warn: "yellow"
+			}
+		};
 
-		logger.color = options.color ?? 34;
-		logger(message);
+		this.logFormat = printf(({ level, message, timestamp }) => {
+			const sendTarget = `<${level}:${chalk.gray(message.type)}> ${message.text}`;
+			return `${chalk.magenta(timestamp)} ${sendTarget}`;
+		});
+
+		this.winstonLogger = createLogger({
+			format: combine(
+				format((info) => {
+					info.level = info.level.toUpperCase();
+					return info;
+				})(),
+				timestamp({
+					format: "YYYY-MM-DD HH:mm:ss"
+				}),
+				colorize(),
+				this.logFormat
+			),
+			transports: [
+				new transports.Console({
+					stderrLevels: ["error"],
+					colorize: true
+				})
+			]
+		});
+
+		addColors(this.loggerLevels.colors);
+
+		const logLevel = config;
+		if (logLevel) {
+			this.winstonLogger.transports[0].level = logLevel;
+			this.winstonLogger.info({ type: "System", text: `Log level set to ${this.winstonLogger.transports[0].level}` });
+		}
+		else {
+			this.winstonLogger.transports[0].level = "info";
+			this.winstonLogger.info({ type: "System", text: `Log level set to ${this.winstonLogger.transports[0].level}` });
+		}
 	}
 
-	info (namespace, message, options = {}) {
-		const logger = debug(`[${namespace}]`);
-
-		logger.color = options.color ?? logger.color;
-		logger(message);
+	formatMessage (type, text) {
+		return { type, text };
 	}
 
-	warn (namespace, message, options = {}) {
-		const logger = debug(`[${namespace}]`);
-
-		logger.color = options.color ?? 9;
-		logger(message);
+	info (type, text) {
+		this.winstonLogger.info(this.formatMessage(type, text));
 	}
 
-	error (namespace, message, options = {}) {
-		const logger = debug(`[${namespace}]`);
-
-		logger.color = options.color ?? 196;
-		logger(message);
+	error (type, text) {
+		this.winstonLogger.error(this.formatMessage(type, text));
 	}
-};
+
+	warn (type, text) {
+		this.winstonLogger.warn(this.formatMessage(type, text));
+	}
+
+	debug (type, text) {
+		this.winstonLogger.debug(this.formatMessage(type, text));
+	}
+
+	json (type, obj) {
+		this.winstonLogger.debug(this.formatMessage(type, util.inspect(obj)));
+	}
+}
+
+module.exports = Logger;
