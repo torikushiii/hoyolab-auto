@@ -21,9 +21,11 @@
   "license": "AGPL-3.0",
   "main": "index.js",
   "dependencies": {
+    "chalk": "4.1.0",
     "cron": "^3.1.6",
     "debug": "^4.3.4",
     "discord.js": "^14.14.1",
-    "got": "^14.2.1"
+    "got": "^14.2.1",
+    "winston": "^3.13.0"
   }
 }
