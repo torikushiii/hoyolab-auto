@@ -1,5 +1,6 @@
 module.exports = {
 	prefix: "-", // Command prefix, if you enable and have Discord bot
+	loglevel: "info",
 	platforms: [
 		{
 			id: 1,
