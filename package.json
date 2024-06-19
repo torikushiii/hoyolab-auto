@@ -3,8 +3,8 @@
   "module": "index.js",
   "type": "commonjs",
   "scripts": {
-    "start": "DEBUG=* node index.js",
-    "watch": "DEBUG=* nodemon index.js",
+    "start": "node index.js",
+    "watch": "nodemon index.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
@@ -27,6 +27,8 @@
     "cron": "3.1.6",
     "discord.js": "14.14.1",
     "got": "14.2.1",
+    "keyv": "^4.5.4",
+    "keyv-file": "^0.3.1",
     "winston": "3.13.0"
   }
 }
