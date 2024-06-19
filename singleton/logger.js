@@ -41,7 +41,7 @@ class Logger {
 
 		addColors(this.loggerLevels.colors);
 
-		const logLevel = config;
+		const logLevel = config ?? "info";
 		if (logLevel) {
 			this.winstonLogger.transports[0].level = logLevel;
 			this.winstonLogger.info({ type: "System", text: `Log level set to ${this.winstonLogger.transports[0].level}` });
@@ -54,6 +54,11 @@ class Logger {
 
 	formatMessage (type, text) {
 		return { type, text };
+	}
+
+	log (type, text) {
+		const target = (typeof text === "object") ? util.inspect(text) : text;
+		this.winstonLogger.info(this.formatMessage(type, target));
 	}
 
 	info (type, text) {
