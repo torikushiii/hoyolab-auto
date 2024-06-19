@@ -1,6 +1,7 @@
 const Command = require("./classes/command.js");
 const Config = require("./classes/config.js");
 
+const Cache = require("./singleton/cache.js");
 const Got = require("./singleton/got.js");
 const Logger = require("./singleton/logger.js");
 const Utils = require("./singleton/utils.js");
@@ -38,6 +39,7 @@ catch {
 		Config,
 		Command,
 
+		Cache: new Cache(),
 		Got: await Got,
 		Logger: new Logger(config.loglevel),
 		Utils: new Utils()
