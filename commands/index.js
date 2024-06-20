@@ -1,4 +1,5 @@
 const loadCommands = (async function () {
+	const { platform } = require("node:os");
 	const fs = require("node:fs/promises");
 	const path = require("node:path");
 
@@ -13,7 +14,11 @@ const loadCommands = (async function () {
 	for (const dir of dirList) {
 		let def;
 
-		const defPath = path.join(__dirname, dir.name, "index.js");
+		let defPath = path.join(__dirname, dir.name, "index.js");
+		if (platform() === "win32") {
+			defPath = path.win32.normalize(defPath);
+		}
+
 		try {
 			def = require(defPath);
 		}
