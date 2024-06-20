@@ -165,14 +165,8 @@ class StaticGot {
 
 module.exports = new Proxy(StaticGot, {
 	apply: function (target, thisArg, args) {
-		const options = args.find(
-			(i) => typeof i === "object" && i?.constructor?.name === "Object"
-		);
-		if (
-			options
-      && typeof options.url === "string"
-      && !options.skipURLSanitization
-		) {
+		const options = args.find((i) => typeof i === "object" && i?.constructor?.name === "Object");
+		if (options && typeof options.url === "string" && !options.skipURLSanitization) {
 			options.url = sanitize(options.url);
 		}
 
