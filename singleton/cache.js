@@ -136,4 +136,4 @@ module.exports = class Cache {
 
 		return [mainKey, ...rest.sort()].join(GROUP_DELIMITER);
 	}
-}
+};
