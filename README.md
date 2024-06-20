@@ -17,7 +17,7 @@ A multi-purpose tool for any supported Hoyoverse games. This tool is designed to
 - [x] Honkai Impact 3rd (Daily Check-In only)
 - [x] Genshin Impact
 - [x] Honkai: Star Rail
-- [ ] Zenless Zone  (Coming soon)
+- [ ] Zenless Zone Zero (Coming soon)
 
 # Features
 - [x] Auto check-in (Runs every midnight your local time)
@@ -63,7 +63,7 @@ A multi-purpose tool for any supported Hoyoverse games. This tool is designed to
 7. Copy the token from the bottom box.
    ![Copy token](https://github.com/torikushiii/starrail-auto/assets/21153445/a24060a5-7195-4a3e-866f-9f2be17d3c8b)
 8. Paste the values into your `default.config.js` or `config.js` file.
-9. To run the script, use `npm start`. For Windows users, you can use either `npm start` or `set DEBUG=* & node index.js` to receive console logs.
+9. To run the script, use `npm start` or `node index.js`.
 
 > [!NOTE]
 > Repeat this step for each required cookie mentioned above.
