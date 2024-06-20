@@ -1,8 +1,8 @@
 const Command = require("./classes/command.js");
 const Config = require("./classes/config.js");
+const Got = require("./classes/got.js");
 
 const Cache = require("./singleton/cache.js");
-const Got = require("./singleton/got.js");
 const Logger = require("./singleton/logger.js");
 const Utils = require("./singleton/utils.js");
 
@@ -39,8 +39,8 @@ catch {
 		Config,
 		Command,
 
+		Got: await Got.initialize(),
 		Cache: new Cache(),
-		Got: await Got,
 		Logger: new Logger(config.loglevel),
 		Utils: new Utils()
 	};
@@ -81,6 +81,9 @@ catch {
 
 		accounts.add(HoyoLab.create(definition.type, definition));
 	}
+
+	const definitions = require("./gots/index.js");
+	await app.Got.importData(definitions);
 
 	globalThis.app = {
 		...app,
