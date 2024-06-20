@@ -19,7 +19,7 @@ const redeemGenshin = async (account, codeList) => {
 	const failed = [];
 
 	for (const code of codeList) {
-		const res = await app.Got({
+		const res = await app.Got("API", {
 			url: "https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey",
 			searchParams: {
 				uid: account.uid,
@@ -37,7 +37,7 @@ const redeemStarRail = async (account, codeList) => {
 	const failed = [];
 
 	for (const code of codeList) {
-		const res = await app.Got({
+		const res = await app.Got("API", {
 			url: "https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey",
 			responseType: "json",
 			throwHttpErrors: false,

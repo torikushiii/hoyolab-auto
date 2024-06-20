@@ -54,7 +54,7 @@ module.exports = class StarRail extends require("./template.js") {
 
 			const cookieData = `cookie_token_v2=${token}; account_mid_v2=${mid}; account_id_v2=${ltuid}`;
 
-			const { body, statusCode } = await app.Got({
+			const { body, statusCode } = await app.Got("MiHoYo", {
 				url: "https://bbs-api-os.hoyolab.com/game_record/card/wapi/getGameRecordCard",
 				responseType: "json",
 				throwHttpErrors: false,
@@ -205,7 +205,7 @@ module.exports = class StarRail extends require("./template.js") {
 	}
 
 	async #sign (cookieData) {
-		const res = await app.Got({
+		const res = await app.Got("MiHoYo", {
 			url: this.config.url.sign,
 			method: "POST",
 			responseType: "json",
@@ -250,7 +250,7 @@ module.exports = class StarRail extends require("./template.js") {
 	}
 
 	async #getSignInfo (cookieData) {
-		const res = await app.Got({
+		const res = await app.Got("MiHoYo", {
 			url: this.config.url.info,
 			responseType: "json",
 			searchParams: {
@@ -300,7 +300,7 @@ module.exports = class StarRail extends require("./template.js") {
 	}
 
 	async #getAwardsData (cookieData) {
-		const res = await app.Got({
+		const res = await app.Got("MiHoYo", {
 			url: this.config.url.home,
 			responseType: "json",
 			searchParams: {
@@ -356,7 +356,7 @@ module.exports = class StarRail extends require("./template.js") {
 	}
 
 	async redeemCode (accountData, code) {
-		const res = await app.Got({
+		const res = await app.Got("MiHoYo", {
 			url: this.config.url.redemption,
 			responseType: "json",
 			throwHttpErrors: false,
@@ -428,7 +428,7 @@ module.exports = class StarRail extends require("./template.js") {
 			};
 		}
 
-		const res = await app.Got({
+		const res = await app.Got("MiHoYo", {
 			url: this.config.url.notes,
 			responseType: "json",
 			throwHttpErrors: false,

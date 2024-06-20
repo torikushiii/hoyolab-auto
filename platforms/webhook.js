@@ -24,7 +24,7 @@ module.exports = class Webhook extends require("./template.js") {
 			});
 		}
 
-		const res = await app.Got({
+		const res = await app.Got("API", {
 			url: this.url,
 			method: "POST",
 			responseType: "json",

@@ -1,5 +1,5 @@
 exports.fetch = async () => {
-	const res = await app.Got({
+	const res = await app.Got("FakeAgent", {
 		url: "https://honkai-star-rail.fandom.com/wiki/Redemption_Code",
 		responseType: "text",
 		throwHttpErrors: false

@@ -18,7 +18,7 @@ const pictureHash = [
 ];
 
 exports.fetch = async () => {
-	const res = await app.Got({
+	const res = await app.Got("FakeAgent", {
 		url: "https://bbs-api-os.hoyolab.com/community/painter/wapi/circle/channel/guide/material",
 		responseType: "json",
 		throwHttpErrors: false,

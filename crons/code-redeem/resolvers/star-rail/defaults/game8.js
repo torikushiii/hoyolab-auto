@@ -1,5 +1,5 @@
 exports.fetch = async () => {
-	const res = await app.Got({
+	const res = await app.Got("FakeAgent", {
 		url: "https://game8.co/games/Honkai-Star-Rail/archives/410296",
 		responseType: "text",
 		throwHttpErrors: false

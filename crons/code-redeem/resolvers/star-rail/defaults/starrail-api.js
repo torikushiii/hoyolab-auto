@@ -13,7 +13,7 @@ exports.fetch = async () => {
 		}
 	}
 
-	const res = await app.Got({
+	const res = await app.Got("HoyoLab", {
 		url: "https://api.ennead.cc/starrail/code",
 		responseType: "json",
 		throwHttpErrors: false,

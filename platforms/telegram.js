@@ -28,7 +28,7 @@ module.exports = class Telegram extends require("./template.js") {
 	}
 
 	async connect () {
-		const res = await app.Got({
+		const res = await app.Got("API", {
 			url: `https://api.telegram.org/bot${this.token}/getUpdates`,
 			method: "POST",
 			responseType: "json",
@@ -112,7 +112,7 @@ module.exports = class Telegram extends require("./template.js") {
 		}
 
 		try {
-			const res = await app.Got({
+			const res = await app.Got("API", {
 				url: `https://api.telegram.org/bot${this.token}/sendMessage`,
 				method: "POST",
 				responseType: "json",
