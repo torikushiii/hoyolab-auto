@@ -64,11 +64,21 @@ const redeemStarRail = async (account, codeList) => {
 			});
 		}
 
-		if (res.body.retcode !== 0) {
+		const retcode = res.body.retcode;
+		if (retcode === -2001 || retcode === -2003) {
+			app.Logger.json("CodeRedeem:StarRail", {
+				message: "Expired or invalid code",
+				args: {
+					code: code.code
+				}
+			});
+			continue;
+		}
+		if (retcode !== 0) {
 			app.Logger.json("CodeRedeem:StarRail", {
 				message: `Star Rail API returned non-zero status code`,
 				args: {
-					retcode: res.body.retcode,
+					retcode,
 					message: res.body
 				}
 			});
