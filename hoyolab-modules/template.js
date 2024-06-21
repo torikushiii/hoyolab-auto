@@ -2,29 +2,40 @@ const GENSHIN_MAX_STAMINA = 200;
 const STARRAIL_MAX_STAMINA = 240;
 
 class DataCache {
+	static data = new Map();
+
 	constructor (expiration = 3_650_000, interval = null) {
-		this.dataCache = new Map();
 		this.expiration = expiration;
 		this.interval = interval;
 	}
 
-	set (key, value, lastUpdate = Date.now()) {
-		this.dataCache.set(key, { ...value, lastUpdate });
+	async set (key, value, lastUpdate = Date.now()) {
+		DataCache.data.set(key, { ...value, lastUpdate });
+		await app.Cache.set({
+			key,
+			value: { ...value, lastUpdate }
+		});
 	}
 
 	async get (key) {
-		const cachedData = this.dataCache.get(key);
+		let cachedData = DataCache.data.get(key);
 		if (!cachedData) {
-			return null;
+			cachedData = await app.Cache.get(key);
+			if (!cachedData) {
+				return null;
+			}
 		}
 
 		const now = Date.now();
 		if (now - cachedData.lastUpdate > this.expiration) {
-			this.dataCache.delete(key);
+			await DataCache.invalidateCache(key);
 			return null;
 		}
 
-		await this.updateCachedData(cachedData);
+		const data = await this.updateCachedData(cachedData);
+		if (!data) {
+			return null;
+		}
 
 		return cachedData;
 	}
@@ -39,7 +50,7 @@ class DataCache {
 		const isAboveThreshold = cachedData.stamina.currentStamina > account.stamina.threshold;
 
 		if (isMaxStamina || isAboveThreshold) {
-			this.dataCache.delete(cachedData.uid);
+			await DataCache.invalidateCache(cachedData.uid);
 			return null;
 		}
 
@@ -47,27 +58,46 @@ class DataCache {
 			cachedData.stamina.maxStamina,
 			cachedData.stamina.currentStamina + recoveredStamina
 		);
-		cachedData.stamina.recoveryTime -= Math.round(secondsSinceLastUpdate);
 
+		cachedData.stamina.recoveryTime -= Math.round(secondsSinceLastUpdate);
 		if (cachedData.stamina.recoveryTime <= 0) {
-			this.dataCache.delete(cachedData.uid);
+			await DataCache.invalidateCache(cachedData.uid);
 			return null;
 		}
 
 		for (const expedition of cachedData.expedition.list) {
-			expedition.remained_time = Number(expedition.remained_time);
-			if (expedition.remained_time === 0) {
-				this.dataCache.delete(cachedData.uid);
+			expedition.remaining_time = Number(expedition.remaining_time);
+			if (expedition.remaining_time === 0) {
+				await DataCache.invalidateCache(cachedData.uid);
 				return null;
 			}
 			else {
-				expedition.remained_time -= Math.round(secondsSinceLastUpdate);
+				expedition.remaining_time -= Math.round(secondsSinceLastUpdate);
 			}
+		}
+
+		return cachedData;
+	}
+
+	static async invalidateCache (key) {
+		if (key instanceof DataCache) {
+			DataCache.data.delete(key);
+			await app.Cache.delete(key);
+		}
+		else if (typeof key === "string") {
+			DataCache.data.delete(key);
+			await app.Cache.delete(key);
+		}
+		else {
+			throw new app.Error({
+				message: "Invalid cache identifier provided.",
+				args: { key }
+			});
 		}
 	}
 
 	clear () {
-		this.dataCache.clear();
+		DataCache.data.clear();
 	}
 
 	startExpirationInterval () {
