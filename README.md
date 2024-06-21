@@ -1,67 +1,62 @@
 <h1 align="center">
-    <img width="120" height="120" src="https://i.ibb.co/nRqTkXv/image.png" alt=""><br>
+    <img width="120" height="120" src="https://i.ibb.co/nRqTkXv/image.png" alt="HoyoLab Auto Logo"><br>
     HoyoLab Auto
 </h1>
 
 <p align="center">
-   <img src="https://img.shields.io/badge/NodeJS-20.2.0-green">
-   <img src="https://img.shields.io/github/license/torikushiii/hoyolab-auto">
-   <img src="https://img.shields.io/github/stars/torikushiii/hoyolab-auto">
+   <img src="https://img.shields.io/badge/NodeJS-20.2.0-green" alt="NodeJS version badge">
+   <img src="https://img.shields.io/github/license/torikushiii/hoyolab-auto" alt="License badge">
+   <img src="https://img.shields.io/github/stars/torikushiii/hoyolab-auto" alt="GitHub stars badge">
 </p>
 
 # HoyoLab Auto
 
-A multi-purpose tool for any supported Hoyoverse games. This tool is designed to help you with your daily check-in, stamina check, expedition check, automatic code-redemption, and more.
+A multi-purpose tool for any supported Hoyoverse games. This tool is designed to assist with daily check-ins, stamina checks, expedition checks, automatic code-redemption, and more.
 
-# Supported Games
+## Supported Games
 - [x] Honkai Impact 3rd (Daily Check-In only)
 - [x] Genshin Impact
 - [x] Honkai: Star Rail
 - [ ] Zenless Zone Zero (Coming soon)
 
-# Features
-- [x] Auto check-in (Runs every midnight your local time)
-- [x] Dailies check
-    - This feature will reminds you to do your dailies, such as completing your daily commissions. Defaulted to 09:00 your local time.
-- [x] Weeklies check
-    - This feature will reminds you to do your weeklies, such as completing your weekly bosses, use your discounted resin, simulated universe, etc. Defaulted to 09:00 your local time.
-- [x] Stamina check (Check your Resin/Stamina every 30 minutes)
-    - [x] Customizable threshold
-        - This feature will notify you when your stamina is above your set threshold.
-- [x] Expedition check (Check your expedition every 30 minutes)
-- [x] Notification
-    - [x] Discord
-    - [x] Telegram
+## Features
+- **Auto check-in**: Runs every midnight local time.
+- **Dailies check**: Reminds you to complete your daily tasks, such as daily commissions, at 09:00 local time.
+- **Weeklies check**: Reminds you to complete weekly tasks, such as weekly bosses and discounted resin usage, at 09:00 local time.
+- **Stamina check**: Monitors your Resin/Stamina every 30 minutes.
+  - **Customizable threshold**: Notifies you when your stamina is above your set threshold.
+- **Expedition check**: Checks your expeditions every 30 minutes.
+- **Notifications**:
+  - Discord
+  - Telegram
 
-
-# Pre-requisites
+## Prerequisites
 - [Node.js](https://nodejs.org/en/)
 
-# Installation
+## Installation
 1. Clone the repository.
 2. Run `npm install` to install the dependencies.
 3. Create a `config.js` or rename `default.config.js` to `config.js`.
 4. Follow the instructions in the `default.config.js` or `config.js` file.
 
-# Usage
+## Usage
+For a detailed usage guide, refer to this gist: [Cookie Guide](https://gist.github.com/torikushiii/59eff33fc8ea89dbc0b2e7652db9d3fd).
 
-For usage guide, refer to this gist: [Cookie Guide](https://gist.github.com/torikushiii/59eff33fc8ea89dbc0b2e7652db9d3fd)
+## Notifications Setup
+For setting up Discord or Telegram notifications, refer to the [setup folder](https://github.com/torikushiii/hoyolab-auto/tree/main/setup).
 
-# Notifications
-For Discord notifications or Telegram setup, refer to this folder: [setup](https://github.com/torikushiii/hoyolab-auto/tree/main/setup)
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change. If there are any bugs, please open an issue.
 
-# Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change. If there's any bugs, please open an issue.
+If you have any suggestions or ideas, feel free to open an issue.
 
-If you have any suggestions/ideas, feel free to open an issue.
+**New to contributing?**
 
-**New here?**
+To get started, fork the repo, make your changes, add, commit, and push your changes to your fork. Then, open a pull request. If you're new to GitHub, [this tutorial](https://www.freecodecamp.org/news/how-to-make-your-first-pull-request-on-github-3#let-s-make-our-first-pull-request-) might help.
 
-To get started, fork the repo, make your changes, add, commit and push your changes to your fork, then come back here and open a pull request. If you're new to GitHub, [this tutorial](https://www.freecodecamp.org/news/how-to-make-your-first-pull-request-on-github-3#let-s-make-our-first-pull-request-) may help.
+You can support the project by giving it a star, sharing it with your friends, contributing to the project, and reporting any bugs you find.
 
-You can support the project by giving it a star, sharing it with your friends, contributing to the project, and report any bugs you find.
-
-# Buy me a coffee
-If this repo is useful to you, you can buy me a coffee to support me. Thank you!
+## Buy Me a Coffee
+If this repo is useful to you, you can support me by buying me a coffee. Thank you!
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/torikushiii)
