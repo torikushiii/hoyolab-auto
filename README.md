@@ -45,28 +45,7 @@ A multi-purpose tool for any supported Hoyoverse games. This tool is designed to
 
 # Usage
 
-> [!WARNING]
-> If you want to run this with multiple different accounts, log-in using incognito then do this step to avoid cookies overlapping.
-
-1. Go to your HoyoLab profile [here](https://www.hoyolab.com/accountCenter/postList).
-2. Log in with your Hoyoverse account.
-3. Open the browser console (F12).
-4. Go to the Application tab.
-   ![Application tab](https://github.com/torikushiii/starrail-auto/assets/21153445/b7b9d211-beda-4c54-98b8-e293b6f130a8)
-5. Look for the `Storage` tab in the left column, then go to Cookies > https://www.hoyolab.com.
-   ![Storage tab](https://github.com/torikushiii/starrail-auto/assets/21153445/a67fe81c-1945-49c2-9d0f-fa971f22a904)
-6. Find the required cookies: `account_mid_v2`, `cookie_token_v2`, and `ltuid_v2` using the Filter box.
-> [!NOTE]
-> For `cookie_token_v2`, choose the one with the bigger size. If they have the same size, select the one with the longer value, if both are the same, choose whichever.
-   
-   ![Cookies](https://github.com/torikushiii/starrail-auto/assets/21153445/692447ab-0925-4a27-8861-6c10c5410520)
-7. Copy the token from the bottom box.
-   ![Copy token](https://github.com/torikushiii/starrail-auto/assets/21153445/a24060a5-7195-4a3e-866f-9f2be17d3c8b)
-8. Paste the values into your `default.config.js` or `config.js` file.
-9. To run the script, use `npm start` or `node index.js`.
-
-> [!NOTE]
-> Repeat this step for each required cookie mentioned above.
+For usage guide, refer to this gist: [Cookie Guide](https://gist.github.com/torikushiii/59eff33fc8ea89dbc0b2e7652db9d3fd)
 
 # Notifications
 For Discord notifications or Telegram setup, refer to this folder: [setup](https://github.com/torikushiii/hoyolab-auto/tree/main/setup)
