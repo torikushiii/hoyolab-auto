@@ -104,6 +104,43 @@ module.exports = {
 
 				await context.channel.send({ embeds });
 			}
+			else if (context.platform.id === 2) {
+				const { data } = notes;
+				const { stamina, dailies, weeklies, expedition } = data;
+				const telegram = app.Platform.get(2);
+
+				if (platform.gameId === 2) {
+					const message = [
+						`Current Stamina: ${stamina.currentStamina}/${stamina.maxStamina}`
+						+ `\nFull in:\n${app.Utils.formatTime(stamina.recoveryTime)}`,
+						"Expedition Status",
+						expedition.list.map((i, idx) => `Account ${idx + 1} - ${app.Utils.formatTime(i.remaining_time)}`).join("\n"),
+						"Dailies",
+						`${dailies.task}/${dailies.maxTask}`,
+						"Weekly Boss Chance Remaining:",
+						`${weeklies.resinDiscount}/${weeklies.resinDiscountLimit}`
+					].join("\n");
+
+					const escapedMessage = app.Utils.escapeCharacters(message);
+					await telegram.send(escapedMessage);
+				}
+				else if (platform.gameId === 6) {
+					const message = [
+						`Current Stamina: ${stamina.currentStamina}/${stamina.maxStamina}`
+						+ `\nFull in:\n${app.Utils.formatTime(stamina.recoveryTime)}`,
+						"Expedition Status",
+						expedition.list.map((i, idx) => `Account ${idx + 1} - ${app.Utils.formatTime(i.remaining_time)}`).join("\n"),
+						"Dailies",
+						`${dailies.task}/${dailies.maxTask}`,
+						"Weekly Status:",
+						`Boss: ${weeklies.weeklyBoss}/${weeklies.weeklyBossLimit}`
+						+ `\nSimulated Universe: ${weeklies.rogueScore}/${weeklies.maxScore}`
+					].join("\n");
+
+					const escapedMessage = app.Utils.escapeCharacters(message);
+					await telegram.send(escapedMessage);
+				}
+			}
 		}
 	})
 };
