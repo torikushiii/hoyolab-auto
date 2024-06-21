@@ -119,7 +119,7 @@ module.exports = {
 				`Recovery Time: ${delta}`
 			];
 
-			if (reserveStamina !== null) {
+			if (reserveStamina !== null && typeof reserveStamina !== "undefined") {
 				description.push(`Reserve Stamina: ${reserveStamina}`);
 			}
 
