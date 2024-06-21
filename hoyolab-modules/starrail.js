@@ -472,7 +472,7 @@ module.exports = class StarRail extends require("./template.js") {
 		}
 
 		const data = res.body.data;
-		
+
 		const stamina = {
 			currentStamina: data.current_stamina,
 			maxStamina: data.max_stamina,
@@ -493,7 +493,7 @@ module.exports = class StarRail extends require("./template.js") {
 			maxScore: data.max_rogue_score
 		};
 
-		this.dataCache.set(accountData.uid, {
+		await this.dataCache.set(accountData.uid, {
 			uid: accountData.uid,
 			nickname: accountData.nickname,
 			lastUpdate: Date.now(),
@@ -502,7 +502,11 @@ module.exports = class StarRail extends require("./template.js") {
 			weeklies,
 			expedition: {
 				completed: data.expeditions.every(i => i.status.toLowerCase() === "finished"),
-				list: data.expeditions
+				list: data.expeditions.map(i => ({
+					avatar: i.avatars,
+					status: i.status,
+					remaining_time: i.remaining_time
+				}))
 			}
 		});
 
@@ -514,7 +518,11 @@ module.exports = class StarRail extends require("./template.js") {
 				weeklies,
 				expedition: {
 					completed: data.expeditions.every(i => i.status.toLowerCase() === "finished"),
-					list: data.expeditions
+					list: data.expeditions.map(i => ({
+						avatar: i.avatars,
+						status: i.status,
+						remaining_time: i.remaining_time
+					}))
 				},
 				assets: {
 					...this.config.assets,

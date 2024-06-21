@@ -501,7 +501,11 @@ module.exports = class Genshin extends require("./template.js") {
 			weeklies,
 			expedition: {
 				completed: data.expeditions.every(i => i.status.toLowerCase() === "finished"),
-				list: data.expeditions
+				list: data.expeditions.map(i => ({
+					avatar: i.avatar_side_icon,
+					status: i.status,
+					remaining_time: i.remained_time
+				}))
 			}
 		});
 
@@ -513,7 +517,11 @@ module.exports = class Genshin extends require("./template.js") {
 				weeklies,
 				expedition: {
 					completed: data.expeditions.every(i => i.status.toLowerCase() === "finished"),
-					list: data.expeditions
+					list: data.expeditions.map(i => ({
+						avatar: i.avatar_side_icon,
+						status: i.status,
+						remaining_time: i.remained_time
+					}))
 				},
 				assets: {
 					...this.config.assets,
