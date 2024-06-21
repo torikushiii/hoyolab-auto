@@ -6,7 +6,8 @@ module.exports = class Telegram extends require("./template.js") {
 
 	static possibleCommands = [
 		"/stamina",
-		"/expedition"
+		"/expedition",
+		"/notes"
 	];
 
 	constructor (config) {
