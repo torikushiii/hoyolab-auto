@@ -57,8 +57,8 @@ class DataCache {
 		for (const expedition of cachedData.expedition.list) {
 			expedition.remained_time = Number(expedition.remained_time);
 			if (expedition.remained_time === 0) {
-				expedition.status = "Finished";
-				expedition.remained_time = "0";
+				this.dataCache.delete(cachedData.uid);
+				return null;
 			}
 			else {
 				expedition.remained_time -= Math.round(secondsSinceLastUpdate);
