@@ -1,23 +1,23 @@
+const fs = require("node:fs");
+
 const cookies = [
 	"cookie_account_1",
-	"cookie_account_2"
+	"cookie_account_2" // Remove this line if you only have one account
 ];
 
-const stuff = [];
-for (const cookie of cookies) {
-	const cookieObj = {};
-	const cookieArr = cookie.split("; ");
-	for (const cookieItem of cookieArr) {
-		const [key, value] = cookieItem.split("=");
-		cookieObj[key.trim()] = value;
-	}
-	stuff.push({
-		cookie: {
-			token: cookieObj.cookie_token_v2,
-			mid: cookieObj.account_mid_v2,
-			ltuid: cookieObj.account_id_v2
-		}
-	});
-}
+const stuff = cookies.map(cookie => {
+	const cookieObj = Object.fromEntries(
+		cookie.split("; ")
+			.map(cookieItem => cookieItem.split("=").map(part => part.trim()))
+	);
+	return {
+		token: cookieObj.cookie_token_v2,
+		mid: cookieObj.account_mid_v2,
+		ltuid: cookieObj.account_id_v2
+	};
+});
 
-console.log(stuff);
+const text = stuff.reduce((acc, { token, mid, ltuid }, i) => `${acc}Account ${i + 1}:\n` + `token: ${token}\n` + `mid: ${mid}\n` + `ltuid: ${ltuid}\n\n`, "");
+
+fs.writeFileSync("generated-cookie.txt", text);
+console.log("Done! Check generated-cookie.txt for the output.");
