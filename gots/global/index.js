@@ -12,7 +12,7 @@ const definition = {
 		mutableDefaults: true,
 		throwHttpErrors: false,
 		headers: {
-			"User-Agent": "HoyoLabAuto/2.0 github.com/torikushiii/hoyolab-auto"
+			"User-Agent": "Custom fork of HoyoLabAuto: github.com/torikushiii/hoyolab-auto"
 		},
 		hooks: {
 			beforeError: [
