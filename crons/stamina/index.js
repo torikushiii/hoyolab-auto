@@ -47,6 +47,10 @@ module.exports = {
 				account.stamina.fired = true;
 				platform.update(account);
 
+				const description = (stamina.currentStamina === stamina.maxStamina)
+					? "Your stamina is full!"
+					: "Your stamina is within the set threshold!";
+
 				const webhook = app.Platform.get(3);
 				if (webhook) {
 					const embed = {
@@ -56,7 +60,7 @@ module.exports = {
 							name: data.assets.author,
 							icon_url: data.assets.logo
 						},
-						description: "Your stamina is within the set threshold!",
+						description,
 						fields: [
 							{ name: "UID", value: account.uid, inline: true },
 							{ name: "Username", value: account.nickname, inline: true },
@@ -80,7 +84,7 @@ module.exports = {
 				const telegram = app.Platform.get(2);
 				if (telegram) {
 					const messageText = [
-						`📢 Stamina Reminder, Your Stamina is Within the Set Threshold!`,
+						`📢 Stamina Reminder, ${description}`,
 						`🎮 **Game**: ${data.assets.game}`,
 						`🆔 **UID**: ${account.uid} ${account.nickname}`,
 						`🌍 **Region**: ${app.Utils.formattedAccountRegion(account.region)}`,
