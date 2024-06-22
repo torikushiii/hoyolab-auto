@@ -3,49 +3,63 @@ const STARRAIL_MAX_STAMINA = 240;
 
 class DataCache {
 	static data = new Map();
+	static expirationInterval;
 
-	constructor (expiration = 3_650_000, interval = null) {
+	constructor (expiration = 3_650_000) {
+		/**
+		 * Cache Expiration in milliseconds
+		 * @type {number}
+		 */
 		this.expiration = expiration;
-		this.interval = interval;
+
+		if (!DataCache.expirationInterval) {
+			DataCache.expirationInterval = setInterval(() => DataCache.data.clear(), this.expiration);
+		}
 	}
 
 	async set (key, value, lastUpdate = Date.now()) {
-		DataCache.data.set(key, { ...value, lastUpdate });
-		await app.Cache.set({
-			key,
-			value: { ...value, lastUpdate }
-		});
+		const data = { ...value, lastUpdate };
+		DataCache.data.set(key, data);
+
+		if (app.Cache) {
+			await app.Cache.set({
+				key,
+				value: data
+			});
+		}
 	}
 
 	async get (key) {
+		// 1. Attempt to get data from memory cache
 		let cachedData = DataCache.data.get(key);
-		if (!cachedData) {
+		if (cachedData) {
+			return this.#updateCachedData(cachedData);
+		}
+
+		// 2. Attempt to get data from keyv cache
+		if (app.Cache) {
 			cachedData = await app.Cache.get(key);
-			if (!cachedData) {
-				return null;
+			if (cachedData) {
+				DataCache.data.set(key, cachedData);
+				return this.#updateCachedData(cachedData);
 			}
 		}
 
-		const now = Date.now();
-		if (now - cachedData.lastUpdate > this.expiration) {
-			await DataCache.invalidateCache(key);
-			return null;
-		}
-
-		const data = await this.updateCachedData(cachedData);
-		if (!data) {
-			return null;
-		}
-
-		return cachedData;
+		return null;
 	}
 
-	async updateCachedData (cachedData) {
+	async #updateCachedData (cachedData) {
 		const now = Date.now();
+		if (now - cachedData.lastUpdate > this.expiration) {
+			await DataCache.invalidateCache(cachedData.uid);
+			return null;
+		}
+
 		const secondsSinceLastUpdate = (now - cachedData.lastUpdate) / 1000;
 		const recoveredStamina = Math.floor(secondsSinceLastUpdate / 360);
 
 		const account = app.HoyoLab.getAccountById(cachedData.uid);
+
 		const isMaxStamina = cachedData.stamina.currentStamina === cachedData.stamina.maxStamina;
 		const isAboveThreshold = cachedData.stamina.currentStamina > account.stamina.threshold;
 
@@ -58,8 +72,8 @@ class DataCache {
 			cachedData.stamina.maxStamina,
 			cachedData.stamina.currentStamina + recoveredStamina
 		);
-
 		cachedData.stamina.recoveryTime -= Math.round(secondsSinceLastUpdate);
+
 		if (cachedData.stamina.recoveryTime <= 0) {
 			await DataCache.invalidateCache(cachedData.uid);
 			return null;
@@ -76,45 +90,22 @@ class DataCache {
 			}
 		}
 
+		await this.set(cachedData.uid, cachedData, now);
+
 		return cachedData;
 	}
 
 	static async invalidateCache (key) {
-		if (key instanceof DataCache) {
-			DataCache.data.delete(key);
+		DataCache.data.delete(key);
+
+		if (app.Cache) {
 			await app.Cache.delete(key);
-		}
-		else if (typeof key === "string") {
-			DataCache.data.delete(key);
-			await app.Cache.delete(key);
-		}
-		else {
-			throw new app.Error({
-				message: "Invalid cache identifier provided.",
-				args: { key }
-			});
 		}
 	}
 
-	clear () {
+	static destroy () {
+		clearInterval(DataCache.expirationInterval);
 		DataCache.data.clear();
-	}
-
-	startExpirationInterval () {
-		if (this.interval) {
-			return;
-		}
-
-		this.interval = setInterval(() => this.clear(), this.expiration);
-	}
-
-	stopExpirationInterval () {
-		if (!this.interval) {
-			return;
-		}
-
-		clearInterval(this.interval);
-		this.interval = null;
 	}
 }
 
