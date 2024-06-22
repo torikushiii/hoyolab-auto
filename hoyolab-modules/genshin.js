@@ -36,8 +36,6 @@ module.exports = class Genshin extends require("./template.js") {
 				message: "No Genshin accounts provided"
 			});
 		}
-
-		this.dataCache.startExpirationInterval();
 	}
 
 	async login () {
