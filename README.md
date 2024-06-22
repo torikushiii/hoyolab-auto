@@ -30,6 +30,10 @@ A multi-purpose tool for any supported Hoyoverse games. This tool is designed to
   - Discord
   - Telegram
 
+## Google App Script
+If you don't have a server to run this script and simply just want to use it for checking in, you can use Google App Script.
+  - [Google App Script](https://github.com/torikushiii/hoyolab-auto/tree/main/services)
+
 ## Prerequisites
 - [Node.js](https://nodejs.org/en/)
 
