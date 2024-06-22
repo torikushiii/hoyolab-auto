@@ -90,7 +90,7 @@ class DataCache {
 			}
 		}
 
-		await this.set(cachedData.uid, cachedData, now);
+		await this.set(cachedData.uid, cachedData, cachedData.lastUpdate);
 
 		return cachedData;
 	}
