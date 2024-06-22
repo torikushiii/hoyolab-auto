@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  instance:
+    build:
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    container_name: hoyolab-auto
+    network_mode: bridge
+    volumes:
+      - ./config.json:/app/config.json:ro
+    environment:
+      TZ: Asia/Shanghai
