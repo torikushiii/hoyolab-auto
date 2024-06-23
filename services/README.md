@@ -5,7 +5,6 @@
 # Contents
 - [Pre-requisites](#pre-requisites)
 - [Setting-up](#setting-up)
-- [Running Automatically](#trigger)
 
 # Pre-requisites
 - Google Account
@@ -24,9 +23,9 @@
    * **Getting Cookie:**
       - When you are at the check-in page, open the developer console (F12) and go to the "Network" tab (refresh the page if needed).
       - Find `home` request and click it.
-      ![image](https://gist.github.com/assets/21153445/85a820d6-4783-4ceb-87e0-125821348d77)
+      ![image](https://github.com/torikushiii/hoyolab-auto/assets/21153445/f4fdc55a-9834-4b00-8284-99c9ccf8992a)
       - Scroll down to the "Request Headers" section and select everything under "cookie" to use at step 2.
-      ![image](https://gist.github.com/assets/21153445/ba9e93c9-3b03-44ec-b2f6-1741ea1c21f8)
+      ![image](https://github.com/torikushiii/hoyolab-auto/assets/21153445/c7f4b197-b729-4886-b0b2-7d4450b4aec8)
      
 **2. Setup in Google Apps Script**
 
