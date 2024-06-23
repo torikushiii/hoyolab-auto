@@ -27,9 +27,55 @@ const redeemGenshin = async (account, codeList) => {
 				lang: "en",
 				cdkey: code,
 				game_biz: "hk4e_global"
+			},
+			headers: {
+				Cookie: account.cookie
 			}
 		});
+
+		if (res.statusCode !== 200) {
+			throw new app.Error({
+				message: "Genshin API returned non-200 status code.",
+				args: {
+					statusCode: res.statusCode,
+					body: res.body
+				}
+			});
+		}
+
+		const retcode = res.body.retcode;
+		if (retcode === -2001 || retcode === -2003) {
+			app.Logger.json("CodeRedeem:Genshin", {
+				message: "Expired or invalid code",
+				args: {
+					code
+				}
+			});
+			continue;
+		}
+
+		if (retcode !== 0) {
+			app.Logger.json("CodeRedeem:Genshin", {
+				message: `Genshin API returned non-zero status code`,
+				args: {
+					retcode,
+					message: res.body
+				}
+			});
+
+			failed.push(code);
+			await setTimeout(7000);
+			continue;
+		}
+
+		success.push(code);
+		await setTimeout(7000);
 	}
+
+	return {
+		success,
+		failed
+	};
 };
 
 const redeemStarRail = async (account, codeList) => {
