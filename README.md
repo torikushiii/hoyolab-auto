@@ -49,6 +49,34 @@ For a detailed usage guide, refer to this gist: [Cookie Guide](https://gist.gith
 ## Notifications Setup
 For setting up Discord or Telegram notifications, refer to the [setup folder](https://github.com/torikushiii/hoyolab-auto/tree/main/setup).
 
+## Docker
+You can also run this script using Docker.
+
+### How to run
+For the application to work, the configuration file must be mounted under `/app/config.js` or `/app/default.config.js` and `app/data`, respectively (refer to `docker-compose.yml`).
+
+  1. Prepare the configuration file by renaming `default.config.js` to `config.js` and filling in the necessary information.
+  2. Build the Docker image:
+      ```bash
+      docker compose build
+      ```
+      or if you want to build without cache:
+      ```bash
+      docker compose build --no-cache
+      ```
+  3. Start the Docker container:
+      ```bash
+      docker compose up -d
+      ```
+  4. Check the logs:
+      ```bash
+      docker compose logs -f
+      ```
+  5. To stop the Docker container:
+      ```bash
+      docker compose down
+      ```
+
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change. If there are any bugs, please open an issue.
 
