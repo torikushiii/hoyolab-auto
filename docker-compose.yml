@@ -9,5 +9,6 @@ services:
     network_mode: bridge
     volumes:
       - ./config.json:/app/config.json:ro
+      - ./data/cache.json:/app/data/cache.json:ro
     environment:
       TZ: Asia/Shanghai
