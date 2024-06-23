@@ -178,7 +178,6 @@ dist
 types.js
 
 # Cache Path
-/data
 cache.json
 
 # Cookie
