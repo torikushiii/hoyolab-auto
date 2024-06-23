@@ -36,7 +36,10 @@ exports.fetch = async () => {
 		return [];
 	}
 
-	app.Logger.json(`Found ${codes.length} codes.`, { codes });
+	app.Logger.json("StarRailAPI", {
+		message: `Found ${codes.length} codes.`,
+		codes
+	});
 
 	return codes.map(i => ({
 		code: i.code,

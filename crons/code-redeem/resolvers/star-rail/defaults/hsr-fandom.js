@@ -6,7 +6,8 @@ exports.fetch = async () => {
 	});
 
 	if (res.statusCode !== 200) {
-		app.Logger.log("Failed to fetch data from HSR Fandom.", {
+		app.Logger.log("HSRFandom", {
+			message: "Failed to fetch data from HSR Fandom.",
 			statusCode: res.statusCode,
 			response: res.body
 		});
@@ -48,7 +49,10 @@ exports.fetch = async () => {
 		});
 	}
 
-	app.Logger.json(`Found ${rewards.length} codes.`, { rewards });
+	app.Logger.json("HSRFandom", {
+		message: `Found ${rewards.length} rewards.`,
+		rewards
+	});
 
 	return rewards;
 };
