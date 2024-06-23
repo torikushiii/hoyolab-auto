@@ -7,5 +7,12 @@ RUN npm i
 
 COPY ["./", "./"]
 
-USER node:node
+RUN mkdir -p /app/data
+
+RUN chown -R node:node /app
+
+USER node
+
+ENV TZ=Asia/Shanghai
+
 CMD ["npm", "start"]
