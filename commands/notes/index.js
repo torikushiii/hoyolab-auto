@@ -58,11 +58,6 @@ module.exports = {
 							value: `${stamina.currentStamina}/${stamina.maxStamina}`
                             + `\nFull in:\n${app.Utils.formatTime(stamina.recoveryTime)}`,
 							inline: true
-						},
-						{
-							name: "Expedition Status",
-							value: expedition.list.map((i, idx) => `**Account ${idx + 1}** - ${app.Utils.formatTime(i.remaining_time)}`).join("\n"),
-							inline: true
 						}
 					],
 					timestamp: new Date(),
@@ -77,11 +72,16 @@ module.exports = {
 						{
 							name: "Dailies",
 							value: `${dailies.task}/${dailies.maxTask}`,
-							inline: false
+							inline: true
 						},
 						{
 							name: "Weekly Boss Chance Remaining:",
 							value: `${weeklies.resinDiscount}/${weeklies.resinDiscountLimit}`,
+							inline: false
+						},
+						{
+							name: "Expedition Status",
+							value: expedition.list.map((i, idx) => `**Account ${idx + 1}** - ${app.Utils.formatTime(i.remaining_time)}`).join("\n"),
 							inline: true
 						}
 					);
@@ -91,12 +91,17 @@ module.exports = {
 						{
 							name: "Dailies",
 							value: `${dailies.task}/${dailies.maxTask}`,
-							inline: false
+							inline: true
 						},
 						{
 							name: "Weekly Status:",
 							value: `Boss: ${weeklies.weeklyBoss}/${weeklies.weeklyBossLimit}`
                             + `\nSimulated Universe: ${weeklies.rogueScore}/${weeklies.maxScore}`,
+							inline: false
+						},
+						{
+							name: "Expedition Status",
+							value: expedition.list.map((i, idx) => `**Account ${idx + 1}** - ${app.Utils.formatTime(i.remaining_time)}`).join("\n"),
 							inline: true
 						}
 					);
