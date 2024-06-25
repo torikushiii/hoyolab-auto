@@ -1,6 +1,7 @@
 module.exports = {
 	prefix: "-", // Command prefix, if you enable and have Discord bot
 	loglevel: "info",
+	userAgent: "Custom fork of HoyoLabAuto: github.com/torikushiii/hoyolab-auto",
 	platforms: [
 		{
 			id: 1,

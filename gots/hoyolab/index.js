@@ -3,7 +3,7 @@ const definition = {
 	optionsType: "object",
 	options: {
 		headers: {
-			"User-Agent": "HoyoLabAuto/2.0 github.com/torikushiii/hoyolab-auto"
+			"User-Agent": app.Config.get("userAgent")
 		}
 	},
 	parent: "Global"

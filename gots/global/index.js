@@ -3,6 +3,7 @@ const definition = {
 	optionsType: "function",
 	options: (() => ({
 		responseType: "json",
+		http2: true,
 		retry: {
 			limit: 0
 		},
@@ -12,7 +13,7 @@ const definition = {
 		mutableDefaults: true,
 		throwHttpErrors: false,
 		headers: {
-			"User-Agent": "Custom fork of HoyoLabAuto: github.com/torikushiii/hoyolab-auto"
+			"User-Agent": app.Config.get("userAgent")
 		},
 		hooks: {
 			beforeError: [
