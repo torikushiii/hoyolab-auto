@@ -81,7 +81,7 @@ class DataCache {
 
 		for (const expedition of cachedData.expedition.list) {
 			expedition.remaining_time = Number(expedition.remaining_time);
-			if (expedition.remaining_time === 0) {
+			if (expedition.remaining_time <= 0) {
 				await DataCache.invalidateCache(cachedData.uid);
 				return null;
 			}
