@@ -1,4 +1,10 @@
-const CodeResolver = require("./resolvers/index.js");
+const {
+	fetchCodes,
+	redeemGenshin,
+	redeemStarRail,
+	// redeemZenless,
+	buildMessage
+} = require("./util.js");
 
 module.exports = {
 	name: "code-redeem",
@@ -17,11 +23,16 @@ module.exports = {
 			return;
 		}
 
-		const { starrail, genshin } = await CodeResolver.fetchAll();
-		if (starrail.length === 0 && genshin.length === 0) {
+		const codeData = await fetchCodes();
+		if (!codeData) {
+			app.Logger.debug("CodeRedeem", "No codes found.");
 			return;
 		}
 
+		const telegram = app.Platform.get(2);
+		const webhook = app.Platform.get(3);
+
+		const { genshin, starrail } = codeData;
 		if (genshin.length !== 0) {
 			const accounts = app.HoyoLab.getActiveAccounts({ whitelist: "genshin" });
 			if (accounts.length === 0) {
@@ -29,38 +40,20 @@ module.exports = {
 				return;
 			}
 
-			const telegram = app.Platform.get(2);
-			const webhook = app.Platform.get(3);
 			for (const account of accounts) {
 				if (account.redeemCode === false) {
 					continue;
 				}
 
-				const { success, failed } = await CodeResolver.redeemGenshin(account, genshin);
+				const { success, failed } = await redeemGenshin(account, genshin);
 				if (success.length !== 0) {
 					for (const code of success) {
-						const embed = {
-							color: 0xBB0BB5,
-							title: "Genshin Impact Code Redeem",
-							description: `(${account.uid}) ${account.nickname}`
-							+ `\nCode Successfully Redeemed!`
-							+ `\nCode: \`${code.code}\``
-							+ `\nRewards: ${code.rewards.join(", ")}`,
-							timestamp: new Date()
-						};
-
+						const message = buildMessage(true, account, code);
 						if (webhook) {
-							await webhook.send(embed);
+							await webhook.send(message.embed);
 						}
 						if (telegram) {
-							const message = [
-								`[Genshin Impact] (${account.uid}) ${account.nickname}`,
-								`Code Successfully Redeemed!`,
-								`Code: ${code.code}`,
-								`Rewards: ${code.rewards.join(", ")}`
-							].join("\n");
-
-							const escapedMessage = app.Utils.escapeCharacters(message);
+							const escapedMessage = app.Utils.escapeCharacters(message.telegram);
 							await telegram.send(escapedMessage);
 						}
 					}
@@ -68,27 +61,12 @@ module.exports = {
 
 				if (failed.length !== 0) {
 					for (const code of failed) {
-						const embed = {
-							color: 0xBB0BB5,
-							title: "Genshin Impact Code Redeem",
-							description: `(${account.uid}) ${account.nickname}`
-							+ `\nFailed to redeem code: \`${code.code}\``
-							+ `\nManually Redeem Here:\nhttps://genshin.hoyoverse.com/en/gift?code=${code.code}`,
-							timestamp: new Date()
-						};
-
+						const message = buildMessage(false, account, code);
 						if (webhook) {
-							await webhook.send(embed);
+							await webhook.send(message.embed);
 						}
 						if (telegram) {
-							const message = [
-								`[Genshin Impact] (${account.uid}) ${account.nickname}`,
-								`Code Failed to Redeem!`,
-								`Code: ${code.code}`,
-								`Manually Redeem Here: https://genshin.hoyoverse.com/en/gift?code=${code.code}`
-							].join("\n");
-
-							const escapedMessage = app.Utils.escapeCharacters(message);
+							const escapedMessage = app.Utils.escapeCharacters(message.telegram);
 							await telegram.send(escapedMessage);
 						}
 					}
@@ -103,38 +81,20 @@ module.exports = {
 				return;
 			}
 
-			const telegram = app.Platform.get(2);
-			const webhook = app.Platform.get(3);
 			for (const account of accounts) {
 				if (account.redeemCode === false) {
 					continue;
 				}
 
-				const { success, failed } = await CodeResolver.redeemStarRail(account, starrail);
+				const { success, failed } = await redeemStarRail(account, starrail);
 				if (success.length !== 0) {
 					for (const code of success) {
-						const embed = {
-							color: 0xBB0BB5,
-							title: "Honkai: Star Rail Code Redeem",
-							description: `(${account.uid}) ${account.nickname}`
-							+ `\nCode Successfully Redeemed!`
-							+ `\nCode: \`${code.code}\``
-							+ `\nRewards: ${code.rewards.join(", ")}`,
-							timestamp: new Date()
-						};
-
+						const message = buildMessage(true, account, code);
 						if (webhook) {
-							await webhook.send(embed);
+							await webhook.send(message.embed);
 						}
 						if (telegram) {
-							const message = [
-								`[Star Rail] (${account.uid}) ${account.nickname}`,
-								`Code Successfully Redeemed!`,
-								`Code: ${code.code}`,
-								`Rewards: ${code.rewards.join(", ")}`
-							].join("\n");
-
-							const escapedMessage = app.Utils.escapeCharacters(message);
+							const escapedMessage = app.Utils.escapeCharacters(message.telegram);
 							await telegram.send(escapedMessage);
 						}
 					}
@@ -142,27 +102,12 @@ module.exports = {
 
 				if (failed.length !== 0) {
 					for (const code of failed) {
-						const embed = {
-							color: 0xBB0BB5,
-							title: "Honkai: Star Rail Code Redeem",
-							description: `(${account.uid}) ${account.nickname}`
-							+ `\nFailed to redeem code: \`${code.code}\``
-							+ `\n Manually Redeem Here:\nhttps://hsr.hoyoverse.com/gift?code=${code.code}`,
-							timestamp: new Date()
-						};
-
+						const message = buildMessage(false, account, code);
 						if (webhook) {
-							await webhook.send(embed);
+							await webhook.send(message.embed);
 						}
 						if (telegram) {
-							const message = [
-								`[Star Rail] (${account.uid}) ${account.nickname}`,
-								`Code Failed to Redeem!`,
-								`Code: ${code.code}`,
-								`Manually Redeem Here: https://hsr.hoyoverse.com/gift?code=${code.code}`
-							].join("\n");
-
-							const escapedMessage = app.Utils.escapeCharacters(message);
+							const escapedMessage = app.Utils.escapeCharacters(message.telegram);
 							await telegram.send(escapedMessage);
 						}
 					}
