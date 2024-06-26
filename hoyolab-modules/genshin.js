@@ -121,6 +121,13 @@ module.exports = class Genshin extends require("./template.js") {
 				redeemCode: account.redeemCode,
 				dailiesCheck: account.dailiesCheck,
 				weekliesCheck: account.weekliesCheck,
+				gameName: "Genshin Impact",
+				assets: {
+					...this.config.assets,
+					...this.config.url,
+					logo: this.#logo,
+					color: this.#color
+				},
 				stamina: {
 					...account.stamina,
 					fired: false

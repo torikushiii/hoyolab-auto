@@ -121,6 +121,13 @@ module.exports = class StarRail extends require("./template.js") {
 				redeemCode: account.redeemCode,
 				dailiesCheck: account.dailiesCheck,
 				weekliesCheck: account.weekliesCheck,
+				gameName: "Honkai: Star Rail",
+				assets: {
+					...this.config.assets,
+					...this.config.url,
+					logo: this.#logo,
+					color: this.#color
+				},
 				stamina: {
 					...account.stamina,
 					fired: false
