@@ -74,7 +74,8 @@ class Logger {
 	}
 
 	debug (type, text) {
-		this.winstonLogger.debug(this.formatMessage(type, text));
+		const target = (typeof text === "object") ? util.inspect(text) : text;
+		this.winstonLogger.debug(this.formatMessage(type, target));
 	}
 
 	json (type, obj) {
