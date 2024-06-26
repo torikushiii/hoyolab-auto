@@ -33,7 +33,7 @@ exports.fetch = async () => {
 		});
 	}
 
-	app.Logger.json("Game8", {
+	app.Logger.debug("Game8", {
 		message: `Fetched ${data.length} codes.`,
 		data
 	});

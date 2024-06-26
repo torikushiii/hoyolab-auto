@@ -42,7 +42,7 @@ exports.fetch = async () => {
 
 	const exchangeGroup = res.body.data.modules.find(i => i.exchange_group !== null);
 	if (!exchangeGroup) {
-		app.Logger.json("HoyoLabAPI", {
+		app.Logger.debug("HoyoLabAPI", {
 			message: "No exchange group found.",
 			body: res.body
 		});

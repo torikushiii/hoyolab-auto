@@ -49,7 +49,7 @@ exports.fetch = async () => {
 		});
 	}
 
-	app.Logger.json("HSRFandom", {
+	app.Logger.debug("HSRFandom", {
 		message: `Found ${rewards.length} rewards.`,
 		rewards
 	});

@@ -49,7 +49,7 @@ exports.fetch = async () => {
 		}
 	}
 
-	app.Logger.json("GenshinFandom", {
+	app.Logger.debug("GenshinFandom", {
 		message: `Found ${rewards.length} codes.`,
 		rewards
 	});

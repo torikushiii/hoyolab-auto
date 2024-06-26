@@ -19,8 +19,12 @@ exports.fetch = async () => {
 	const codes = [];
 	const $codes = $(".a-listItem");
 	if ($codes.length === 0) {
-		app.Logger.json("Game8", { body: res.body });
-		app.Logger.error("Game8", "No codes found on the page.");
+		app.Logger.debug("Game8", {
+			message: "No codes found.",
+			args: {
+				body: res.body
+			}
+		});
 	}
 
 	for (let i = 0; i < $codes.length; i++) {
@@ -41,7 +45,7 @@ exports.fetch = async () => {
 		});
 	}
 
-	app.Logger.json("Game8", {
+	app.Logger.debug("Game8", {
 		message: `Found ${codes.length} codes.`,
 		codes
 	});
