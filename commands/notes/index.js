@@ -44,7 +44,7 @@ module.exports = {
 				const region = app.Utils.formattedAccountRegion(account.region);
 
 				const { data } = notes;
-				const { stamina, dailies, weeklies, expedition } = data;
+				const { stamina, dailies, weeklies, expedition, realm } = data;
                 
 				const embeds = [{
 					color: data.assets.color,
@@ -75,9 +75,15 @@ module.exports = {
 							inline: true
 						},
 						{
-							name: "Weekly Boss Chance Remaining:",
+							name: "Weekly Boss:",
 							value: `${weeklies.resinDiscount}/${weeklies.resinDiscountLimit}`,
-							inline: false
+							inline: true
+						},
+						{
+							name: "Realm Currency",
+							value: `${realm.currentCoin}/${realm.maxCoin}`
+							+ `\nCapped in: ${app.Utils.formatTime(realm.recoveryTime)}`,
+							inline: true
 						},
 						{
 							name: "Expedition Status",

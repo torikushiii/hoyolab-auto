@@ -497,6 +497,12 @@ module.exports = class Genshin extends require("./template.js") {
 			resinDiscountLimit: data.resin_discount_num_limit
 		};
 
+		const realm = {
+			currentCoin: data.current_home_coin,
+			maxCoin: data.max_home_coin,
+			recoveryTime: data.home_coin_recovery_time
+		};
+
 		this.dataCache.set(accountData.uid, {
 			uid: accountData.uid,
 			nickname: accountData.nickname,
@@ -504,6 +510,7 @@ module.exports = class Genshin extends require("./template.js") {
 			stamina,
 			dailies,
 			weeklies,
+			realm,
 			expedition: {
 				completed: data.expeditions.every(i => i.status.toLowerCase() === "finished"),
 				list: data.expeditions.map(i => ({
@@ -520,6 +527,7 @@ module.exports = class Genshin extends require("./template.js") {
 				stamina,
 				dailies,
 				weeklies,
+				realm,
 				expedition: {
 					completed: data.expeditions.every(i => i.status.toLowerCase() === "finished"),
 					list: data.expeditions.map(i => ({
