@@ -232,7 +232,7 @@ module.exports = class HoyoLab {
 
 		this.#gameId = defaults.gameId;
 		this.#config = defaults.config ?? {};
-		this.#dataCache = new DataCache(3_650_000);
+		this.#dataCache = new DataCache(3_650_000, this.#config.regenRate);
 
 		HoyoLab.list.push(this);
 	}
