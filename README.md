@@ -35,6 +35,7 @@ If you don't have a server to run this script and simply just want to use it for
   - [Google App Script](https://github.com/torikushiii/hoyolab-auto/tree/main/services)
 
 ## Prerequisites
+- [Git](https://git-scm.com/downloads)
 - [Node.js](https://nodejs.org/en/)
 
 ## Installation
