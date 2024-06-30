@@ -84,7 +84,7 @@
 2. **Trigger the Function (Recommended):**
    - In the Apps Script editor, click on the "Triggers" icon (clock symbol) in the left sidebar.
    - Click "+ Add Trigger" and configure:
-     - **Function to run:** `checkInGenshin`
+     - **Function to run:** `checkInAllGames`
      - **Event source:** `Time-driven`
      - **Type of time-based trigger:** `Day timer` 
      - **Select time:** Set your desired time for daily check-ins.
