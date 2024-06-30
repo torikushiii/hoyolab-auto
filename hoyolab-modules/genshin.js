@@ -3,6 +3,7 @@ const DEFAULT_CONSTANTS = {
 	ACT_ID: "e202102251931481",
 	successMessage: "Congratulations, Traveler! You have successfully checked in today~",
 	signedMessage: "Traveler, you've already checked in today~",
+	regenRate: 480,
 	assets: {
 		author: "Paimon",
 		game: "Genshin Impact"

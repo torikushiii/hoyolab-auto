@@ -3,6 +3,7 @@ const DEFAULT_CONSTANTS = {
 	ACT_ID: "e202303301540311",
 	successMessage: "You have successfully checked in today, Trailblazer~",
 	signedMessage: "You've already checked in today, Trailblazer~",
+	regenRate: 360,
 	assets: {
 		author: "PomPom",
 		game: "Honkai: Star Rail"

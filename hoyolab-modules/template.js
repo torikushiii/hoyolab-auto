@@ -5,12 +5,9 @@ class DataCache {
 	static data = new Map();
 	static expirationInterval;
 
-	constructor (expiration = 3_650_000) {
-		/**
-		 * Cache Expiration in milliseconds
-		 * @type {number}
-		 */
+	constructor (expiration = 3_650_000, rate) {
 		this.expiration = expiration;
+		this.rate = rate;
 
 		if (!DataCache.expirationInterval) {
 			DataCache.expirationInterval = setInterval(() => DataCache.data.clear(), this.expiration);
@@ -22,10 +19,7 @@ class DataCache {
 		DataCache.data.set(key, data);
 
 		if (app.Cache) {
-			await app.Cache.set({
-				key,
-				value: data
-			});
+			await app.Cache.set({ key, value: data });
 		}
 	}
 
@@ -50,13 +44,14 @@ class DataCache {
 
 	async #updateCachedData (cachedData) {
 		const now = Date.now();
+
 		if (now - cachedData.lastUpdate > this.expiration) {
 			await DataCache.invalidateCache(cachedData.uid);
 			return null;
 		}
 
 		const secondsSinceLastUpdate = (now - cachedData.lastUpdate) / 1000;
-		const recoveredStamina = Math.floor(secondsSinceLastUpdate / 360);
+		const recoveredStamina = Math.floor(secondsSinceLastUpdate / this.rate);
 
 		const account = app.HoyoLab.getAccountById(cachedData.uid);
 
@@ -89,8 +84,6 @@ class DataCache {
 				expedition.remaining_time -= Math.round(secondsSinceLastUpdate);
 			}
 		}
-
-		await this.set(cachedData.uid, cachedData, cachedData.lastUpdate);
 
 		return cachedData;
 	}
