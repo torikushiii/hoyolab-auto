@@ -4,6 +4,7 @@ const DEFAULT_CONSTANTS = {
 	successMessage: "You have successfully checked in today, Trailblazer~",
 	signedMessage: "You've already checked in today, Trailblazer~",
 	regenRate: 360,
+	maxStamina: 240,
 	assets: {
 		author: "PomPom",
 		game: "Honkai: Star Rail"

@@ -4,6 +4,7 @@ const DEFAULT_CONSTANTS = {
 	successMessage: "Congratulations, Traveler! You have successfully checked in today~",
 	signedMessage: "Traveler, you've already checked in today~",
 	regenRate: 480,
+	maxStamina: 200,
 	assets: {
 		author: "Paimon",
 		game: "Genshin Impact"

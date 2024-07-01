@@ -1,6 +1,3 @@
-const GENSHIN_MAX_STAMINA = 200;
-const STARRAIL_MAX_STAMINA = 240;
-
 class DataCache {
 	static data = new Map();
 	static expirationInterval;
@@ -188,18 +185,11 @@ module.exports = class HoyoLab {
 					}
 				});
 			}
-            
-			if (this.#name === "genshin" && stamina.threshold > GENSHIN_MAX_STAMINA) {
+
+			const maxStamina = defaults.config.maxStamina;
+			if (stamina.threshold > maxStamina) {
 				throw new app.Error({
-					message: `Invalid stamina threshold provided for Genshin. Maximum stamina is ${GENSHIN_MAX_STAMINA}.`,
-					args: {
-						threshold: stamina.threshold
-					}
-				});
-			}
-			else if (this.#name === "starrail" && stamina.threshold > STARRAIL_MAX_STAMINA) {
-				throw new app.Error({
-					message: `Invalid stamina threshold provided for Star Rail. Maximum stamina is ${STARRAIL_MAX_STAMINA}.`,
+					message: `Invalid stamina threshold provided for ${name}. Maximum stamina is ${maxStamina}.`,
 					args: {
 						threshold: stamina.threshold
 					}
