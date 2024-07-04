@@ -169,12 +169,33 @@ module.exports = class HoyoLab {
 			}
 
 			const { redeemCode, dailiesCheck, weekliesCheck } = account;
-			if (typeof dailiesCheck !== "boolean" || typeof weekliesCheck !== "boolean" || typeof redeemCode !== "boolean") {
+			if (dailiesCheck && typeof dailiesCheck !== "boolean") {
 				throw new app.Error({
 					message: "Invalid check provided for HoyoLab expected boolean.",
 					args: {
 						dailiesCheck,
-						weekliesCheck
+						weekliesCheck,
+						redeemCode
+					}
+				});
+			}
+			if (weekliesCheck && typeof weekliesCheck !== "boolean") {
+				throw new app.Error({
+					message: "Invalid check provided for HoyoLab expected boolean.",
+					args: {
+						dailiesCheck,
+						weekliesCheck,
+						redeemCode
+					}
+				});
+			}
+			if (redeemCode && typeof redeemCode !== "boolean") {
+				throw new app.Error({
+					message: "Invalid check provided for HoyoLab expected boolean.",
+					args: {
+						dailiesCheck,
+						weekliesCheck,
+						redeemCode
 					}
 				});
 			}
@@ -200,9 +221,17 @@ module.exports = class HoyoLab {
 			}
 
 			const { expedition } = account;
-			if (!expedition || typeof expedition.check !== "boolean" || typeof expedition.persistent !== "boolean") {
+			if (expedition && typeof expedition.check !== "boolean") {
 				throw new app.Error({
-					message: "Invalid expedition object provided for HoyoLab.",
+					message: "Invalid expedition.check provided for HoyoLab expected boolean.",
+					args: {
+						expedition
+					}
+				});
+			}
+			if (expedition && typeof expedition.persistent !== "boolean") {
+				throw new app.Error({
+					message: "Invalid expedition.persistent provided for HoyoLab expected boolean.",
 					args: {
 						expedition
 					}
