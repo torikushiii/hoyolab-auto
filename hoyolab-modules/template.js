@@ -71,14 +71,17 @@ class DataCache {
 			return null;
 		}
 
-		for (const expedition of cachedData.expedition.list) {
-			expedition.remaining_time = Number(expedition.remaining_time);
-			if (expedition.remaining_time <= 0) {
-				await DataCache.invalidateCache(cachedData.uid);
-				return null;
-			}
-			else {
-				expedition.remaining_time -= Math.round(secondsSinceLastUpdate);
+		const expedition = cachedData.expedition;
+		if (expedition && expedition.list.length !== 0) {
+			for (const expedition of cachedData.expedition.list) {
+				expedition.remaining_time = Number(expedition.remaining_time);
+				if (expedition.remaining_time <= 0) {
+					await DataCache.invalidateCache(cachedData.uid);
+					return null;
+				}
+				else {
+					expedition.remaining_time -= Math.round(secondsSinceLastUpdate);
+				}
 			}
 		}
 
