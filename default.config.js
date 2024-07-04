@@ -146,6 +146,13 @@ module.exports = {
 						token: "",
 						mid: "",
 						ltuid: ""
+					},
+					redeemCode: false,
+					dailiesCheck: true,
+					stamina: {
+						check: true,
+						threshold: 200,
+						persistent: false
 					}
 				}
 			]
