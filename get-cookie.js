@@ -11,8 +11,8 @@ const stuff = cookies.map(cookie => {
 			.map(cookieItem => cookieItem.split("=").map(part => part.trim()))
 	);
 	return {
-		token: cookieObj.cookie_token_v2,
-		mid: cookieObj.account_mid_v2,
+		token: cookieObj.ltoken_v2,
+		mid: cookieObj.ltmid_v2,
 		ltuid: cookieObj.account_id_v2
 	};
 });

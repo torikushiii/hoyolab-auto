@@ -35,8 +35,8 @@ module.exports = {
 					cookie: {
 						// If there's and extra space at the end of the cookie value, please remove it
 						// e.g. "token: "testxdxd123    " -> "token: "testxdxd123"
-						token: "", // cookie_token_v2
-						mid: "", // account_mid_v2
+						token: "", // ltoken_v2
+						mid: "", // ltmid_v2
 						ltuid: "" // ltuid_v2
 					}
 				}
@@ -51,8 +51,8 @@ module.exports = {
 					cookie: {
 						// If there's and extra space at the end of the cookie value, please remove it
 						// e.g. "token: "testxdxd123    " -> "token: "testxdxd123"
-						token: "", // cookie_token_v2
-						mid: "", // account_mid_v2
+						token: "", // ltoken_v2
+						mid: "", // ltmid_v2
 						ltuid: "", // ltuid_v2
 						// Not required, but you can add it to hopefully avoid captcha if you have multiple accounts
 						deviceId: "",
@@ -92,8 +92,8 @@ module.exports = {
 					cookie: {
 						// If there's and extra space at the end of the cookie value, please remove it
 						// e.g. "token: "testxdxd123    " -> "token: "testxdxd123"
-						token: "", // cookie_token_v2
-						mid: "", // account_mid_v2
+						token: "", // ltoken_v2
+						mid: "", // ltmid_v2
 						ltuid: "", // ltuid_v2
 						// Not required, but you can add it to hopefully avoid captcha if you have multiple accounts
 						deviceId: "",
@@ -116,8 +116,8 @@ module.exports = {
 				// Delete this if you only have one account
 				{
 					cookie: {
-						token: "", // cookie_token_v2
-						mid: "", // account_mid_v2
+						token: "", // ltoken_v2
+						mid: "", // ltmid_v2
 						ltuid: "", // ltuid_v2
 						deviceId: "",
 						deviceFp: ""
