@@ -1,7 +1,9 @@
 const DEFAULT_CONSTANTS = {
 	ACT_ID: "e202406031448091",
-	successMessage: "Congratulations Phaethon! You have successfully checked in today!~",
-	signedMessage: "You have already checked in today, Phaethon!~",
+	successMessage: "Congratulations Proxy! You have successfully checked in today!~",
+	signedMessage: "You have already checked in today, Proxy!~",
+	regenRate: 360,
+	maxStamina: 240,
 	assets: {
 		author: "Eous",
 		game: "Zenless Zone Zero"
@@ -10,8 +12,8 @@ const DEFAULT_CONSTANTS = {
 		info: "https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/info",
 		home: "https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/home",
 		sign: "https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/sign",
-		notes: "",
-		redemption: ""
+		notes: "https://sg-act-nap-api.hoyolab.com/event/game_record_zzz/api/zzz/note",
+		redemption: "https://public-operation-nap.hoyoverse.com/common/apicdkey/api/webExchangeCdkey"
 	}
 };
 
@@ -358,4 +360,111 @@ module.exports = class ZenlessZoneZero extends require("./template.js") {
 			data: data.awards
 		};
 	}
+
+	async notes (accountData) {
+		const cachedData = await this.dataCache.get(accountData.uid);
+		if (cachedData) {
+			return {
+				success: true,
+				data: {
+					...cachedData,
+					assets: {
+						...this.config.assets,
+						logo: this.#logo,
+						color: this.#color
+					}
+				}
+			};
+		}
+
+		const res = await app.Got("MiHoYo", {
+			url: this.config.url.notes,
+			responseType: "json",
+			throwHttpErrors: false,
+			searchParams: {
+				server: accountData.region,
+				role_id: accountData.uid
+			},
+			headers: {
+				"x-rpc-device_id": accountData.deviceId,
+				"x-rpc-device_fp": accountData.deviceFp,
+				Cookie: accountData.cookie,
+				DS: app.Utils.generateDS()
+			}
+		});
+
+		if (res.statusCode !== 200) {
+			app.Logger.log(`${this.fullName}:Notes`, {
+				message: "Failed to fetch data from hoyolab",
+				args: {
+					platform: this.name,
+					uid: accountData.uid,
+					region: accountData.region,
+					body: res.body
+				}
+			});
+
+			return { success: false };
+		}
+		if (res.body.retcode !== 0) {
+			app.Logger.log(`${this.fullName}:Notes`, {
+				message: "HoyoLab returned non-zero retcode",
+				args: {
+					platform: this.name,
+					uid: accountData.uid,
+					region: accountData.region,
+					body: res.body
+				}
+			});
+
+			return { success: false };
+		}
+
+		const data = res.body.data;
+
+		// I have no idea what these for yet.
+		const cardSign = data.card_sign;
+		const stamina = {
+			currentStamina: data.energy.progress.current,
+			maxStamina: data.energy.progress.max,
+			recoveryTime: data.energy.restore
+		};
+
+		const dailies = {
+			task: data.vitality.current,
+			maxTask: data.vitality.max
+		};
+
+		const shop = {
+			state: (data.vhs_sale.sale_state === "SaleStateNo") ? "Closed" : "Open"
+		};
+
+		await this.dataCache.set(accountData.uid, {
+			uid: accountData.uid,
+			nickname: data.nickname,
+			lastUpdate: Date.now(),
+			cardSign,
+			stamina,
+			dailies,
+			shop
+		});
+
+		return {
+			success: true,
+			data: {
+				cardSign,
+				stamina,
+				dailies,
+				shop,
+				assets: {
+					...this.config.assets,
+					logo: this.#logo,
+					color: this.#color
+				}
+			}
+		};
+	}
+
+	get logo () { return this.#logo; }
+	get color () { return this.#color; }
 };

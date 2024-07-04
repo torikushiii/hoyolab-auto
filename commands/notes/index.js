@@ -10,6 +10,11 @@ module.exports = {
 				reply: `Please specify a game. Valid games are: ${validGames.join(", ")}`
 			};
 		}
+
+		if (game === "zenless" || game === "zzz") {
+			game = "nap";
+		}
+
 		if (!validGames.includes(game.toLowerCase())) {
 			return {
 				success: false,
@@ -108,6 +113,20 @@ module.exports = {
 						{
 							name: "Expedition Status",
 							value: expedition.list.map((i, idx) => `**Account ${idx + 1}** - ${app.Utils.formatTime(i.remaining_time)}`).join("\n"),
+							inline: true
+						}
+					);
+				}
+				else if (platform.gameId === 8) {
+					embeds[0].fields.push(
+						{
+							name: "Dailies",
+							value: `${dailies.task}/${dailies.maxTask}`,
+							inline: true
+						},
+						{
+							name: "Shop Status",
+							value: `${data.shop.state}`,
 							inline: true
 						}
 					);
