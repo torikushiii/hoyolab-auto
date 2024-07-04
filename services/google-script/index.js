@@ -19,6 +19,13 @@ const config = {
 			// "account_cookie_2",
 			// ... more account cookies
 		]
+	},
+	zenless: {
+		data: [
+			// "account_cookie_1",
+			// "account_cookie_2",
+			// ... more account cookies
+		]
 	}
 };
 
@@ -70,6 +77,21 @@ const DEFAULT_CONSTANTS = {
 			info: "https://sg-public-api.hoyolab.com/event/luna/os/info",
 			home: "https://sg-public-api.hoyolab.com/event/luna/os/home",
 			sign: "https://sg-public-api.hoyolab.com/event/luna/os/sign"
+		}
+	},
+	zenless: {
+		ACT_ID: "e202406031448091",
+		successMessage: "Congratulations Proxy! You have successfully checked in today!~",
+		signedMessage: "You have already checked in today, Proxy!~",
+		game: "Zenless Zone Zero",
+		assets: {
+			author: "Eous",
+			game: "Zenless Zone Zero"
+		},
+		url: {
+			info: "https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/info",
+			home: "https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/home",
+			sign: "https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/sign"
 		}
 	}
 };
@@ -311,4 +333,5 @@ function checkInAllGames () {
 	checkInGame("genshin");
 	checkInGame("honkai");
 	checkInGame("starrail");
+	checkInGame("zenless");
 }
