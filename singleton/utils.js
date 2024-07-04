@@ -50,17 +50,21 @@ module.exports = class UtilsSingleton {
 	formattedAccountRegion (region) {
 		switch (region) {
 			case "os_cht":
+			case "prod_gf_cht":
 			case "prod_official_cht":
 				return "TW";
 			case "os_asia":
+			case "prod_gf_jp":
 			case "prod_official_asia":
 				return "SEA";
 			case "eur01":
 			case "os_euro":
+			case "prod_gf_eur":
 			case "prod_official_eur":
 				return "EU";
 			case "usa01":
 			case "os_usa":
+			case "prod_gf_usa":
 			case "prod_official_usa":
 				return "NA";
 			default:

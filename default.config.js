@@ -135,6 +135,20 @@ module.exports = {
 					}
 				}
 			]
+		},
+		{
+			id: 4,
+			active: false,
+			type: "zenless",
+			data: [
+				{
+					cookie: {
+						token: "",
+						mid: "",
+						ltuid: ""
+					}
+				}
+			]
 		}
 	]
 };
