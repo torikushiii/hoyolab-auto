@@ -17,7 +17,7 @@ A multi-purpose tool for any supported Hoyoverse games. This tool is designed to
 - [x] Honkai Impact 3rd (Daily Check-In only)
 - [x] Genshin Impact
 - [x] Honkai: Star Rail
-- [ ] Zenless Zone Zero (Coming soon)
+- [x] Zenless Zone Zero (Coming soon)
 
 ## Features
 - **Auto check-in**: Runs every midnight local time.
@@ -26,6 +26,10 @@ A multi-purpose tool for any supported Hoyoverse games. This tool is designed to
 - **Stamina check**: Monitors your Resin/Stamina every 30 minutes.
   - **Customizable threshold**: Notifies you when your stamina is above your set threshold.
 - **Expedition check**: Checks your expeditions every 30 minutes.
+- **Code Redemption**: Automatically search and redeem codes for supported games.
+  - **Genshin Impact**
+  - **Honkai: Star Rail**
+  - **Zenless Zone Zero (Soon)**
 - **Notifications**:
   - Discord
   - Telegram
