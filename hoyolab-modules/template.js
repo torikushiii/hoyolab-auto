@@ -390,9 +390,15 @@ module.exports = class HoyoLab {
 		}
 
 		if (whitelist && !Array.isArray(whitelist)) {
+			if (whitelist === "zenless") {
+				whitelist = "nap";
+			}
 			whitelist = [whitelist];
 		}
 		if (blacklist && !Array.isArray(blacklist)) {
+			if (blacklist === "zenless") {
+				blacklist = "nap";
+			}
 			blacklist = [blacklist];
 		}
 
