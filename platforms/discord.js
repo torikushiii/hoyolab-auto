@@ -40,7 +40,7 @@ module.exports = class DiscordController extends require("./template.js") {
 		});
 
 		this.initListeners();
-		this.client.login(this.token);
+		await this.client.login(this.token);
 	}
 
 	initListeners () {
