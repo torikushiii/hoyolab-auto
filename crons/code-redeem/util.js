@@ -5,12 +5,12 @@ const REDEMPTION_LINKS = {
 };
 
 const fetchCodes = async () => {
-	const { genshin, starrail } = await CodeResolver.fetchAll();
-	if (starrail.length === 0 && genshin.length === 0) {
+	const { genshin, starrail, zenless } = await CodeResolver.fetchAll();
+	if (starrail.length === 0 && genshin.length === 0 && zenless.length === 0) {
 		return false;
 	}
 
-	return { genshin, starrail };
+	return { genshin, starrail, zenless };
 };
 
 const redeemGenshin = async (account, codeData) => {
@@ -35,7 +35,7 @@ const buildMessage = (status, account, code) => {
 
 	const message = [
 		`[${gameName}] (${account.uid}) ${account.nickname}`,
-		`${messageTitle}`,
+		`\n${messageTitle}`,
 		`Code: ${code.code}`,
 		...(status === false ? [`Manually Redeem Here: ${redeemLink}`] : []),
 		...(status === true ? [`Rewards: ${code.rewards.join(", ")}`] : [])

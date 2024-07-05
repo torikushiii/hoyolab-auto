@@ -1,16 +1,19 @@
 const Genshin = require("./genshin");
 const StarRail = require("./star-rail");
+const ZenlessZoneZero = require("./zenless");
 const { setTimeout } = require("node:timers/promises");
 
 const fetchAll = async () => {
-	const [genshin, starrail] = await Promise.all([
+	const [genshin, starrail, zenless] = await Promise.all([
 		Genshin.fetchAll(),
-		StarRail.fetchAll()
+		StarRail.fetchAll(),
+		ZenlessZoneZero.fetchAll()
 	]);
 
 	return {
 		genshin,
-		starrail
+		starrail,
+		zenless
 	};
 };
 
@@ -145,8 +148,74 @@ const redeemStarRail = async (account, codeList) => {
 	};
 };
 
+const redeemZenless = async (account, codeList) => {
+	const success = [];
+	const failed = [];
+
+	for (const code of codeList) {
+		const res = await app.Got("API", {
+			url: "https://public-operation-nap.hoyoverse.com/common/apicdkey/api/webExchangeCdkey",
+			searchParams: {
+				uid: account.uid,
+				region: account.region,
+				lang: "en",
+				cdkey: code.code,
+				game_biz: "hk4e_global",
+				sLangKey: "en-us"
+			},
+			headers: {
+				Cookie: account.cookie
+			}
+		});
+
+		if (res.statusCode !== 200) {
+			throw new app.Error({
+				message: "Zenless API returned non-200 status code.",
+				args: {
+					statusCode: res.statusCode,
+					body: res.body
+				}
+			});
+		}
+
+		const retcode = res.body.retcode;
+		if (retcode === -2001 || retcode === -2003) {
+			app.Logger.debug("CodeRedeem:Zenless", {
+				message: "Expired or invalid code",
+				args: {
+					code
+				}
+			});
+			continue;
+		}
+
+		if (retcode !== 0) {
+			app.Logger.debug("CodeRedeem:Zenless", {
+				message: `Zenless API returned non-zero status code`,
+				args: {
+					retcode,
+					message: res.body
+				}
+			});
+
+			failed.push(code);
+			await setTimeout(7000);
+			continue;
+		}
+
+		success.push(code);
+		await setTimeout(7000);
+	}
+
+	return {
+		success,
+		failed
+	};
+};
+
 module.exports = {
 	fetchAll,
 	redeemGenshin,
-	redeemStarRail
+	redeemStarRail,
+	redeemZenless
 };

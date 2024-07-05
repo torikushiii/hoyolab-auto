@@ -29,7 +29,7 @@ A multi-purpose tool for any supported Hoyoverse games. This tool is designed to
 - **Code Redemption**: Automatically search and redeem codes for supported games.
   - **Genshin Impact**
   - **Honkai: Star Rail**
-  - **Zenless Zone Zero (Soon)**
+  - **Zenless Zone Zero**
 - **Notifications**:
   - Discord
   - Telegram
