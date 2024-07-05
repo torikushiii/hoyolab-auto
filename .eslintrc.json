@@ -85,9 +85,7 @@
         "no-return-await": "off",
         "no-self-compare": "warn",
         "no-sequences": "error",
-        "no-trailing-spaces": ["warn", {
-            "skipBlankLines": true
-        }],
+        "no-trailing-spaces": ["warn"],
         "no-underscore-dangle": "off",
         "no-unneeded-ternary": "warn",
         "no-unused-vars": "warn",
