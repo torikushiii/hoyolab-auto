@@ -30,7 +30,7 @@ module.exports = class DiscordController extends require("./template.js") {
 		}
 	}
 
-	connect () {
+	async connect () {
 		this.client = new Client({
 			intents: [
 				GatewayIntentBits.Guilds,
