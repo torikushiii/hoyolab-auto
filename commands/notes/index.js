@@ -50,7 +50,7 @@ module.exports = {
 
 				const { data } = notes;
 				const { stamina, dailies, weeklies, expedition, realm } = data;
-                
+
 				const embeds = [{
 					color: data.assets.color,
 					author: {
@@ -126,7 +126,12 @@ module.exports = {
 						},
 						{
 							name: "Shop Status",
-							value: `${data.shop.state}`,
+							value: data.shop.state,
+							inline: true
+						},
+						{
+							name: "Scratch Card",
+							value: data.cardSign,
 							inline: true
 						}
 					);

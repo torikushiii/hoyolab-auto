@@ -76,7 +76,7 @@ module.exports = class ZenlessZoneZero extends require("./template.js") {
 					}
 				});
 			}
-            
+
 			const res = body;
 			if (res.retcode !== 0) {
 				throw new app.Error({
@@ -422,8 +422,8 @@ module.exports = class ZenlessZoneZero extends require("./template.js") {
 
 		const data = res.body.data;
 
-		// I have no idea what these for yet.
-		const cardSign = data.card_sign;
+		// Howl daliy scratch card.
+		const cardSign = (data.card_sign === "CardSignDone") ? "Completed" : "Not Completed";
 		const stamina = {
 			currentStamina: data.energy.progress.current,
 			maxStamina: data.energy.progress.max,
@@ -435,8 +435,14 @@ module.exports = class ZenlessZoneZero extends require("./template.js") {
 			maxTask: data.vitality.max
 		};
 
+		const ShopState = {
+			SaleStateNo: "Closed",
+			SaleStateDoing: "Open",
+			SaleStateDone: "Finished"
+		};
+
 		const shop = {
-			state: (data.vhs_sale.sale_state === "SaleStateNo") ? "Closed" : "Open"
+			state: ShopState[data.vhs_sale.sale_state]
 		};
 
 		await this.dataCache.set(accountData.uid, {
