@@ -17,7 +17,7 @@ A multi-purpose tool for any supported Hoyoverse games. This tool is designed to
 - [x] Honkai Impact 3rd (Daily Check-In only)
 - [x] Genshin Impact
 - [x] Honkai: Star Rail
-- [x] Zenless Zone Zero (Coming soon)
+- [x] Zenless Zone Zero
 
 ## Features
 - **Auto check-in**: Runs every midnight local time.
