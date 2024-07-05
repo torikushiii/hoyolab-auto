@@ -25,8 +25,9 @@ const redeemGenshin = async (account, codeList) => {
 				uid: account.uid,
 				region: account.region,
 				lang: "en",
-				cdkey: code,
-				game_biz: "hk4e_global"
+				cdkey: code.code,
+				game_biz: "hk4e_global",
+				sLangKey: "en-us"
 			},
 			headers: {
 				Cookie: account.cookie
