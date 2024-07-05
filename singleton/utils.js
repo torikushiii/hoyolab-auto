@@ -2,7 +2,7 @@ const crypto = require("node:crypto");
 
 module.exports = class UtilsSingleton {
 	static DS_SALT = "6s25p5ox5y14umn1p61aqyyvbvvl3lrt";
-	
+
 	static timeUnits = {
 		h: { m: 60, s: 3600, ms: 3600.0e3 },
 		m: { s: 60, ms: 60.0e3 },
@@ -29,7 +29,7 @@ module.exports = class UtilsSingleton {
 			seconds -= hours * UtilsSingleton.timeUnits.h.s;
 			array.push(`${hours} hr`);
 		}
-        
+
 		if (seconds >= UtilsSingleton.timeUnits.m.s) {
 			const minutes = Math.floor(seconds / UtilsSingleton.timeUnits.m.s);
 			seconds -= minutes * UtilsSingleton.timeUnits.m.s;
@@ -75,7 +75,7 @@ module.exports = class UtilsSingleton {
 	escapeCharacters (string) {
 		return string.replace(/[_[\]()~`>#+\-=|{}.!]/g, "\\$&");
 	}
-	
+
 	cheerio (html) {
 		const cheerio = require("cheerio");
 		return cheerio.load(html);

@@ -2,7 +2,7 @@ class Error extends globalThis.Error {
 	#args;
 	#timestamp;
 	#messageDescriptor;
-    
+
 	constructor (obj = {}) {
 		if (obj.constructor !== Object) {
 			throw new globalThis.Error("obj must be an object to receive as params");
@@ -22,7 +22,7 @@ class Error extends globalThis.Error {
 		this.name = obj.name ?? "Error";
 		this.#timestamp = Date.now();
 		this.#messageDescriptor = Object.getOwnPropertyDescriptor(this, "message");
-        
+
 		Object.defineProperty(this, "message", {
 			get: () => {
 				const message = (this.#messageDescriptor.get === "function")

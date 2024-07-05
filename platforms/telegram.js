@@ -1,6 +1,6 @@
 module.exports = class Telegram extends require("./template.js") {
 	lastUpdatedId = 0;
-	
+
 	gotModule;
 	gotRequestErrors;
 
@@ -125,7 +125,7 @@ module.exports = class Telegram extends require("./template.js") {
 					disable_notification: this.disableNotification
 				}
 			});
-	
+
 			if (res.body.ok !== true) {
 				throw new app.Error({
 					message: "Failed to send telegram message",
@@ -136,7 +136,7 @@ module.exports = class Telegram extends require("./template.js") {
 					}
 				});
 			}
-	
+
 			return true;
 		}
 		catch (e) {

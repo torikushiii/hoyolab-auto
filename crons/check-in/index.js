@@ -13,7 +13,7 @@ module.exports = {
 		const activeGameAccounts = app.HoyoLab.getActivePlatform();
 		for (const name	of activeGameAccounts) {
 			const platform = app.HoyoLab.get(name);
-			
+
 			const execution = await platform.checkAndExecute();
 			if (execution.length === 0) {
 				app.Logger.info("Cron:CheckIn", "All accounts either signed in or failed to sign in");
@@ -30,7 +30,7 @@ module.exports = {
 
 		for (let i = 0; i < messages.length; i++) {
 			const message = messages[i];
-			
+
 			const webhook = app.Platform.get(3);
 			if (webhook) {
 				const embed = {

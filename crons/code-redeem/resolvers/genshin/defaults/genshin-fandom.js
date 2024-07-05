@@ -29,7 +29,7 @@ exports.fetch = async () => {
 		if (rowData.length > 0) {
 			const codeRegex = /GENSHINGIFT|[A-Z0-9]{12,15}/;
 			const code = rowData[0].match(codeRegex)?.[0];
-			
+
 			const reward = rowData[1];
 			const rewardList = reward.split(/×\d+/g).filter(Boolean).map(i => i.trim());
 			const rewardAmount = reward.match(/×\d+/g).map(i => i.replace("×", "").trim());

@@ -68,7 +68,7 @@ module.exports = class Platform {
 	get disableNotification () { return this.#disableNotification; }
 
 	initListeners () {}
-	
+
 	// eslint-disable-next-line no-unused-vars
 	async send (message, options = {}) {
 		throw new app.Error({

@@ -129,7 +129,7 @@ module.exports = class Command extends require("./template.js") {
 				reply: "Command not found"
 			};
 		}
-        
+
 		const appendOptions = { ...options };
 		const contextOptions = {
 			platform: options.platform,

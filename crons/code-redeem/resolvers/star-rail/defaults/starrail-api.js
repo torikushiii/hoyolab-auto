@@ -5,7 +5,7 @@ exports.fetch = async () => {
 		try {
 			const { execSync } = require("child_process");
 			const hash = execSync("git rev-parse --short HEAD").toString().trim();
-    
+
 			version = `HoyoLabAuto@${hash}`;
 		}
 		catch {

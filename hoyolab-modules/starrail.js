@@ -27,7 +27,7 @@ module.exports = class StarRail extends require("./template.js") {
 			gameId: 6,
 			config: DEFAULT_CONSTANTS
 		});
-        
+
 		if (!this.id) {
 			throw new app.Error({
 				message: "No HoyoLab ID provided for StarRail controller"
@@ -77,7 +77,7 @@ module.exports = class StarRail extends require("./template.js") {
 					}
 				});
 			}
-            
+
 			const res = body;
 			if (res.retcode !== 0) {
 				throw new app.Error({

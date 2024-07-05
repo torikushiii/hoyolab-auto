@@ -73,7 +73,7 @@ module.exports = {
 
 				const delta = app.Utils.formatTime(recoveryTime);
 				const fixedRegion = app.Utils.formattedAccountRegion(region);
-				
+
 				const description = [
 					`\n\`\`\`yaml\n${username} (${uid}) - ${fixedRegion}\`\`\``,
 					`Current: ${currentStamina}/${maxStamina}`,
@@ -97,7 +97,7 @@ module.exports = {
 				discord: discordData
 			};
 		}
-		
+
 		let text = "";
 		for (const list of data) {
 			const {

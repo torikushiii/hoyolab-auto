@@ -17,19 +17,19 @@
    - [Honkai: Star Rail](https://act.hoyolab.com/bbs/event/signin/hkrpg/index.html?act_id=e202303301540311)
 
 2. **Getting the Cookie:**
-   
+
 > [!NOTE]
 > Please log in to your Hoyo account using incognito mode before copying the cookie.
-   
+
    - When you are at the check-in page, open the developer console (F12) and go to the "Network" tab (refresh the page if needed).
    - Find the `home` request and click it.
 
      ![image](https://github.com/torikushiii/hoyolab-auto/assets/21153445/672051f5-26a8-4be0-9403-fca30ac3986c)
-        
+
    - Scroll down to the "Request Headers" section and select everything under "cookie" to use in step 2.
 
      ![image](https://github.com/torikushiii/hoyolab-auto/assets/21153445/e4cb8259-aef4-4b2c-9d88-78e30a03b05c)
-     
+
 ### 2. Setup in Google Apps Script
 
 1. **Create a New Project:**
@@ -43,7 +43,7 @@
 
 3. **Configuration:**
    - **Paste your `cookie`:** In the config object, add the following (replace placeholders with your actual data):
-     
+
      ```javascript
      const config = {
        genshin: {
@@ -86,7 +86,7 @@
    - Click "+ Add Trigger" and configure:
      - **Function to run:** `checkInAllGames`
      - **Event source:** `Time-driven`
-     - **Type of time-based trigger:** `Day timer` 
+     - **Type of time-based trigger:** `Day timer`
      - **Select time:** Set your desired time for daily check-ins.
    - Save the trigger. This will automatically run your script every day at the specified time.
 

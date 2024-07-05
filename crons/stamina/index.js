@@ -43,7 +43,7 @@ module.exports = {
 
 				const max = stamina.maxStamina;
 				const delta = app.Utils.formatTime(stamina.recoveryTime);
-				
+
 				account.stamina.fired = true;
 				platform.update(account);
 

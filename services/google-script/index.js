@@ -95,7 +95,7 @@ const DEFAULT_CONSTANTS = {
 		}
 	}
 };
-  
+
 class Game {
 	/**
      * @param {string} name - The short name of the game (e.g., "genshin").
@@ -106,20 +106,20 @@ class Game {
 		this.fullName = DEFAULT_CONSTANTS[name].game; // Get full name from constants
 		this.config = { ...DEFAULT_CONSTANTS[name], ...config.config };
 		this.data = config.data || [];
-  
+
 		if (this.data.length === 0) {
 			console.warn(`No ${this.fullName} accounts provided. Skipping...`);
 			return;
 		}
 	}
-  
+
 	async checkAndExecute () {
 		const accounts = this.data;
 		if (accounts.length === 0) {
 			console.warn(`No active accounts found for ${this.fullName}`);
 			return [];
 		}
-  
+
 		const success = [];
 		for (const cookie of accounts) {
 			try {
@@ -127,41 +127,41 @@ class Game {
 				if (!info.success) {
 					continue;
 				}
-  
+
 				const awardsData = await this.getAwardsData(cookie);
 				if (!awardsData.success) {
 					continue;
 				}
-  
+
 				const awards = awardsData.data;
 				const data = {
 					total: info.data.total,
 					today: info.data.today,
 					isSigned: info.data.isSigned
 				};
-  
+
 				if (data.isSigned) {
 					console.info(`${this.fullName}:CheckIn`, "Already signed in today");
 					continue;
 				}
-  
+
 				const totalSigned = data.total;
 				const awardObject = {
 					name: awards[totalSigned].name,
 					count: awards[totalSigned].cnt,
 					icon: awards[totalSigned].icon
 				};
-  
+
 				const sign = await this.sign(cookie);
 				if (!sign.success) {
 					continue;
 				}
-  
+
 				console.info(
 					`${this.fullName}:CheckIn`,
 					`Today's Reward: ${awardObject.name} x${awardObject.count}`
 				);
-  
+
 				success.push({
 					platform: this.name,
 					total: data.total + 1,
@@ -174,10 +174,10 @@ class Game {
 				console.error(`${this.fullName}:CheckIn`, e);
 			}
 		}
-  
+
 		return success;
 	}
-  
+
 	async sign (cookieData) {
 		try {
 			const payload = { act_id: this.config.ACT_ID };
@@ -190,15 +190,15 @@ class Game {
 				},
 				payload: JSON.stringify(payload)
 			};
-  
+
 			const response = UrlFetchApp.fetch(this.config.url.sign, options);
 			const data = JSON.parse(response.getContentText());
-  
+
 			if (response.getResponseCode() !== 200 || data.retcode !== 0) {
 				console.error(`${this.fullName}:sign`, "Failed to sign in.", data);
 				return { success: false };
 			}
-  
+
 			return { success: true };
 		}
 		catch (e) {
@@ -206,7 +206,7 @@ class Game {
 			return { success: false };
 		}
 	}
-  
+
 	async getSignInfo (cookieData) {
 		try {
 			const url = `${this.config.url.info}?act_id=${this.config.ACT_ID}`;
@@ -214,7 +214,7 @@ class Game {
 				headers: { Cookie: cookieData }
 			});
 			const data = JSON.parse(response.getContentText());
-  
+
 			if (response.getResponseCode() !== 200 || data.retcode !== 0) {
 				console.error(
 					`${this.fullName}:getSignInfo`,
@@ -223,7 +223,7 @@ class Game {
 				);
 				return { success: false };
 			}
-  
+
 			return {
 				success: true,
 				data: {
@@ -238,7 +238,7 @@ class Game {
 			return { success: false };
 		}
 	}
-  
+
 	async getAwardsData (cookieData) {
 		try {
 			const url = `${this.config.url.home}?act_id=${this.config.ACT_ID}`;
@@ -246,7 +246,7 @@ class Game {
 				headers: { Cookie: cookieData }
 			});
 			const data = JSON.parse(response.getContentText());
-  
+
 			if (response.getResponseCode() !== 200 || data.retcode !== 0) {
 				console.error(
 					`${this.fullName}:getAwardsData`,
@@ -255,14 +255,14 @@ class Game {
 				);
 				return { success: false };
 			}
-  
+
 			if (data.data.awards.length === 0) {
 				console.warn(
 					`${this.fullName}:getAwardsData`,
 					"No awards data available."
 				);
 			}
-  
+
 			return { success: true, data: data.data.awards };
 		}
 		catch (e) {
@@ -273,20 +273,20 @@ class Game {
 			return { success: false };
 		}
 	}
-  
+
 	get userAgent () {
 		return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36";
 	}
 }
-  
+
 function checkInGame (gameName) {
 	const game = new Game(gameName, config[gameName]); // Create a Game instance
-  
+
 	game
 		.checkAndExecute()
 		.then((successes) => {
 			console.log("Successful check-ins:", successes);
-  
+
 			if (DISCORD_WEBHOOK) {
 				for (const success of successes) {
 					sendDiscordNotification(success);
@@ -297,7 +297,7 @@ function checkInGame (gameName) {
 			console.error("An error occurred during check-in:", e);
 		});
 }
-  
+
 function sendDiscordNotification (success) {
 	const embed = {
 		color: 16748258,
@@ -315,7 +315,7 @@ function sendDiscordNotification (success) {
 			text: `${success.assets.game} Daily Check-In`
 		}
 	};
-  
+
 	UrlFetchApp.fetch(DISCORD_WEBHOOK, {
 		method: "POST",
 		contentType: "application/json",
@@ -326,8 +326,8 @@ function sendDiscordNotification (success) {
 		})
 	});
 }
-  
-  
+
+
 // Example usage: check in for Genshin, Honkai, and Star Rail
 function checkInAllGames () {
 	checkInGame("genshin");

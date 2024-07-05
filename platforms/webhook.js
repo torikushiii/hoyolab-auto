@@ -10,7 +10,7 @@ module.exports = class Webhook extends require("./template.js") {
 	}
 
 	connect () {}
-	
+
 	async send (message, options = {}) {
 		if (typeof message !== "object") {
 			throw new app.Error({

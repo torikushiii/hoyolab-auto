@@ -37,7 +37,7 @@ module.exports = class HonkaiImpact extends require("./template.js") {
 
 	async login () {
 		const accounts = this.data;
-        
+
 		for (const account of accounts) {
 			const { token, mid, ltuid } = account.cookie;
 			if (!token || !mid || !ltuid) {
@@ -72,7 +72,7 @@ module.exports = class HonkaiImpact extends require("./template.js") {
 					}
 				});
 			}
-            
+
 			const res = body;
 			if (res.retcode !== 0) {
 				throw new app.Error({
