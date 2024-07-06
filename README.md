@@ -26,6 +26,7 @@ A multi-purpose tool for any supported Hoyoverse games. This tool is designed to
 - **Stamina check**: Monitors your Resin/Stamina every 30 minutes.
   - **Customizable threshold**: Notifies you when your stamina is above your set threshold.
 - **Expedition check**: Checks your expeditions every 30 minutes.
+- **Shop status**: This will notify you when your shop has finished selling videos (ZZZ Feature).
 - **Code Redemption**: Automatically search and redeem codes for supported games.
   - **Genshin Impact**
   - **Honkai: Star Rail**
