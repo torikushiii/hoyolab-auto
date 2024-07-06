@@ -30,7 +30,7 @@ module.exports = {
 		let reply = "";
 		if (res.success.length > 0) {
 			reply += "**Successfully redeemed codes:**\n";
-			reply += `\`\`\`\n${res.success.map(i => `${i.uid} - ${i.reason}`).join("\n")}\`\`\``;
+			reply += `\`\`\`\n${res.success.map(i => `${i.uid}`).join("\n")}\`\`\``;
 		}
 
 		if (res.failed.length > 0) {
