@@ -23,7 +23,7 @@ module.exports = {
 			const { data } = notes;
 
 			const shop = data.shop;
-			if (shop.state === "Open") {
+			if (shop.state === "Finished") {
 				const webhook = app.Platform.get(3);
 
 				const region = app.Utils.formattedAccountRegion(account.region);
