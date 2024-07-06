@@ -17,6 +17,10 @@ module.exports = {
 			};
 		}
 
+		if (game === "zenless" || game === "zzz") {
+			game = "nap";
+		}
+
 		codes = codes.map(code => code.toUpperCase());
 
 		const res = await app.HoyoLab.redeemCode(game, codes);
