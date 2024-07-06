@@ -1,6 +1,6 @@
 module.exports = {
 	name: "shop-status",
-	expression: "0 */30 * * * *",
+	expression: "0 */1 * * *",
 	description: "This will check your current shop status and will fire a notification if your shop has finished selling.",
 	code: (async function shopStatus () {
 		const accounts = app.HoyoLab.getActiveAccounts({ whitelist: "nap" });
