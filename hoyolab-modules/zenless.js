@@ -1,3 +1,4 @@
+const { setTimeout } = require("node:timers/promises");
 const DEFAULT_CONSTANTS = {
 	ACT_ID: "e202406031448091",
 	successMessage: "Congratulations Proxy! You have successfully checked in today!~",
@@ -43,17 +44,8 @@ module.exports = class ZenlessZoneZero extends require("./template.js") {
 		const accounts = this.data;
 
 		for (const account of accounts) {
-			const { token, mid, ltuid } = account.cookie;
-			if (!token || !mid || !ltuid) {
-				throw new app.Error({
-					message: "No cookie provided for ZenlessZoneZero account",
-					args: {
-						cookie: account.cookie
-					}
-				});
-			}
-
-			const cookieData = `cookie_token_v2=${token}; account_mid_v2=${mid}; account_id_v2=${ltuid}`;
+			const cookieData = account.cookie;
+			const ltuid = account.ltuid;
 
 			const { body, statusCode } = await app.Got("MiHoYo", {
 				url: "https://bbs-api-os.hoyolab.com/game_record/card/wapi/getGameRecordCard",
@@ -357,6 +349,71 @@ module.exports = class ZenlessZoneZero extends require("./template.js") {
 		};
 	}
 
+	async redeemCode (accountData, code) {
+		const cookieData = app.HoyoLab.parseCookie(accountData.cookie, {
+			whitelist: [
+				"cookie_token_v2",
+				"account_mid_v2",
+				"account_id_v2"
+			]
+		});
+
+		const res = await app.Got("MiHoYo", {
+			url: this.config.url.redemption,
+			responseType: "json",
+			throwHttpErrors: false,
+			searchParams: {
+				t: Date.now(),
+				lang: "en",
+				game_biz: "nap_global",
+				uid: accountData.uid,
+				region: accountData.region,
+				cdkey: code
+			},
+			headers: {
+				Cookie: cookieData
+			}
+		});
+
+		await setTimeout(5000);
+
+		if (res.statusCode !== 200) {
+			app.Logger.log(`${this.fullName}:RedeemCode`, {
+				message: "Request threw non-200 status code",
+				args: {
+					code,
+					status: res.statusCode,
+					body: res.body
+				}
+			});
+
+			return {
+				success: false
+			};
+		}
+		if (res.body.retcode !== 0) {
+			app.Logger.log(`${this.fullName}:RedeemCode`, {
+				message: "Failed to redeem code",
+				args: {
+					code,
+					status: res.body.retcode,
+					body: res.body
+				}
+			});
+
+			return {
+				success: false,
+				message: res.body.message
+			};
+		}
+
+		app.Logger.info(`${this.fullName}:RedeemCode`, `(${accountData.uid}) ${accountData.nickname} redeemed code: ${code}`);
+
+		return {
+			success: true
+		};
+	}
+
 	async notes (accountData) {
 		const cachedData = await this.dataCache.get(accountData.uid);
 		if (cachedData) {
@@ -373,6 +430,14 @@ module.exports = class ZenlessZoneZero extends require("./template.js") {
 			};
 		}
 
+		const cookieData = app.HoyoLab.parseCookie(accountData.cookie, {
+			whitelist: [
+				"ltoken_v2",
+				"ltmid_v2",
+				"ltuid_v2"
+			]
+		});
+
 		const res = await app.Got("MiHoYo", {
 			url: this.config.url.notes,
 			responseType: "json",
@@ -384,7 +449,7 @@ module.exports = class ZenlessZoneZero extends require("./template.js") {
 			headers: {
 				"x-rpc-device_id": accountData.deviceId,
 				"x-rpc-device_fp": accountData.deviceFp,
-				Cookie: accountData.cookie,
+				Cookie: cookieData,
 				DS: app.Utils.generateDS()
 			}
 		});
@@ -418,7 +483,7 @@ module.exports = class ZenlessZoneZero extends require("./template.js") {
 
 		const data = res.body.data;
 
-		// Howl daliy scratch card.
+		// Howl daily scratch card.
 		const cardSign = (data.card_sign === "CardSignDone") ? "Completed" : "Not Completed";
 		const stamina = {
 			currentStamina: data.energy.progress.current,

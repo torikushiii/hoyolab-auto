@@ -22,7 +22,15 @@ const redeemGenshin = async (account, codeList) => {
 	const failed = [];
 
 	for (const code of codeList) {
-		const res = await app.Got("API", {
+		const cookieData = app.HoyoLab.parseCookie(account.cookie, {
+			whitelist: [
+				"cookie_token_v2",
+				"account_mid_v2",
+				"account_id_v2"
+			]
+		});
+
+		const res = await app.Got("MiHoYo", {
 			url: "https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey",
 			searchParams: {
 				uid: account.uid,
@@ -33,7 +41,7 @@ const redeemGenshin = async (account, codeList) => {
 				sLangKey: "en-us"
 			},
 			headers: {
-				Cookie: account.cookie
+				Cookie: cookieData
 			}
 		});
 
@@ -87,7 +95,15 @@ const redeemStarRail = async (account, codeList) => {
 	const failed = [];
 
 	for (const code of codeList) {
-		const res = await app.Got("API", {
+		const cookieData = app.HoyoLab.parseCookie(account.cookie, {
+			whitelist: [
+				"cookie_token_v2",
+				"account_mid_v2",
+				"account_id_v2"
+			]
+		});
+
+		const res = await app.Got("MiHoYo", {
 			url: "https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey",
 			responseType: "json",
 			throwHttpErrors: false,
@@ -100,7 +116,7 @@ const redeemStarRail = async (account, codeList) => {
 				uid: account.uid
 			},
 			headers: {
-				Cookie: account.cookie
+				Cookie: cookieData
 			}
 		});
 
@@ -153,18 +169,26 @@ const redeemZenless = async (account, codeList) => {
 	const failed = [];
 
 	for (const code of codeList) {
-		const res = await app.Got("API", {
+		const cookieData = app.HoyoLab.parseCookie(account.cookie, {
+			whitelist: [
+				"cookie_token_v2",
+				"account_mid_v2",
+				"account_id_v2"
+			]
+		});
+
+		const res = await app.Got("MiHoYo", {
 			url: "https://public-operation-nap.hoyoverse.com/common/apicdkey/api/webExchangeCdkey",
 			searchParams: {
+				t: Date.now(),
+				lang: "en",
+				game_biz: "nap_global",
 				uid: account.uid,
 				region: account.region,
-				lang: "en",
-				cdkey: code.code,
-				game_biz: "hk4e_global",
-				sLangKey: "en-us"
+				cdkey: code.code
 			},
 			headers: {
-				Cookie: account.cookie
+				Cookie: cookieData
 			}
 		});
 

@@ -32,13 +32,7 @@ module.exports = {
 			type: "honkai",
 			data: [
 				{
-					cookie: {
-						// If there's and extra space at the end of the cookie value, please remove it
-						// e.g. "token: "testxdxd123    " -> "token: "testxdxd123"
-						token: "", // cookie_token_v2
-						mid: "", // account_mid_v2
-						ltuid: "" // ltuid_v2
-					}
+					cookie: ""
 				}
 			]
 		},
@@ -48,16 +42,7 @@ module.exports = {
 			type: "genshin",
 			data: [
 				{
-					cookie: {
-						// If there's and extra space at the end of the cookie value, please remove it
-						// e.g. "token: "testxdxd123    " -> "token: "testxdxd123"
-						token: "", // cookie_token_v2
-						mid: "", // account_mid_v2
-						ltuid: "", // ltuid_v2
-						// Not required, but you can add it to hopefully avoid captcha if you have multiple accounts
-						deviceId: "",
-						deviceFp: ""
-					},
+					cookie: "",
 					// Enable this if you want to automatically redeem codes
 					// Please note that if you have multiple accounts in the different regions
 					// the code will be redeemed but you won't get the reward
@@ -89,16 +74,7 @@ module.exports = {
 				// Just add another object inside the data array
 				// Account #1
 				{
-					cookie: {
-						// If there's and extra space at the end of the cookie value, please remove it
-						// e.g. "token: "testxdxd123    " -> "token: "testxdxd123"
-						token: "", // cookie_token_v2
-						mid: "", // account_mid_v2
-						ltuid: "", // ltuid_v2
-						// Not required, but you can add it to hopefully avoid captcha if you have multiple accounts
-						deviceId: "",
-						deviceFp: ""
-					},
+					cookie: "",
 					redeemCode: false,
 					dailiesCheck: true,
 					weekliesCheck: true,
@@ -115,13 +91,7 @@ module.exports = {
 				// Account #2
 				// Delete this if you only have one account
 				{
-					cookie: {
-						token: "", // cookie_token_v2
-						mid: "", // account_mid_v2
-						ltuid: "", // ltuid_v2
-						deviceId: "",
-						deviceFp: ""
-					},
+					cookie: "",
 					dailiesCheck: false,
 					weekliesCheck: false,
 					stamina: {
@@ -142,11 +112,7 @@ module.exports = {
 			type: "zenless",
 			data: [
 				{
-					cookie: {
-						token: "",
-						mid: "",
-						ltuid: ""
-					},
+					cookie: "",
 					redeemCode: false,
 					shopStatus: false, // This will check if your shop has finished selling videos
 					dailiesCheck: true,

@@ -147,23 +147,12 @@ module.exports = class HoyoLab {
 		}
 
 		for (const account of accounts) {
-			const { token, mid, ltuid } = account.cookie;
-			if (!token || !mid || !ltuid) {
-				throw new app.Error({
-					message: "Invalid cookie provided for HoyoLab.",
-					args: {
-						cookie: account.cookie
-					}
-				});
-			}
-
 			if (this.#name === "honkai") {
+				const parsedCookie = this.#parseCookie(account.cookie);
+				const ltuid = account.cookie.match(/ltuid_v2=([^;]+)/)[1];
 				this.#data.push({
-					cookie: {
-						token: token.trim(),
-						mid: mid.trim(),
-						ltuid: ltuid.trim()
-					}
+					cookie: parsedCookie.cookie,
+					ltuid
 				});
 				break;
 			}
@@ -244,13 +233,12 @@ module.exports = class HoyoLab {
 				});
 			}
 
+			const parsedCookie = this.#parseCookie(account.cookie);
+			const ltuid = account.cookie.match(/ltuid_v2=([^;]+)/)[1];
 			this.#data.push({
-				cookie: {
-					token: token.trim(),
-					mid: mid.trim(),
-					ltuid: ltuid.trim()
-				},
-				redeemCode,
+				cookie: parsedCookie.cookie,
+				ltuid,
+				redeemCode: parsedCookie.codeRedeem !== false ? redeemCode : parsedCookie.codeRedeem,
 				shopStatus,
 				dailiesCheck,
 				weekliesCheck,
@@ -286,6 +274,90 @@ module.exports = class HoyoLab {
 	}
 
 	destroy () {}
+
+	#parseCookie (cookie) {
+		const cookies = cookie.split("; ");
+		const cookieMap = Object.fromEntries(
+			cookies.map(c => {
+				const [key, value] = c.split("=");
+				return [key, value];
+			})
+		);
+
+		const {
+			ltoken_v2,
+			ltuid_v2,
+			ltmid_v2,
+			cookie_token_v2,
+			account_mid_v2,
+			account_id_v2
+		} = cookieMap;
+
+		if (!ltoken_v2 || !ltuid_v2 || !ltmid_v2) {
+			throw new app.Error({
+				message: "No ltoken_v2, ltuid_v2, or ltmid_v2 found in cookie.",
+				args: { cookie }
+			});
+		}
+
+		if (cookie_token_v2 && account_mid_v2 && account_id_v2) {
+			return {
+				cookie: this.#buildCookie(cookieMap, { token: true }),
+				codeRedeem: true
+			};
+		}
+
+		if (this.name !== "honkai") {
+			app.Logger.warn("HoyoLab", `No cookie_token_v2 or account_mid_v2 found in cookie for ${this.name}. This will disable "redeemCode" functionality.`);
+		}
+
+		return {
+			cookie: this.#buildCookie(cookieMap),
+			codeRedeem: false
+		};
+	}
+
+	#buildCookie (cookie, options = {}) {
+		const { token } = options;
+
+		const cookieObj = {
+			ltoken_v2: cookie.ltoken_v2,
+			ltuid_v2: cookie.ltuid_v2,
+			ltmid_v2: cookie.ltmid_v2
+		};
+
+		if (token) {
+			cookieObj.cookie_token_v2 = cookie.cookie_token_v2;
+			cookieObj.account_mid_v2 = cookie.account_mid_v2;
+			cookieObj.account_id_v2 = cookie.account_id_v2;
+		}
+
+		return Object.entries(cookieObj)
+			.map(([key, value]) => `${key}=${value}`)
+			.join("; ");
+	}
+
+	static parseCookie (cookie, options = {}) {
+		const { whitelist = [], separator = ";" } = options;
+
+		const cookiesArray = cookie.split(separator).map(c => c.trim());
+		const cookieMap = Object.fromEntries(
+			cookiesArray.map(c => {
+				const [key, value] = c.split("=");
+				return [key, value];
+			})
+		);
+
+		if (whitelist.length === 0) {
+			return cookieMap.join(`${separator} `);
+		}
+
+		const filteredCookiesArray = Object.keys(cookieMap)
+			.filter(key => whitelist.includes(key))
+			.map(key => `${key}=${cookieMap[key]}`);
+
+		return filteredCookiesArray.join(`${separator} `);
+	}
 
 	update (account) {
 		const index = this.accounts.findIndex(i => i.uid === account.uid);

@@ -44,17 +44,8 @@ module.exports = class Genshin extends require("./template.js") {
 		const accounts = this.data;
 
 		for (const account of accounts) {
-			const { token, mid, ltuid } = account.cookie;
-			if (!token || !mid || !ltuid) {
-				throw new app.Error({
-					message: "No cookie provided for Genshin account",
-					args: {
-						cookie: account.cookie
-					}
-				});
-			}
-
-			const cookieData = `cookie_token_v2=${token}; account_mid_v2=${mid}; account_id_v2=${ltuid}`;
+			const cookieData = account.cookie;
+			const ltuid = account.ltuid;
 
 			const { body, statusCode } = await app.Got("MiHoYo", {
 				url: "https://bbs-api-os.hoyolab.com/game_record/card/wapi/getGameRecordCard",
@@ -365,6 +356,14 @@ module.exports = class Genshin extends require("./template.js") {
 	}
 
 	async redeemCode (accountData, code) {
+		const cookieData = app.HoyoLab.parseCookie(accountData.cookie, {
+			whitelist: [
+				"cookie_token_v2",
+				"account_mid_v2",
+				"account_id_v2"
+			]
+		});
+
 		const res = await app.Got("MiHoYo", {
 			url: this.config.url.redemption,
 			responseType: "json",
@@ -378,7 +377,7 @@ module.exports = class Genshin extends require("./template.js") {
 				sLangKey: "en-us"
 			},
 			headers: {
-				Cookie: accountData.cookie
+				Cookie: cookieData
 			}
 		});
 
@@ -438,6 +437,14 @@ module.exports = class Genshin extends require("./template.js") {
 			};
 		}
 
+		const cookieData = app.HoyoLab.parseCookie(accountData.cookie, {
+			whitelist: [
+				"ltoken_v2",
+				"ltmid_v2",
+				"ltuid_v2"
+			]
+		});
+
 		const res = await app.Got("MiHoYo", {
 			url: this.config.url.notes,
 			responseType: "json",
@@ -449,7 +456,7 @@ module.exports = class Genshin extends require("./template.js") {
 			headers: {
 				"x-rpc-device_id": accountData.deviceId,
 				"x-rpc-device_fp": accountData.deviceFp,
-				Cookie: accountData.cookie,
+				Cookie: cookieData,
 				DS: app.Utils.generateDS()
 			}
 		});

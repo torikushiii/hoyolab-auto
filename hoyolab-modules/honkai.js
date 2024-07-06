@@ -39,17 +39,8 @@ module.exports = class HonkaiImpact extends require("./template.js") {
 		const accounts = this.data;
 
 		for (const account of accounts) {
-			const { token, mid, ltuid } = account.cookie;
-			if (!token || !mid || !ltuid) {
-				throw new app.Error({
-					message: "No cookie provided for Honkai Impact account",
-					args: {
-						cookie: account.cookie
-					}
-				});
-			}
-
-			const cookieData = `cookie_token_v2=${token}; account_mid_v2=${mid}; account_id_v2=${ltuid}`;
+			const cookieData = account.cookie;
+			const ltuid = account.ltuid;
 
 			const { body, statusCode } = await app.Got("MiHoYo", {
 				url: "https://bbs-api-os.hoyolab.com/game_record/card/wapi/getGameRecordCard",
