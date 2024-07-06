@@ -148,6 +148,7 @@ module.exports = {
 						ltuid: ""
 					},
 					redeemCode: false,
+					shopStatus: false, // This will check if your shop has finished selling videos
 					dailiesCheck: true,
 					stamina: {
 						check: true,
