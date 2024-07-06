@@ -168,14 +168,13 @@ module.exports = class HoyoLab {
 				break;
 			}
 
-			const { redeemCode, dailiesCheck, weekliesCheck } = account;
+			const { redeemCode, shopStatus, dailiesCheck, weekliesCheck } = account;
 			if (dailiesCheck && typeof dailiesCheck !== "boolean") {
 				throw new app.Error({
 					message: "Invalid check provided for HoyoLab expected boolean.",
 					args: {
 						dailiesCheck,
-						weekliesCheck,
-						redeemCode
+						type: typeof dailiesCheck
 					}
 				});
 			}
@@ -183,9 +182,8 @@ module.exports = class HoyoLab {
 				throw new app.Error({
 					message: "Invalid check provided for HoyoLab expected boolean.",
 					args: {
-						dailiesCheck,
 						weekliesCheck,
-						redeemCode
+						type: typeof weekliesCheck
 					}
 				});
 			}
@@ -193,9 +191,17 @@ module.exports = class HoyoLab {
 				throw new app.Error({
 					message: "Invalid check provided for HoyoLab expected boolean.",
 					args: {
-						dailiesCheck,
-						weekliesCheck,
-						redeemCode
+						redeemCode,
+						type: typeof redeemCode
+					}
+				});
+			}
+			if (shopStatus && typeof shopStatus !== "boolean") {
+				throw new app.Error({
+					message: "Invalid check provided for HoyoLab expected boolean.",
+					args: {
+						shopStatus,
+						type: typeof shopStatus
 					}
 				});
 			}
@@ -245,6 +251,7 @@ module.exports = class HoyoLab {
 					ltuid: ltuid.trim()
 				},
 				redeemCode,
+				shopStatus,
 				dailiesCheck,
 				weekliesCheck,
 				stamina,
