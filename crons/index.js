@@ -10,6 +10,14 @@ const ShopStatus = require("./shop-status/index.js");
 const Stamina = require("./stamina/index.js");
 const WeekliesReminder = require("./weeklies-reminder/index.js");
 
+let config;
+try {
+	config = require("../config.js");
+}
+catch {
+	config = require("../default.config.js");
+}
+
 const definitions = [
 	CheckIn,
 	CodeRedeem,
@@ -31,7 +39,8 @@ const initCrons = () => {
 			code: definition.code
 		};
 
-		const job = new CronJob(definition.expression, () => cron.code(cron));
+		const expression = config.crons[definition.name] || definition.expression;
+		const job = new CronJob(expression, () => cron.code(cron));
 		job.start();
 
 		crons.job = job;

@@ -25,6 +25,18 @@ module.exports = {
 			url: "(YOUR_WEBHOOK_URL)" // You can follow this guide to create a webhook: https://github.com/torikushiii/hoyolab-auto/blob/main/setup/DISCORD_WEBHOOK.md
 		}
 	],
+	crons: {
+		// You can use this site to generate cron expression: https://crontab.guru/
+		"check-in": "0 0 0 * * *",
+		"code-redeem": "* * * * *",
+		"dailies-reminder": "0 0 21 * * *",
+		expedition: "0 */30 * * * *",
+		"missed-check-in": "0 0 23 * * *",
+		"realm-currency": "0 */1 * * *",
+		"shop-status": "0 */1 * * *",
+		stamina: "* * * * *",
+		"weeklies-reminder": "0 0 21 * * 0"
+	},
 	accounts: [
 		{
 			id: 1,
