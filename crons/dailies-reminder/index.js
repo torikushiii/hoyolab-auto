@@ -35,7 +35,7 @@ module.exports = {
 				if (webhook) {
 					const embed = {
 						color: data.assets.color,
-						title: "Dalies Reminder",
+						title: "Dailies Reminder",
 						author: {
 							name: data.assets.author,
 							icon_url: data.assets.logo
