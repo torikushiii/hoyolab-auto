@@ -155,6 +155,12 @@ module.exports = class HoyoLab {
 		}
 
 		for (const account of accounts) {
+			if (typeof account.cookie === "object") {
+				throw new app.Error({
+					message: "This cookie method is deprecated, please follow the new cookie guide again: https://gist.github.com/torikushiii/59eff33fc8ea89dbc0b2e7652db9d3fd"
+				});
+			}
+
 			if (this.#name === "honkai") {
 				const parsedCookie = this.#parseCookie(account.cookie);
 				const ltuid = account.cookie.match(/ltuid_v2=([^;]+)/)[1];
