@@ -86,7 +86,8 @@ const DEFAULT_CONSTANTS = {
 		game: "Zenless Zone Zero",
 		assets: {
 			author: "Eous",
-			game: "Zenless Zone Zero"
+			game: "Zenless Zone Zero",
+			icon: "https://hyl-static-res-prod.hoyolab.com/communityweb/business/nap.png"
 		},
 		url: {
 			info: "https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/info",
