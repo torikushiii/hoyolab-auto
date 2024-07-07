@@ -99,8 +99,17 @@ class DataCache {
 				await DataCache.invalidateCache(cachedData.uid);
 				return null;
 			}
+
+			realm.recoveryTime -= Math.round(secondsSinceLastUpdate);
+			if (realm.recoveryTime <= 0) {
+				await DataCache.invalidateCache(cachedData.uid);
+				return null;
+			}
 		}
 
+		cachedData.lastUpdate = now;
+
+		await app.Cache.set({ key: cachedData.uid, value: cachedData });
 		return cachedData;
 	}
 
