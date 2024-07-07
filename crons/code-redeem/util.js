@@ -1,7 +1,8 @@
 const CodeResolver = require("./resolvers/index.js");
 const REDEMPTION_LINKS = {
 	genshin: "https://genshin.hoyoverse.com/en/gift",
-	starrail: "https://hsr.hoyoverse.com/gift"
+	starrail: "https://hsr.hoyoverse.com/gift",
+	nap: "https://zenless.hoyoverse.com/redemption"
 };
 
 const fetchCodes = async () => {
@@ -31,12 +32,12 @@ const redeemZenless = async (account, codeData) => {
 const buildMessage = (status, account, code) => {
 	const gameName = account.gameName;
 	const messageTitle = status ? "Code Successfully Redeemed!" : "Code Redeem Failed!";
-	const redeemLink = `${REDEMPTION_LINKS[account.platform]}?=code=${code.code}`;
+	const redeemLink = `${REDEMPTION_LINKS[account.platform]}?code=${code.code}`;
 
 	const message = [
 		`[${gameName}] (${account.uid}) ${account.nickname}`,
 		`\n${messageTitle}`,
-		`Code: ${code.code}`,
+		`\nCode: ${code.code}`,
 		...(status === false ? [`Manually Redeem Here: ${redeemLink}`] : []),
 		...(status === true ? [`Rewards: ${code.rewards.join(", ")}`] : [])
 	].join("\n");
@@ -46,7 +47,7 @@ const buildMessage = (status, account, code) => {
 		title: `${gameName} Code Redeem`,
 		description: `(${account.uid}) ${account.nickname}`
 		+ `\n${messageTitle}`
-		+ `Code: ${code.code}`
+		+ `\nCode: ${code.code}`
 		+ `${status === false ? `\nManually Redeem Here: ${redeemLink}` : ""}`
 		+ `${status === true ? `\nRewards: ${code.rewards.join(", ")}` : ""}`,
 		timestamp: new Date()
