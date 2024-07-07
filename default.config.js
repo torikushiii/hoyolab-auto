@@ -34,7 +34,7 @@ module.exports = {
 		"missed-check-in": "0 0 23 * * *",
 		"realm-currency": "0 */1 * * *",
 		"shop-status": "0 */1 * * *",
-		stamina: "* * * * *",
+		stamina: "0 */30 * * * *",
 		"weeklies-reminder": "0 0 21 * * 0"
 	},
 	accounts: [
