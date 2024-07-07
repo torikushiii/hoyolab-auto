@@ -169,6 +169,11 @@ module.exports = class HoyoLab {
 				});
 			}
 
+			if (account.cookie.length === 0) {
+				// this will just skip the account if there is no cookie provided
+				continue;
+			}
+
 			if (this.#name === "honkai") {
 				const parsedCookie = this.#parseCookie(account.cookie);
 				const ltuid = account.cookie.match(/ltuid_v2=([^;]+)/)[1];
