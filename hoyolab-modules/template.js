@@ -93,6 +93,14 @@ class DataCache {
 			}
 		}
 
+		if (cachedData.realm) {
+			const realm = cachedData.realm;
+			if (realm.currentCoin === realm.maxCoin) {
+				await DataCache.invalidateCache(cachedData.uid);
+				return null;
+			}
+		}
+
 		return cachedData;
 	}
 
@@ -209,6 +217,26 @@ module.exports = class HoyoLab {
 				});
 			}
 
+			const { realm } = account;
+			if (realm && typeof realm.check !== "boolean") {
+				throw new app.Error({
+					message: "Invalid realm.check provided for HoyoLab expected boolean.",
+					args: {
+						realm,
+						type: typeof realm.check
+					}
+				});
+			}
+			if (realm && typeof realm.persistent !== "boolean") {
+				throw new app.Error({
+					message: "Invalid realm.persistent provided for HoyoLab expected boolean.",
+					args: {
+						realm,
+						type: typeof realm.persistent
+					}
+				});
+			}
+
 			const { stamina } = account;
 			if (!stamina || typeof stamina.check !== "boolean" || typeof stamina.threshold !== "number" || typeof stamina.persistent !== "boolean") {
 				throw new app.Error({
@@ -254,6 +282,7 @@ module.exports = class HoyoLab {
 				ltuid,
 				redeemCode: parsedCookie.codeRedeem !== false ? redeemCode : parsedCookie.codeRedeem,
 				shopStatus,
+				realm,
 				dailiesCheck,
 				weekliesCheck,
 				stamina,

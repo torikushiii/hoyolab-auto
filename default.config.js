@@ -50,6 +50,10 @@ module.exports = {
 					redeemCode: false,
 					dailiesCheck: true, // Enable this if you want to get reminded to do your daily commissions
 					weekliesCheck: true, // Enable this if you want to get reminded to do your weeklies
+					realm: {
+						check: false,
+						persistent: false
+					},
 					stamina: {
 						check: false, // Enable this if you want to get notified when your stamina is above the threshold
 						threshold: 150, // Your stamina threshold, only fires notification when your stamina is above this value

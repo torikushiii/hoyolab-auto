@@ -129,6 +129,11 @@ module.exports = class Genshin extends require("./template.js") {
 					...account.expedition,
 					fired: false
 				},
+				realm: {
+					check: account.realm.check ?? false,
+					persistent: account.realm.persistent ?? false,
+					fired: false
+				},
 				cookie: cookieData,
 				deviceId: account.cookie.deviceId ?? "",
 				deviceFp: account.cookie.deviceFp ?? ""
