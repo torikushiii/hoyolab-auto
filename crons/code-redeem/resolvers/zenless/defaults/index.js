@@ -1,8 +1,10 @@
+const Game8Resolver = require("./game8");
 const PCGamerResolver = require("./pcgamer");
 const ReadWriteResolver = require("./readwrite");
 
 const fetch = async () => {
 	const promises = await Promise.allSettled([
+		Game8Resolver.fetch(),
 		PCGamerResolver.fetch(),
 		ReadWriteResolver.fetch()
 	]);
