@@ -508,7 +508,7 @@ module.exports = class ZenlessZoneZero extends require("./template.js") {
 
 		await this.dataCache.set(accountData.uid, {
 			uid: accountData.uid,
-			nickname: data.nickname,
+			nickname: accountData.nickname,
 			lastUpdate: Date.now(),
 			cardSign,
 			stamina,
