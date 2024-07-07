@@ -85,6 +85,14 @@ class DataCache {
 			}
 		}
 
+		if (cachedData.shop) {
+			const shop = cachedData.shop;
+			if (shop.state === "Finished") {
+				await DataCache.invalidateCache(cachedData.uid);
+				return null;
+			}
+		}
+
 		return cachedData;
 	}
 
