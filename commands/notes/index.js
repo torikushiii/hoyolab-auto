@@ -35,6 +35,7 @@ module.exports = {
 		for (const account of accounts) {
 			const { stamina, expedition } = account;
 			if (stamina.check === false && expedition.check === false) {
+				await context.channel.send(`${account.nickname} - Notes disabled for this account.`);
 				continue;
 			}
 
