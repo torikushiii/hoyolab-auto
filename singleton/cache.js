@@ -4,6 +4,14 @@ const { KeyvFile } = require("keyv-file");
 const GROUP_DELIMITER = String.fromCharCode(7);
 const ITEM_DELIMITER = String.fromCharCode(8);
 
+const isValidInteger = (value) => {
+	if (typeof value !== "number") {
+		return false;
+	}
+
+	return Boolean(Number.isFinite(value) && Math.trunc(value) === value);
+};
+
 module.exports = class Cache {
 	#store;
 
@@ -29,6 +37,17 @@ module.exports = class Cache {
 			key += `-${data.specificKey}`;
 		}
 
+		if (data.expiry) {
+			if (!isValidInteger(data.expiry)) {
+				throw new app.Error({
+					message: "If provided, expiry must be a valid positive integer",
+					args: { data }
+				});
+			}
+
+			return await this.#store.set(key, data.value, data.expiry);
+		}
+
 		return await this.#store.set(key, data.value);
 	}
 
@@ -39,7 +58,6 @@ module.exports = class Cache {
 
 	async delete (keyIdentifier) {
 		const key = Cache.resolveKey(keyIdentifier);
-
 		return await this.#store.delete(key);
 	}
 
