@@ -2,7 +2,7 @@ class DataCache {
 	static data = new Map();
 	static expirationInterval;
 
-	constructor (expiration = 3_650_000, rate) {
+	constructor (expiration, rate) {
 		this.expiration = expiration;
 		this.rate = rate;
 
@@ -16,7 +16,11 @@ class DataCache {
 		DataCache.data.set(key, data);
 
 		if (app.Cache) {
-			await app.Cache.set({ key, value: data });
+			await app.Cache.set({
+				key,
+				value: data,
+				expiry: 3_600_000 // 1 hour
+			});
 		}
 	}
 
@@ -109,7 +113,6 @@ class DataCache {
 
 		cachedData.lastUpdate = now;
 
-		await app.Cache.set({ key: cachedData.uid, value: cachedData });
 		return cachedData;
 	}
 
@@ -306,7 +309,7 @@ module.exports = class HoyoLab {
 
 		this.#gameId = defaults.gameId;
 		this.#config = defaults.config ?? {};
-		this.#dataCache = new DataCache(3_650_000, this.#config.regenRate);
+		this.#dataCache = new DataCache(600_000, this.#config.regenRate);
 
 		HoyoLab.list.push(this);
 	}
