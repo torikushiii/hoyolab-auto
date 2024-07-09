@@ -7,8 +7,8 @@ exports.fetch = async () => {
 
 	if (res.statusCode !== 200) {
 		app.Logger.log("Game8", {
-			statusCode: res.statusCode,
-			body: res.body
+			message: "Failed to fetch data.",
+			statusCode: res.statusCode
 		});
 
 		return [];

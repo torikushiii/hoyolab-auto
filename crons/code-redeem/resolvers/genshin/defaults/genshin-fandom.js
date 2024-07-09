@@ -8,8 +8,7 @@ exports.fetch = async () => {
 	if (res.statusCode !== 200) {
 		console.log("GenshinFandom", {
 			message: "Failed to fetch data from Genshin Fandom.",
-			statusCode: res.statusCode,
-			response: res.body
+			statusCode: res.statusCode
 		});
 
 		return [];

@@ -8,8 +8,7 @@ exports.fetch = async () => {
 	if (res.statusCode !== 200) {
 		app.Logger.log("HSRFandom", {
 			message: "Failed to fetch data from HSR Fandom.",
-			statusCode: res.statusCode,
-			response: res.body
+			statusCode: res.statusCode
 		});
 
 		return [];

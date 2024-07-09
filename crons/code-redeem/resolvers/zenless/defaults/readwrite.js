@@ -8,8 +8,7 @@ exports.fetch = async () => {
 	if (res.statusCode !== 200) {
 		app.Logger.log("ReadWrite", {
 			message: "Failed to fetch data from ReadWrite.",
-			statusCode: res.statusCode,
-			response: res.body
+			statusCode: res.statusCode
 		});
 
 		return [];
