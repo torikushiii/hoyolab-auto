@@ -1,3 +1,47 @@
+const getStaminaData = async (accounts, game) => {
+	const data = [];
+	for (const account of accounts) {
+		if (!account.stamina.check) {
+			continue;
+		}
+
+		const platform = app.HoyoLab.get(game);
+		const notes = await platform.notes(account);
+		if (notes.success === false) {
+			continue;
+		}
+
+		data.push({
+			uid: account.uid,
+			region: account.region,
+			username: account.nickname,
+			...notes.data.stamina
+		});
+	}
+	return data;
+};
+
+const formatStaminaMessage = (data, discord = false) => {
+	let text = "";
+	for (const { uid, region, username, currentStamina, maxStamina, recoveryTime, reserveStamina } of data) {
+		const delta = app.Utils.formatTime(recoveryTime);
+		const fixedRegion = app.Utils.formattedAccountRegion(region);
+
+		const description = [
+			discord ? `\n\`\`\`yaml\n${username} (${uid}) - ${fixedRegion}\`\`\`` : `\n${username} (${uid}) - ${fixedRegion}`,
+			`Current: ${currentStamina}/${maxStamina}`,
+			`Recovery Time: ${delta}`
+		];
+
+		if (reserveStamina !== null && typeof reserveStamina !== "undefined") {
+			description.push(`Reserve Stamina: ${reserveStamina}`);
+		}
+
+		text += `${description.join("\n")}\n\n`;
+	}
+	return text;
+};
+
 module.exports = {
 	name: "stamina",
 	description: "Check your specified game stamina",
@@ -19,172 +63,57 @@ module.exports = {
 		const supportedGames = app.HoyoLab.supportedGames({ blacklist: "honkai" });
 
 		if (supportedGames.length === 0) {
-			if (interaction) {
-				return await interaction.reply({
-					content: "There are no accounts available for checking notes.",
-					ephemeral: true
-				});
-			}
-
-			return {
-				success: false,
-				reply: "There are no accounts available for checking notes."
-			};
+			const message = "There are no accounts available for checking stamina.";
+			return interaction
+				? interaction.reply({ content: message, ephemeral: true })
+				: { success: false, reply: message };
 		}
 
 		if (!game) {
-			if (interaction) {
-				return await interaction.reply({
-					content: "Please specify a game.",
-					ephemeral: true
-				});
-			}
-
-			return {
-				success: false,
-				reply: `Please specify a game. Supported games are: ${supportedGames.join(", ")}`
-			};
+			const message = `Please specify a game. Supported games are: ${supportedGames.join(", ")}`;
+			return interaction
+				? interaction.reply({ content: message, ephemeral: true })
+				: { success: false, reply: message };
 		}
 
-		if (game === "zenless" || game === "zzz") {
-			game = "nap";
+		game = game.toLowerCase() === "zenless" || game.toLowerCase() === "zzz" ? "nap" : game.toLowerCase();
+
+		if (!supportedGames.includes(game)) {
+			const message = `Invalid game specified. Supported games are: ${supportedGames.join(", ")}`;
+			return interaction
+				? interaction.reply({ content: message, ephemeral: true })
+				: { success: false, reply: message };
 		}
-
-		if (!supportedGames.includes(game.toLowerCase())) {
-			if (interaction) {
-				return await interaction.reply({
-					content: "You don't have any accounts for that game.",
-					ephemeral: true
-				});
-			}
-
-			return {
-				success: false,
-				reply: `Invalid game specified. Supported games are: ${supportedGames.join(", ")}`
-			};
-		}
-
-		game = game.toLowerCase();
 
 		const accounts = app.HoyoLab.getActiveAccounts({ whitelist: game });
 		if (accounts.length === 0) {
-			if (interaction) {
-				return await interaction.reply({
-					content: "You don't have any accounts for that game.",
-					ephemeral: true
-				});
-			}
-
-			return {
-				success: false,
-				reply: "You don't have any accounts for that game."
-			};
+			const message = "You don't have any accounts for that game.";
+			return interaction
+				? interaction.reply({ content: message, ephemeral: true })
+				: { success: false, reply: message };
 		}
 
-		const data = [];
-		for (const account of accounts) {
-			if (account.stamina.check === false) {
-				continue;
-			}
+		const staminaData = await getStaminaData(accounts, game);
 
-			const platform = app.HoyoLab.get(game);
-			const notes = await platform.notes(account);
-			if (notes.success === false) {
-				continue;
-			}
-
-			data.push({
-				uid: account.uid,
-				region: account.region,
-				username: account.nickname,
-				...notes.data.stamina
-			});
+		if (staminaData.length === 0) {
+			const message = "No stamina data found for this type of account";
+			return interaction
+				? interaction.reply({ content: message, ephemeral: true })
+				: { success: false, reply: message };
 		}
 
-		if (data.length === 0) {
-			return {
-				success: false,
-				reply: "No stamina data found for this type of account"
-			};
-		}
-
-		if (context.platform.id === 1) {
+		if (interaction) {
 			const discordData = {
-				embeds: []
+				embeds: [{
+					title: "Stamina",
+					description: formatStaminaMessage(staminaData, true)
+				}]
 			};
-
-			let text = "";
-			for (const list of data) {
-				const {
-					uid,
-					region,
-					username,
-					currentStamina,
-					maxStamina,
-					recoveryTime,
-					reserveStamina
-				} = list;
-
-				const delta = app.Utils.formatTime(recoveryTime);
-				const fixedRegion = app.Utils.formattedAccountRegion(region);
-
-				const description = [
-					`\n\`\`\`yaml\n${username} (${uid}) - ${fixedRegion}\`\`\``,
-					`Current: ${currentStamina}/${maxStamina}`,
-					`Recovery Time: ${delta}`
-				];
-
-				if (reserveStamina !== null && typeof reserveStamina !== "undefined") {
-					description.push(`Reserve Stamina: ${reserveStamina}`);
-				}
-
-				text += `${description.join("\n")}\n\n`;
-			}
-
-			discordData.embeds.push({
-				title: "Stamina",
-				description: text
-			});
-
-			if (interaction) {
-				return await interaction.reply({
-					embeds: discordData.embeds,
-					ephemeral: true
-				});
-			}
+			return await interaction.reply({ embeds: discordData.embeds, ephemeral: true });
 		}
-
-		let text = "";
-		for (const list of data) {
-			const {
-				uid,
-				region,
-				username,
-				currentStamina,
-				maxStamina,
-				recoveryTime,
-				reserveStamina
-			} = list;
-
-			const delta = app.Utils.formatTime(recoveryTime);
-			const fixedRegion = app.Utils.formattedAccountRegion(region);
-
-			const description = [
-				`\n${username} (${uid}) - ${fixedRegion}`,
-				`Current: ${currentStamina}/${maxStamina}`,
-				`Recovery Time: ${delta}`
-			];
-
-			if (reserveStamina !== null && typeof reserveStamina !== "undefined") {
-				description.push(`Reserve Stamina: ${reserveStamina}`);
-			}
-
-			text += `${description.join("\n")}\n\n`;
+		else {
+			const text = formatStaminaMessage(staminaData);
+			return { success: true, reply: text };
 		}
-
-		return {
-			success: true,
-			reply: text
-		};
 	})
 };

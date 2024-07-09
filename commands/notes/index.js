@@ -173,7 +173,7 @@ module.exports = {
 			required: true
 		}
 	],
-	run: async (context, game) => {
+	run: (async function notes (context, game) {
 		const { interaction } = context;
 
 		const supportedGames = app.HoyoLab.supportedGames({ blacklist: "honkai" });
@@ -214,5 +214,5 @@ module.exports = {
 		if (interaction) {
 			await interaction.reply({ embeds: embedData, ephemeral: true });
 		}
-	}
+	})
 };
