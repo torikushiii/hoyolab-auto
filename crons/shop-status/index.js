@@ -11,7 +11,11 @@ module.exports = {
 
 		const platform = app.HoyoLab.get("nap");
 		for (const account of accounts) {
-			if (account.shopStatus === false) {
+			if (account.shop.check === false) {
+				continue;
+			}
+
+			if (account.shop.fired) {
 				continue;
 			}
 
@@ -23,8 +27,16 @@ module.exports = {
 			const { data } = notes;
 
 			const shop = data.shop;
+			if (shop.state !== "Finished") {
+				account.shop.fired = false;
+				platform.update(account);
+			}
+
 			if (shop.state === "Finished") {
 				const webhook = app.Platform.get(3);
+
+				account.shop.fired = true;
+				platform.update(account);
 
 				const region = app.Utils.formattedAccountRegion(account.region);
 				if (webhook) {

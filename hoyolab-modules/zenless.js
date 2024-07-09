@@ -112,7 +112,6 @@ module.exports = class ZenlessZoneZero extends require("./template.js") {
 				region: data.region,
 				level: data.level,
 				redeemCode: account.redeemCode,
-				shopStatus: account.shopStatus,
 				dailiesCheck: account.dailiesCheck,
 				gameName: "Zenless Zone Zero",
 				assets: {
@@ -123,6 +122,10 @@ module.exports = class ZenlessZoneZero extends require("./template.js") {
 				},
 				stamina: {
 					...account.stamina,
+					fired: false
+				},
+				shop: {
+					check: account.shopStatus,
 					fired: false
 				},
 				cookie: cookieData
