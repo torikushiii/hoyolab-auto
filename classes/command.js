@@ -131,9 +131,6 @@ module.exports = class Command extends require("./template.js") {
 		if (!app.Config) {
 			app.Logger.warn("Command", "No configuration data found");
 		}
-		else if (Command.prefix === null) {
-			app.Logger.warn("Command", "No command prefix found");
-		}
 
 		const names = Command.data.flatMap(i => i.name);
 		const duplicates = names.filter((i, index) => names.indexOf(i) !== index);
