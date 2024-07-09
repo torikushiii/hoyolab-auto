@@ -8,6 +8,9 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
+  "engines": {
+    "node": ">=20.0"
+  },
   "devDependencies": {
     "@types/bun": "latest",
     "@babel/core": "^7.18.10",
