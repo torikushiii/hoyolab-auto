@@ -1,13 +1,48 @@
 module.exports = {
 	name: "notes",
 	description: "Check your HoyoLab notes.",
-	params: null,
+	params: [
+		{
+			name: "game",
+			description: "The game you want to check notes for.",
+			type: "string",
+			choices: [
+				{ name: "Genshin Impact", value: "genshin" },
+				{ name: "Honkai: Star Rail", value: "starrail" },
+				{ name: "Zenless Zone Zero", value: "nap" }
+			],
+			required: true
+		}
+	],
 	run: (async function notes (context, game) {
-		const validGames = app.HoyoLab.supportedGames({ blacklist: "honkai" });
-		if (!game) {
+		const { interaction } = context;
+		const supportedGames = app.HoyoLab.supportedGames({ blacklist: "honkai" });
+
+		if (supportedGames.length === 0) {
+			if (interaction) {
+				return await interaction.reply({
+					content: "There are no accounts available for checking notes.",
+					ephemeral: true
+				});
+			}
+
 			return {
 				success: false,
-				reply: `Please specify a game. Valid games are: ${validGames.join(", ")}`
+				reply: "There are no accounts available for checking notes."
+			};
+		}
+
+		if (!game) {
+			if (interaction) {
+				return await interaction.reply({
+					content: "Please specify a game.",
+					ephemeral: true
+				});
+			}
+
+			return {
+				success: false,
+				reply: `Please specify a game. Supported games are: ${supportedGames.join(", ")}`
 			};
 		}
 
@@ -15,10 +50,17 @@ module.exports = {
 			game = "nap";
 		}
 
-		if (!validGames.includes(game.toLowerCase())) {
+		if (!supportedGames.includes(game.toLowerCase())) {
+			if (interaction) {
+				return await interaction.reply({
+					content: "You don't have any accounts for that game.",
+					ephemeral: true
+				});
+			}
+
 			return {
 				success: false,
-				reply: `Invalid game. Valid games are: ${validGames.join(", ")}`
+				reply: `Invalid game specified. Supported games are: ${supportedGames.join(", ")}`
 			};
 		}
 
@@ -26,23 +68,28 @@ module.exports = {
 
 		const accounts = app.HoyoLab.getActiveAccounts({ whitelist: game });
 		if (accounts.length === 0) {
+			if (interaction) {
+				return await interaction.reply({
+					content: "You don't have any accounts for that game.",
+					ephemeral: true
+				});
+			}
+
 			return {
 				success: false,
-				reply: "No accounts found for that type of game"
+				reply: "You don't have any accounts for that game."
 			};
 		}
 
 		for (const account of accounts) {
 			const { stamina, expedition } = account;
 			if (stamina.check === false && expedition.check === false) {
-				await context.channel.send(`${account.nickname} - Notes disabled for this account.`);
 				continue;
 			}
 
 			const platform = app.HoyoLab.get(game);
 			const notes = await platform.notes(account);
 			if (notes.success === false) {
-				await context.channel.send(`${account.nickname} - Failed to fetch notes, check the logs for more information.`);
 				continue;
 			}
 
@@ -138,7 +185,7 @@ module.exports = {
 					);
 				}
 
-				await context.channel.send({ embeds });
+				await interaction.reply({ embeds, ephemeral: true });
 			}
 			else if (context.platform.id === 2) {
 				const { data } = notes;

@@ -3,7 +3,9 @@ const {
 	Client,
 	DiscordAPIError,
 	GatewayIntentBits,
-	PermissionFlagsBits
+	PermissionFlagsBits,
+	REST,
+	Routes
 } = require("discord.js");
 
 const ignoredChannels = [
@@ -41,9 +43,12 @@ module.exports = class DiscordController extends require("./template.js") {
 
 		this.initListeners();
 		await this.client.login(this.token);
+
+		await this.registerSlashCommands();
 	}
 
 	initListeners () {
+		/** @type {Client} */
 		const client = this.client;
 
 		client.on("messageCreate", async (messageData) => {
@@ -86,6 +91,28 @@ module.exports = class DiscordController extends require("./template.js") {
 					userData: author
 				});
 			}
+		});
+
+		client.on("interactionCreate", async (interaction) => {
+			if (!interaction.isChatInputCommand()) {
+				return;
+			}
+
+			const commandName = interaction.commandName;
+			const options = interaction.options;
+
+			const args = options.data.map(i => i.value);
+
+			const channelData = interaction.channel;
+			const userData = interaction.user;
+
+			await this.handleCommand({
+				interaction,
+				command: commandName,
+				args,
+				channelData,
+				userData
+			});
 		});
 	}
 
@@ -145,6 +172,7 @@ module.exports = class DiscordController extends require("./template.js") {
 
 	async handleCommand (data) {
 		const {
+			interaction,
 			command,
 			args,
 			channelData,
@@ -152,6 +180,7 @@ module.exports = class DiscordController extends require("./template.js") {
 		} = data;
 
 		const execution = await app.Command.checkAndRun(command, args, channelData, userData, {
+			interaction,
 			platform: {
 				id: 1,
 				name: "Discord"
@@ -175,6 +204,31 @@ module.exports = class DiscordController extends require("./template.js") {
 		}
 		else {
 			await this.send(reply, channelData);
+		}
+	}
+
+	async registerSlashCommands () {
+		const commands = [];
+
+		for (const command of app.Command.data) {
+			const slashCommandData = command.getSlashCommandData();
+			commands.push(slashCommandData.toJSON());
+		}
+
+		const rest = new REST({ version: "10" }).setToken(this.token);
+
+		try {
+			app.Logger.info("Discord", "Registering application commands.");
+
+			await rest.put(
+				Routes.applicationCommands(this.botId),
+				{ body: commands }
+			);
+
+			app.Logger.info("Discord", `Successfully registered ${commands.length} application commands.`);
+		}
+		catch (e) {
+			console.error(e);
 		}
 	}
 

@@ -1,3 +1,5 @@
+const { SlashCommandBuilder, Message } = require("discord.js");
+
 module.exports = class Command extends require("./template.js") {
 	name;
 	description = null;
@@ -62,6 +64,54 @@ module.exports = class Command extends require("./template.js") {
 
 	execute (...args) {
 		return this.code(...args);
+	}
+
+	getSlashCommandData () {
+		if (!this.params || this.params.length === 0) {
+			return new SlashCommandBuilder()
+				.setName(this.name)
+				.setDescription(this.description ?? "No description provided");
+		}
+
+		const builder = new SlashCommandBuilder()
+			.setName(this.name)
+			.setDescription(this.description ?? "No description provided");
+
+		for (const param of this.params) {
+			let option;
+
+			/* eslint-disable implicit-arrow-linebreak */
+			switch (param.type) {
+				case "string":
+					option = builder.addStringOption(opt =>
+						opt.setName(param.name)
+							.setDescription(param.description)
+							.addChoices(param.choices ?? [])
+							.setRequired(param.required ?? false)
+					);
+					break;
+				case "integer":
+					option = builder.addIntegerOption(opt =>
+						opt.setName(param.name)
+							.setDescription(param.description)
+							.setRequired(param.required ?? false)
+					);
+					break;
+				case "boolean":
+					option = builder.addBooleanOption(opt =>
+						opt.setName(param.name)
+							.setDescription(param.description)
+							.setRequired(param.required ?? false)
+					);
+					break;
+				default:
+					console.warn(`Unsupported parameter type: ${param.type} for ${this.name}`);
+					continue;
+			}
+			/* eslint-enable implicit-arrow-linebreak */
+		}
+
+		return builder;
 	}
 
 	static async initialize () {
@@ -133,6 +183,7 @@ module.exports = class Command extends require("./template.js") {
 		const appendOptions = { ...options };
 		const contextOptions = {
 			platform: options.platform,
+			interaction: options.interaction,
 			invocation: identifier,
 			user: userData,
 			channel: channelData,
@@ -149,6 +200,12 @@ module.exports = class Command extends require("./template.js") {
 		let execution;
 		try {
 			execution = await command.code(contextOptions, ...args);
+			if (execution instanceof Message) {
+				return;
+			}
+			if (execution?.reply === undefined) {
+				return;
+			}
 		}
 		catch (e) {
 			const logObject = {

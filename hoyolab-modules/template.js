@@ -502,11 +502,17 @@ module.exports = class HoyoLab {
 			for (const code of codes) {
 				const res = await platform.redeemCode(account, code);
 				if (res.success) {
-					success.push({ uid: account.uid });
+					success.push({
+						uid: account.uid,
+						nick: account.nickname,
+						code
+					});
 				}
 				else {
 					failed.push({
 						uid: account.uid,
+						nick: account.nickname,
+						code,
 						reason: res.message
 					});
 				}
