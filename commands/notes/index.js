@@ -81,6 +81,7 @@ module.exports = {
 			};
 		}
 
+		const embedData = [];
 		for (const account of accounts) {
 			const { stamina, expedition } = account;
 			if (stamina.check === false && expedition.check === false) {
@@ -185,7 +186,7 @@ module.exports = {
 					);
 				}
 
-				await interaction.reply({ embeds, ephemeral: true });
+				embedData.push(...embeds);
 			}
 			else if (context.platform.id === 2) {
 				const { data } = notes;
@@ -224,6 +225,13 @@ module.exports = {
 					await telegram.send(escapedMessage);
 				}
 			}
+		}
+
+		if (interaction) {
+			await interaction.reply({
+				embeds: embedData,
+				ephemeral: true
+			});
 		}
 	})
 };

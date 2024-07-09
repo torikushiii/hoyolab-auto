@@ -109,6 +109,7 @@ module.exports = {
 			};
 		}
 
+		const embedData = [];
 		if (context.platform.id === 1) {
 			for (const expedition of data) {
 				const expeditionList = expedition.list.map((expedition) => ({
@@ -129,8 +130,12 @@ module.exports = {
 					timestamp: new Date()
 				}];
 
-				await interaction.reply({
-					embeds,
+				embedData.push(...embeds);
+			}
+
+			if (interaction) {
+				return await interaction.reply({
+					embeds: embedData,
 					ephemeral: true
 				});
 			}
