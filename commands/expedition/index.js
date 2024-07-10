@@ -83,10 +83,13 @@ module.exports = {
 	],
 	run: (async function expedition (context, game) {
 		const { interaction } = context;
-		const supportedGames = app.HoyoLab.supportedGames({ blacklist: "honkai" });
+		const supportedGames = app.HoyoLab.supportedGames({ blacklist: [
+			"honkai",
+			"nap"
+		]});
 
 		if (supportedGames.length === 0) {
-			const message = "There are no accounts available for checking expeditions.";
+			const message = "There are no accounts available for checking expeditions or the game is not supported.";
 			return interaction
 				? interaction.reply({ content: message, ephemeral: true })
 				: { success: false, reply: message };
