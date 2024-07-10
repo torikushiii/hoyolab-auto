@@ -55,33 +55,53 @@ For a detailed usage guide, refer to this gist: [Cookie Guide](https://gist.gith
 ## Notifications Setup
 For setting up Discord or Telegram notifications, refer to the [setup folder](https://github.com/torikushiii/hoyolab-auto/tree/main/setup).
 
-## Docker
-You can also run this script using Docker.
+## Running with Docker
 
-### How to run
-For the application to work, the configuration file must be mounted under `/app/config.js` or `/app/default.config.js` and `app/data`, respectively (refer to `docker-compose.yml`).
+This application can be easily managed and run using Docker and the provided Makefile.
 
-  1. Prepare the configuration file by renaming `default.config.js` to `config.js` and filling in the necessary information.
-  2. Build the Docker image:
-      ```bash
-      docker compose build
-      ```
-      or if you want to build without cache:
-      ```bash
-      docker compose build --no-cache
-      ```
-  3. Start the Docker container:
-      ```bash
-      docker compose up -d
-      ```
-  4. Check the logs:
-      ```bash
-      docker compose logs -f
-      ```
-  5. To stop the Docker container:
-      ```bash
-      docker compose down
-      ```
+**1. Prerequisites**
+
+- **Docker:**  Ensure Docker is installed and running. Download it from [https://www.docker.com/](https://www.docker.com/).
+- **Docker Compose:** Most Docker installations include Docker Compose. If not, install it from [https://docs.docker.com/compose/install/](https://docs.docker.com/compose/install/).
+
+**2. Configuration**
+
+- **Rename `default.config.js`:** Create a copy of `default.config.js` named `config.js` and fill in your application's configuration:
+  ```bash
+  cp default.config.js config.js
+  # Edit config.js with your settings 
+  ```
+
+**3. Using the Makefile**
+
+A Makefile is provided to streamline common Docker tasks. Here are some examples:
+
+- **Build the image:**
+  ```bash
+  make build 
+  ``` 
+- **Start the application:**
+  ```bash
+  make up
+  ```
+- **Stop the application:**
+  ```bash
+  make down
+  ```
+- **View logs:**
+  ```bash
+  make logs 
+  ```
+- **Rebuild and restart:**
+  ```bash
+  make update 
+  ```
+  
+  For a complete list of available Makefile targets, run:
+
+  ```bash
+  make help
+  ```
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change. If there are any bugs, please open an issue.

@@ -3,16 +3,16 @@ FROM node:20-alpine
 WORKDIR /app
 
 COPY ["package.json", "./"]
-RUN npm i
+RUN npm install --omit=dev
 
-COPY ["./", "./"]
+COPY . .
 
-RUN mkdir -p /app/data
+RUN addgroup -S hoyolab && adduser -S -G hoyolab hoyolab && \
+    mkdir -p /app/data && \
+    chown -R hoyolab:hoyolab /app 
 
-RUN chown -R node:node /app
-
-USER node
+USER hoyolab
 
 ENV TZ=Asia/Shanghai
 
-CMD ["npm", "start"]
+CMD ["npm", "start"] 
