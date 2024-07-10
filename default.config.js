@@ -25,6 +25,8 @@ module.exports = {
 		}
 	],
 	crons: {
+		whitelist: [], // You can whitelist some crons if you only want to run specific crons
+		blacklist: [], // You can blacklist some crons if you don't want to run them
 		// You can use this site to generate cron expression: https://crontab.guru/
 		"check-in": "0 0 0 * * *",
 		"code-redeem": "* * * * *",
@@ -55,7 +57,7 @@ module.exports = {
 				{
 					cookie: "",
 					// Enable this if you want to automatically redeem codes
-					// Please note that if you have multiple accounts in the different regions
+					// Please note that if you have one account with characters in multiple servers
 					// the code will be redeemed but you won't get the reward
 					// so please be careful when enabling this, and only enable it on the account that you want to redeem the code
 					redeemCode: false,

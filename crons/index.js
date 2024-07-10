@@ -31,8 +31,20 @@ const definitions = [
 ];
 
 const initCrons = () => {
+	const { blacklist = [], whitelist = [] } = config.crons;
+	if (blacklist.length > 0 && whitelist.length > 0) {
+		throw new Error(`Cannot have both a blacklist and a whitelist for crons`);
+	}
+
 	const crons = [];
 	for (const definition of definitions) {
+		if (blacklist.length > 0 && blacklist.includes(definition.name)) {
+			continue;
+		}
+		else if (whitelist.length > 0 && !whitelist.includes(definition.name)) {
+			continue;
+		}
+
 		const cron = {
 			name: definition.name,
 			description: definition.description,
