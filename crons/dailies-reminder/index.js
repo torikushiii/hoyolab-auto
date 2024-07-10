@@ -31,6 +31,10 @@ module.exports = {
 				const max = data.stamina.maxStamina;
 				const delta = app.Utils.formatTime(data.stamina.recoveryTime);
 
+				if (data.dailies.task === data.dailies.maxTask) {
+					continue;
+				}
+
 				const webhook = app.Platform.get(3);
 				if (webhook) {
 					const embed = {
