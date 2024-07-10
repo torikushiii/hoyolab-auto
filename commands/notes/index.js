@@ -113,24 +113,23 @@ const getNotesEmbedData = async (accounts, game, platformId) => {
 			let message = "";
 			if (platform.gameId === 2) {
 				message = [
+					`${account.nickname} - ${account.uid}`,
 					`Current Stamina: ${stamina.currentStamina}/${stamina.maxStamina}`
-					+ `\nFull in:\n${app.Utils.formatTime(stamina.recoveryTime)}`,
+					+ `\nFull in: ${app.Utils.formatTime(stamina.recoveryTime)}`,
 					"Expedition Status",
 					expedition.list.map((i, idx) => `Account ${idx + 1} - ${app.Utils.formatTime(i.remaining_time)}`).join("\n"),
-					"Dailies",
-					`${dailies.task}/${dailies.maxTask}`,
-					"Weekly Boss Chance Remaining:",
-					`${weeklies.resinDiscount}/${weeklies.resinDiscountLimit}`
+					`Dailies: ${dailies.task}/${dailies.maxTask}`,
+					`Weekly Boss Chance Remaining: ${weeklies.resinDiscount}/${weeklies.resinDiscountLimit}`
 				].join("\n");
 			}
 			else if (platform.gameId === 6) {
 				message = [
+					`${account.nickname} - ${account.uid}`,
 					`Current Stamina: ${stamina.currentStamina}/${stamina.maxStamina}`
-					+ `\nFull in:\n${app.Utils.formatTime(stamina.recoveryTime)}`,
+					+ `\nFull in: ${app.Utils.formatTime(stamina.recoveryTime)}`,
 					"Expedition Status",
 					expedition.list.map((i, idx) => `Account ${idx + 1} - ${app.Utils.formatTime(i.remaining_time)}`).join("\n"),
-					"Dailies",
-					`${dailies.task}/${dailies.maxTask}`,
+					`Dailies: ${dailies.task}/${dailies.maxTask}`,
 					"Weekly Status:",
 					`Boss: ${weeklies.weeklyBoss}/${weeklies.weeklyBossLimit}`
 					+ `\nSimulated Universe: ${weeklies.rogueScore}/${weeklies.maxScore}`
@@ -138,14 +137,12 @@ const getNotesEmbedData = async (accounts, game, platformId) => {
 			}
 			else if (platform.gameId === 8) {
 				message = [
+					`${account.nickname} - ${account.uid}`,
 					`Current Stamina: ${stamina.currentStamina}/${stamina.maxStamina}`
-					+ `\nFull in:\n${app.Utils.formatTime(stamina.recoveryTime)}`,
-					"Dailies",
-					`${dailies.task}/${dailies.maxTask}`,
-					"Shop Status",
-					data.shop.state,
-					"Scratch Card",
-					data.cardSign
+					+ `\nFull in: ${app.Utils.formatTime(stamina.recoveryTime)}`,
+					`Dailies: ${dailies.task}/${dailies.maxTask}`,
+					`Shop Status: ${data.shop.state}`,
+					`Howl Scratch Card: ${data.cardSign}`
 				].join("\n");
 			}
 
