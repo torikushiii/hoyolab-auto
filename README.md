@@ -57,7 +57,8 @@ For setting up Discord or Telegram notifications, refer to the [setup folder](ht
 
 ## Running with Docker
 
-This application can be easily managed and run using Docker and the provided Makefile.
+This application can be easily managed and run using Docker. We provide a Makefile 
+for convenience, but you can also use Docker commands directly.
 
 **1. Prerequisites**
 
@@ -72,9 +73,11 @@ This application can be easily managed and run using Docker and the provided Mak
   # Edit config.js with your settings 
   ```
 
-**3. Using the Makefile**
+**3. Building and Running with Docker Compose**
 
-A Makefile is provided to streamline common Docker tasks. Here are some examples:
+**Using the Makefile (Recommended):**
+
+The provided Makefile simplifies common Docker tasks. 
 
 - **Build the image:**
   ```bash
@@ -101,6 +104,31 @@ A Makefile is provided to streamline common Docker tasks. Here are some examples
 
   ```bash
   make help
+  ```
+
+**Using Docker Compose Directly:**
+
+If you prefer not to use the Makefile, you can use the following Docker Compose commands:
+
+- **Build the image:**
+  ```bash
+  docker-compose build
+  ```
+- **Start the application:**
+  ```bash
+  docker-compose up -d
+  ```
+- **Stop the application:**
+  ```bash
+  docker-compose down
+  ```
+- **View logs:**
+  ```bash
+  docker-compose logs -f instance
+  ```
+- **Rebuild and restart:**
+  ```bash
+  docker-compose down && docker-compose build && docker-compose up -d
   ```
 
 ## Contributing
