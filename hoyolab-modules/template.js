@@ -168,7 +168,7 @@ module.exports = class HoyoLab {
 			});
 		}
 
-		if (accounts === 0) {
+		if (accounts.length === 0) {
 			throw new app.Error({
 				message: `No accounts provided for ${name}, please provide at least one account or disable the platform.`
 			});
