@@ -462,67 +462,44 @@ module.exports = class HoyoLab {
 		return platforms;
 	}
 
-	static async redeemCode (game, codes) {
+	static async redeemCode (game, uid, code) {
 		// eslint-disable-next-line object-curly-spacing
-		const accountData = HoyoLab.getActiveAccounts({ whitelist: game });
+		const accountData = HoyoLab.getActiveAccounts({ whitelist: game, uid });
 		if (accountData.length === 0) {
 			return {
 				success: false,
-				reply: "No active accounts found for this type of game."
+				data: {
+					reason: "No active accounts found for this type of game."
+				}
 			};
 		}
 
-		const allDisabled = accountData.every(account => account.redeemCode === false);
-		if (allDisabled) {
+		const disabled = accountData.every(account => account.redeemCode === false);
+		if (disabled) {
 			return {
 				success: false,
-				reply: "None of the accounts have redeemCode enabled. Please enable on accounts you wish to redeem codes on."
+				data: {
+					reason: "Redeem code functionality is currently disabled for this account."
+				}
 			};
 		}
 
-		if (!Array.isArray(codes)) {
-			throw new app.Error({
-				message: "Invalid codes provided for redeemCode expected array.",
-				args: {
-					codes,
-					type: typeof codes
-				}
-			});
-		}
-
-		const success = [];
-		const failed = [];
-
 		const platform = HoyoLab.get(game);
-		for (const account of accountData) {
-			if (account.redeemCode === false) {
-				continue;
-			}
+		const [account] = accountData;
 
-			for (const code of codes) {
-				const res = await platform.redeemCode(account, code);
-				if (res.success) {
-					success.push({
-						uid: account.uid,
-						nick: account.nickname,
-						code
-					});
-				}
-				else {
-					failed.push({
-						uid: account.uid,
-						nick: account.nickname,
-						code,
-						reason: res.message
-					});
-				}
-			}
+		const res = await platform.redeemCode(account, code);
+		if (res.success) {
+			return { success: true };
 		}
-
-		return {
-			success,
-			failed
-		};
+		else {
+			return {
+				success: false,
+				data: {
+					code,
+					reason: res.message
+				}
+			};
+		}
 	}
 
 	static getActiveAccounts (options = {}) {
@@ -557,6 +534,11 @@ module.exports = class HoyoLab {
 
 			return i.accounts;
 		}).filter(i => i !== null);
+
+		if (options.uid) {
+			const account = accounts.find(account => account.uid === options.uid);
+			return account ? [account] : [];
+		}
 
 		return accounts;
 	}
