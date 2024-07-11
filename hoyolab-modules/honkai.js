@@ -140,17 +140,33 @@ module.exports = class HonkaiImpact extends require("./template.js") {
 				isSigned: info.data.issign
 			};
 
-			if (data.isSigned) {
-				app.Logger.info(`${this.fullName}:CheckIn`, `${account.nickname} already signed in today`);
-				continue;
-			}
-
 			const totalSigned = data.total;
 			const awardObject = {
 				name: awards[totalSigned].name,
 				count: awards[totalSigned].cnt,
 				icon: awards[totalSigned].icon
 			};
+
+			if (data.isSigned) {
+				app.Logger.info(`${this.fullName}:CheckIn`, `${account.nickname} already signed in today`);
+
+				success.push({
+					uid: account.uid,
+					platform: this.name,
+					rank: account.level,
+					username: account.nickname,
+					region: app.Utils.formattedAccountRegion(account.region),
+					total: data.total,
+					result: this.config.signedMessage,
+					assets: {
+						...this.config.assets,
+						logo: this.#logo,
+						color: this.#color
+					},
+					award: awardObject
+				});
+				continue;
+			}
 
 			const sign = await this.#sign(account.cookie);
 			if (!sign.success) {
