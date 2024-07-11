@@ -31,6 +31,7 @@ module.exports = {
 		"check-in": "0 0 0 * * *",
 		"code-redeem": "*/15 * * * *",
 		"dailies-reminder": "0 0 21 * * *",
+		"howl-scratch-card": "0 0 21 * * *",
 		expedition: "0 */30 * * * *",
 		"missed-check-in": "0 0 23 * * *",
 		"realm-currency": "0 */1 * * *",

@@ -4,6 +4,7 @@ const CheckIn = require("./check-in/index.js");
 const CodeRedeem = require("./code-redeem/index.js");
 const DailiesReminder = require("./dailies-reminder/index.js");
 const Expedition = require("./expedition/index.js");
+const HowlScratchCard = require("./howl-scratch-card/index.js");
 const MissedCheckIn = require("./missed-check-in/index.js");
 const RealmCurrency = require("./realm-currency/index.js");
 const ShopStatus = require("./shop-status/index.js");
@@ -23,6 +24,7 @@ const definitions = [
 	CodeRedeem,
 	DailiesReminder,
 	Expedition,
+	HowlScratchCard,
 	MissedCheckIn,
 	RealmCurrency,
 	ShopStatus,
