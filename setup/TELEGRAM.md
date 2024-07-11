@@ -22,3 +22,29 @@ This is an **OPTIONAL** feature. If you want to receive a Telegram notification 
     ```
 9. Paste your user ID into the `chatId` Telegram field at the `config.js` file.
 10. You should receive a Telegram notification when the check-in is successful and any other features that you have enabled.
+
+# Screenshots
+Here are some screenshots of the bot in action:
+
+- Stamina Reminder
+
+![image](https://github.com/user-attachments/assets/df403ce3-cf5c-4362-9374-305aa586cf87)
+
+- Notes
+
+![image](https://github.com/user-attachments/assets/465dc4e5-973c-4ca7-a97f-f903ce1e955f)
+
+- Stamina
+
+![image](https://github.com/user-attachments/assets/ce8730cd-25fe-45c4-bb4d-898267df4921)
+
+- Check-in
+
+![image](https://github.com/user-attachments/assets/982a9bbd-0669-4e3e-a5d6-3c5867bfc050)
+
+# Commands
+Here's a list of commands that you can use with the bot:
+
+- `/expedition` - Show the current expedition status
+- `/notes` - Shows your current in-game notes
+- `/stamina` - Shows your current stamina
