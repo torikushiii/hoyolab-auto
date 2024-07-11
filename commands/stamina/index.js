@@ -73,7 +73,7 @@ module.exports = {
 			const message = `Please specify a game. Supported games are: ${supportedGames.join(", ")}`;
 			return interaction
 				? interaction.reply({ content: message, ephemeral: true })
-				: { success: false, reply: message };
+				: { success: false, reply: message.replace(/nap/, "zenless") };
 		}
 
 		game = game.toLowerCase() === "zenless" || game.toLowerCase() === "zzz" ? "nap" : game.toLowerCase();
@@ -82,7 +82,7 @@ module.exports = {
 			const message = `Invalid game specified. Supported games are: ${supportedGames.join(", ")}`;
 			return interaction
 				? interaction.reply({ content: message, ephemeral: true })
-				: { success: false, reply: message };
+				: { success: false, reply: message.replace(/nap/, "zenless") };
 		}
 
 		const accounts = app.HoyoLab.getActiveAccounts({ whitelist: game });
@@ -90,7 +90,7 @@ module.exports = {
 			const message = "You don't have any accounts for that game.";
 			return interaction
 				? interaction.reply({ content: message, ephemeral: true })
-				: { success: false, reply: message };
+				: { success: false, reply: message.replace(/nap/, "zenless") };
 		}
 
 		const staminaData = await getStaminaData(accounts, game);
@@ -99,7 +99,7 @@ module.exports = {
 			const message = "No stamina data found for this type of account";
 			return interaction
 				? interaction.reply({ content: message, ephemeral: true })
-				: { success: false, reply: message };
+				: { success: false, reply: message.replace(/nap/, "zenless") };
 		}
 
 		if (interaction) {

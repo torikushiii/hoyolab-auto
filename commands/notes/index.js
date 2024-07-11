@@ -193,7 +193,7 @@ module.exports = {
 			const message = `Please specify a game. Supported games are: ${supportedGames.join(", ")}`;
 			return interaction
 				? interaction.reply({ content: message, ephemeral: true })
-				: { success: false, reply: message };
+				: { success: false, reply: message.replace(/nap/, "zenless") };
 		}
 
 		game = game.toLowerCase() === "zenless" || game.toLowerCase() === "zzz" ? "nap" : game.toLowerCase();
@@ -202,7 +202,7 @@ module.exports = {
 			const message = `Invalid game specified. Supported games are: ${supportedGames.join(", ")}`;
 			return interaction
 				? interaction.reply({ content: message, ephemeral: true })
-				: { success: false, reply: message };
+				: { success: false, reply: message.replace(/nap/, "zenless") };
 		}
 
 		const accounts = app.HoyoLab.getActiveAccounts({ whitelist: game, uid });

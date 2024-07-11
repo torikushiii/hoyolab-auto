@@ -456,7 +456,7 @@ module.exports = class HoyoLab {
 				return null;
 			}
 
-			return (i.name === "nap") ? "zenless" : i.name;
+			return i.name;
 		}).filter(i => i !== null);
 
 		return platforms;
