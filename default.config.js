@@ -29,7 +29,7 @@ module.exports = {
 		blacklist: [], // You can blacklist some crons if you don't want to run them
 		// You can use this site to generate cron expression: https://crontab.guru/
 		"check-in": "0 0 0 * * *",
-		"code-redeem": "* * * * *",
+		"code-redeem": "*/15 * * * *",
 		"dailies-reminder": "0 0 21 * * *",
 		expedition: "0 */30 * * * *",
 		"missed-check-in": "0 0 23 * * *",
