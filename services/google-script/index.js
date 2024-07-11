@@ -36,6 +36,7 @@ const DEFAULT_CONSTANTS = {
 		successMessage: "Congratulations, Traveler! You have successfully checked in today~",
 		signedMessage: "Traveler, you've already checked in today~",
 		game: "Genshin Impact",
+		gameId: 2,
 		assets: {
 			author: "Paimon",
 			game: "Genshin Impact",
@@ -52,6 +53,7 @@ const DEFAULT_CONSTANTS = {
 		successMessage: "You have successfully checked in today, Captain~",
 		signedMessage: "You've already checked in today, Captain~",
 		game: "Honkai Impact 3rd",
+		gameId: 1,
 		assets: {
 			author: "Kiana",
 			game: "Honkai Impact 3rd",
@@ -68,6 +70,7 @@ const DEFAULT_CONSTANTS = {
 		successMessage: "You have successfully checked in today, Trailblazer~",
 		signedMessage: "You've already checked in today, Trailblazer~",
 		game: "Honkai: Star Rail",
+		gameId: 6,
 		assets: {
 			author: "PomPom",
 			game: "Honkai: Star Rail",
@@ -84,6 +87,7 @@ const DEFAULT_CONSTANTS = {
 		successMessage: "Congratulations Proxy! You have successfully checked in today!~",
 		signedMessage: "You have already checked in today, Proxy!~",
 		game: "Zenless Zone Zero",
+		gameId: 8,
 		assets: {
 			author: "Eous",
 			game: "Zenless Zone Zero",
@@ -124,6 +128,12 @@ class Game {
 		const success = [];
 		for (const cookie of accounts) {
 			try {
+				const ltuid = cookie.match(/ltuid_v2=([^;]+)/)[1];
+				const accountDetails = await this.getAccountDetails(cookie, ltuid);
+				if (!accountDetails) {
+					continue;
+				}
+
 				const info = await this.getSignInfo(cookie);
 				if (!info.success) {
 					continue;
@@ -168,6 +178,10 @@ class Game {
 					total: data.total + 1,
 					result: this.config.successMessage,
 					assets: { ...this.config.assets },
+					account: {
+						uid: accountDetails.uid,
+						nickname: accountDetails.nickname
+					},
 					award: awardObject
 				});
 			}
@@ -177,6 +191,40 @@ class Game {
 		}
 
 		return success;
+	}
+
+	async getAccountDetails (cookieData, ltuid) {
+		try {
+			const options = {
+				method: "GET",
+				headers: {
+					"User-Agent": this.userAgent,
+					Cookie: cookieData
+				}
+			};
+
+			const url = `https://bbs-api-os.hoyolab.com/game_record/card/wapi/getGameRecordCard?uid=${ltuid}`;
+			const response = await UrlFetchApp.fetch(url, options);
+			const data = JSON.parse(response.getContentText());
+
+			if (response.getResponseCode() !== 200 || data.retcode !== 0) {
+				throw new Error(`Failed to login to ${this.fullName} account: ${JSON.stringify(data)}`);
+			}
+
+			const accountData = data.data.list.find(account => account.game_id === this.config.gameId);
+			if (!accountData) {
+				throw new Error(`No ${this.fullName} account found for ltuid: ${ltuid}`);
+			}
+
+			return {
+				uid: accountData.game_role_id,
+				nickname: accountData.nickname
+			};
+		}
+		catch (e) {
+			console.error(`${this.fullName}:login`, `Error: ${e.message}`);
+			throw e; // Re-throw to be handled by the caller
+		}
 	}
 
 	async sign (cookieData) {
@@ -304,7 +352,7 @@ function sendDiscordNotification (success) {
 		color: 16748258,
 		title: `${success.assets.game} Daily Check-In`,
 		author: {
-			name: success.assets.author,
+			name: `${success.account.uid} - ${success.account.nickname}`,
 			icon_url: success.assets.icon
 		},
 		description: `Today's Reward: ${success.award.name} x${success.award.count}\nTotal Check-Ins: ${success.total}`,
