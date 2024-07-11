@@ -168,9 +168,16 @@ module.exports = {
 				{ name: "Zenless Zone Zero", value: "nap" }
 			],
 			required: true
+		},
+		{
+			name: "account",
+			description: "Select the account you want to check notes for. If not specified, will check all accounts.",
+			type: "string",
+			required: false,
+			accounts: true
 		}
 	],
-	run: (async function notes (context, game) {
+	run: (async function notes (context, game, uid) {
 		const { interaction } = context;
 
 		const supportedGames = app.HoyoLab.supportedGames({ blacklist: "honkai" });
@@ -198,12 +205,24 @@ module.exports = {
 				: { success: false, reply: message };
 		}
 
-		const accounts = app.HoyoLab.getActiveAccounts({ whitelist: game });
+		const accounts = app.HoyoLab.getActiveAccounts({ whitelist: game, uid });
 		if (accounts.length === 0) {
 			const message = "You don't have any accounts for that game.";
 			return interaction
 				? interaction.reply({ content: message, ephemeral: true })
 				: { success: false, reply: message };
+		}
+
+		if (accounts.length === 1) {
+			const [account] = accounts;
+			const { stamina, expedition } = account;
+
+			if (!stamina.check && !expedition.check) {
+				const message = "This account has no notes to check.";
+				return interaction
+					? interaction.reply({ content: message, ephemeral: true })
+					: { success: false, reply: message };
+			}
 		}
 
 		const embedData = await getNotesEmbedData(accounts, game, context.platform.id);

@@ -14,13 +14,20 @@ module.exports = {
 			required: true
 		},
 		{
-			name: "codes",
-			description: "The codes you want to redeem.",
+			name: "account",
+			description: "Select the account you want to check notes for.",
+			type: "string",
+			required: true,
+			accounts: true
+		},
+		{
+			name: "code",
+			description: "The code you want to redeem. (Only one code per command)",
 			type: "string",
 			required: true
 		}
 	],
-	run: (async function redeem (context, game, ...codes) {
+	run: (async function redeem (context, game, uid, code) {
 		const { interaction } = context;
 		const supportedGames = app.HoyoLab.supportedGames({ blacklist: "honkai" });
 
@@ -51,10 +58,17 @@ module.exports = {
 				reply: `No game provided. Supported games are: ${supportedGames.join(", ")}`
 			};
 		}
-		if (codes.length === 0) {
+		if (!code) {
+			if (interaction) {
+				return await interaction.reply({
+					content: "Please specify a code.",
+					ephemeral: true
+				});
+			}
+
 			return {
 				success: false,
-				reply: "No codes provided."
+				reply: "No code provided."
 			};
 		}
 
@@ -62,45 +76,34 @@ module.exports = {
 			game = "nap";
 		}
 
-		codes = codes.map(code => code.toUpperCase());
+		code = code.toUpperCase();
 
 		if (interaction) {
-			await interaction.deferReply();
+			await interaction.deferReply({ ephemeral: true });
 		}
 
-		const res = await app.HoyoLab.redeemCode(game, codes);
+		const res = await app.HoyoLab.redeemCode(game, uid, code);
 		if (!res.success) {
 			if (interaction) {
 				return interaction.editReply({
-					content: res.reply,
+					content: `Failed to redeem code: ${res.data.reason}`,
 					ephemeral: true
 				});
 			}
 
 			return {
 				success: false,
-				reply: res.reply
+				reply: `Failed to redeem code: ${res.data.reason}`
 			};
 		}
 
-		let reply = "";
-		if (res.success.length > 0) {
-			reply += "**Successfully redeemed codes:**\n";
-			reply += `\`\`\`\n${res.success.map(i => `(${i.uid}) ${i.nick} - ${i.code}`).join("\n")}\`\`\``;
-		}
-
-		if (res.failed.length > 0) {
-			reply += "\n**Failed Code Redemption(s):**\n";
-			reply += `\`\`\`\n${res.failed.map(i => `(${i.uid}) ${i.nick} - ${i.code} ${i.reason}`).join("\n")}\`\`\``;
-		}
-
 		if (interaction) {
-			return await interaction.editReply(reply);
+			return interaction.editReply(`Successfully redeemed code: ${code}`);
 		}
 
 		return {
 			success: true,
-			reply
+			reply: `Successfully redeemed code: ${code}`
 		};
 	})
 };
