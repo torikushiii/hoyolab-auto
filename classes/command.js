@@ -83,12 +83,32 @@ module.exports = class Command extends require("./template.js") {
 			/* eslint-disable implicit-arrow-linebreak */
 			switch (param.type) {
 				case "string":
-					option = builder.addStringOption(opt =>
-						opt.setName(param.name)
-							.setDescription(param.description)
-							.addChoices(param.choices ?? [])
-							.setRequired(param.required ?? false)
-					);
+					if (param.accounts) {
+						const accounts = app.HoyoLab.getActiveAccounts({ blacklist: "honkai" });
+						if (accounts.length === 0) {
+							continue;
+						}
+
+						const choices = accounts.map(i => ({
+							name: `(${app.Utils.formattedAccountRegion(i.region)}) ${i.game.short} - (${i.uid}) ${i.nickname}`,
+							value: i.uid
+						}));
+
+						option = builder.addStringOption(opt =>
+							opt.setName(param.name)
+								.setDescription(param.description)
+								.addChoices(choices)
+								.setRequired(param.required ?? false)
+						);
+					}
+					else {
+						option = builder.addStringOption(opt =>
+							opt.setName(param.name)
+								.setDescription(param.description)
+								.addChoices(param.choices ?? [])
+								.setRequired(param.required ?? false)
+						);
+					}
 					break;
 				case "integer":
 					option = builder.addIntegerOption(opt =>
