@@ -57,7 +57,7 @@ const redeemGenshin = async (account, codeList) => {
 
 		const retcode = res.body.retcode;
 		if (retcode === -2001 || retcode === -2003) {
-			app.Logger.debug("CodeRedeem:Genshin", {
+			app.Logger.log("CodeRedeem:Genshin", {
 				message: "Expired or invalid code",
 				args: {
 					code
@@ -67,7 +67,7 @@ const redeemGenshin = async (account, codeList) => {
 		}
 
 		if (retcode !== 0) {
-			app.Logger.debug("CodeRedeem:Genshin", {
+			app.Logger.log("CodeRedeem:Genshin", {
 				message: `Genshin API returned non-zero status code`,
 				args: {
 					retcode,
@@ -132,7 +132,7 @@ const redeemStarRail = async (account, codeList) => {
 
 		const retcode = res.body.retcode;
 		if (retcode === -2001 || retcode === -2003) {
-			app.Logger.debug("CodeRedeem:StarRail", {
+			app.Logger.log("CodeRedeem:StarRail", {
 				message: "Expired or invalid code",
 				args: {
 					code: code.code
@@ -141,7 +141,7 @@ const redeemStarRail = async (account, codeList) => {
 			continue;
 		}
 		if (retcode !== 0) {
-			app.Logger.debug("CodeRedeem:StarRail", {
+			app.Logger.log("CodeRedeem:StarRail", {
 				message: `Star Rail API returned non-zero status code`,
 				args: {
 					retcode,
@@ -204,7 +204,7 @@ const redeemZenless = async (account, codeList) => {
 
 		const retcode = res.body.retcode;
 		if (retcode === -2001 || retcode === -2003) {
-			app.Logger.debug("CodeRedeem:Zenless", {
+			app.Logger.log("CodeRedeem:Zenless", {
 				message: "Expired or invalid code",
 				args: {
 					code
@@ -214,7 +214,7 @@ const redeemZenless = async (account, codeList) => {
 		}
 
 		if (retcode !== 0) {
-			app.Logger.debug("CodeRedeem:Zenless", {
+			app.Logger.log("CodeRedeem:Zenless", {
 				message: `Zenless API returned non-zero status code`,
 				args: {
 					retcode,
