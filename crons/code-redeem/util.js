@@ -30,7 +30,7 @@ const redeemZenless = async (account, codeData) => {
 };
 
 const buildMessage = (status, account, code) => {
-	const gameName = account.gameName;
+	const gameName = account.game.name;
 	const messageTitle = status ? "Code Successfully Redeemed!" : "Code Redeem Failed!";
 	const redeemLink = `${REDEMPTION_LINKS[account.platform]}?code=${code.code}`;
 

@@ -1,4 +1,3 @@
-const { setTimeout } = require("node:timers/promises");
 const DEFAULT_CONSTANTS = {
 	ACT_ID: "e202406031448091",
 	successMessage: "Congratulations Proxy! You have successfully checked in today!~",
@@ -113,7 +112,10 @@ module.exports = class ZenlessZoneZero extends require("./template.js") {
 				level: data.level,
 				redeemCode: account.redeemCode,
 				dailiesCheck: account.dailiesCheck,
-				gameName: "Zenless Zone Zero",
+				game: {
+					name: "Zenless Zone Zero",
+					short: "ZZZ"
+				},
 				assets: {
 					...this.config.assets,
 					...this.config.url,
@@ -377,8 +379,6 @@ module.exports = class ZenlessZoneZero extends require("./template.js") {
 				Cookie: cookieData
 			}
 		});
-
-		await setTimeout(5000);
 
 		if (res.statusCode !== 200) {
 			app.Logger.log(`${this.fullName}:RedeemCode`, {

@@ -1,4 +1,3 @@
-const { setTimeout } = require("node:timers/promises");
 const DEFAULT_CONSTANTS = {
 	ACT_ID: "e202102251931481",
 	successMessage: "Congratulations, Traveler! You have successfully checked in today~",
@@ -114,7 +113,10 @@ module.exports = class Genshin extends require("./template.js") {
 				redeemCode: account.redeemCode,
 				dailiesCheck: account.dailiesCheck,
 				weekliesCheck: account.weekliesCheck,
-				gameName: "Genshin Impact",
+				game: {
+					name: "Genshin Impact",
+					short: "GI"
+				},
 				assets: {
 					...this.config.assets,
 					...this.config.url,
@@ -385,8 +387,6 @@ module.exports = class Genshin extends require("./template.js") {
 				Cookie: cookieData
 			}
 		});
-
-		await setTimeout(5000);
 
 		if (res.statusCode !== 200) {
 			app.Logger.log(`${this.fullName}:RedeemCode`, {

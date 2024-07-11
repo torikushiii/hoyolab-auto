@@ -1,4 +1,3 @@
-const { setTimeout } = require("node:timers/promises");
 const DEFAULT_CONSTANTS = {
 	ACT_ID: "e202303301540311",
 	successMessage: "You have successfully checked in today, Trailblazer~",
@@ -114,7 +113,10 @@ module.exports = class StarRail extends require("./template.js") {
 				redeemCode: account.redeemCode,
 				dailiesCheck: account.dailiesCheck,
 				weekliesCheck: account.weekliesCheck,
-				gameName: "Honkai: Star Rail",
+				game: {
+					name: "Honkai: Star Rail",
+					short: "HSR"
+				},
 				assets: {
 					...this.config.assets,
 					...this.config.url,
@@ -380,8 +382,6 @@ module.exports = class StarRail extends require("./template.js") {
 				Cookie: cookieData
 			}
 		});
-
-		await setTimeout(5000);
 
 		if (res.statusCode !== 200) {
 			app.Logger.log(`${this.fullName}:RedeemCode`, {
