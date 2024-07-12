@@ -13,7 +13,7 @@ const getNotesEmbedData = async (accounts, game, platformId) => {
 		}
 
 		if (platformId === 1) {
-			const region = app.Utils.formattedAccountRegion(account.region);
+			const region = app.HoyoLab.getRegion(account.region);
 			const { data } = notes;
 			const { stamina, dailies, weeklies, expedition, realm } = data;
 

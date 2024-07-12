@@ -64,7 +64,7 @@ module.exports = {
 						fields: [
 							{ name: "UID", value: account.uid, inline: true },
 							{ name: "Username", value: account.nickname, inline: true },
-							{ name: "Region", value: app.Utils.formattedAccountRegion(account.region), inline: true },
+							{ name: "Region", value: app.HoyoLab.getRegion(account.region), inline: true },
 							{ name: "Stamina", value: `${current}/${max}`, inline: true },
 							{ name: "Recovery Time", value: delta, inline: true }
 						],
@@ -87,7 +87,7 @@ module.exports = {
 						`📢 Stamina Reminder, ${description}`,
 						`🎮 **Game**: ${data.assets.game}`,
 						`🆔 **UID**: ${account.uid} ${account.nickname}`,
-						`🌍 **Region**: ${app.Utils.formattedAccountRegion(account.region)}`,
+						`🌍 **Region**: ${app.HoyoLab.getRegion(account.region)}`,
 						`🔋 **Stamina**: ${current}/${max}`,
 						`🕒 **Recovery Time**: ${delta}`
 					].join("\n");

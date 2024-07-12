@@ -39,7 +39,7 @@ module.exports = {
 
 				const webhook = app.Platform.get(3);
 				if (webhook) {
-					const region = app.Utils.formattedAccountRegion(account.region);
+					const region = app.HoyoLab.getRegion(account.region);
 					const embed = {
 						color: data.assets.color,
 						title: "Realm Currency",

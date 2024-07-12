@@ -38,7 +38,7 @@ module.exports = {
 				account.shop.fired = true;
 				platform.update(account);
 
-				const region = app.Utils.formattedAccountRegion(account.region);
+				const region = app.HoyoLab.getRegion(account.region);
 				if (webhook) {
 					const embed = {
 						color: data.assets.color,

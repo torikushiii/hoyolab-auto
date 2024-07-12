@@ -38,7 +38,7 @@ const getExpeditionEmbedData = async (accounts, game, platformId) => {
 				fields: [
 					{ name: "UID", value: expedition.uid, inline: true },
 					{ name: "Username", value: expedition.username, inline: true },
-					{ name: "Region", value: app.Utils.formattedAccountRegion(expedition.region), inline: true },
+					{ name: "Region", value: app.HoyoLab.getRegion(expedition.region), inline: true },
 					...expeditionList
 				],
 				timestamp: new Date()
@@ -58,7 +58,7 @@ const getExpeditionEmbedData = async (accounts, game, platformId) => {
 			reply += `${[
 				`UID: ${expedition.uid}`,
 				`Username: ${expedition.username}`,
-				`Region: ${app.Utils.formattedAccountRegion(expedition.region)}`,
+				`Region: ${app.HoyoLab.getRegion(expedition.region)}`,
 				...expeditionList
 			].join("\n")}\n`;
 		}

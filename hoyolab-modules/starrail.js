@@ -136,7 +136,7 @@ module.exports = class StarRail extends require("./template.js") {
 				deviceFp: account.cookie.deviceFp ?? ""
 			});
 
-			const region = app.Utils.formattedAccountRegion(data.region);
+			const region = app.HoyoLab.getRegion(data.region);
 			app.Logger.info(this.fullName, `Logged into (${data.game_role_id}) ${data.nickname} (${region})`);
 		}
 	}
@@ -182,7 +182,7 @@ module.exports = class StarRail extends require("./template.js") {
 					platform: this.name,
 					rank: account.level,
 					username: account.nickname,
-					region: app.Utils.formattedAccountRegion(account.region),
+					region: app.HoyoLab.getRegion(account.region),
 					total: data.total,
 					result: this.config.signedMessage,
 					assets: {
@@ -207,7 +207,7 @@ module.exports = class StarRail extends require("./template.js") {
 				platform: this.name,
 				rank: account.level,
 				username: account.nickname,
-				region: app.Utils.formattedAccountRegion(account.region),
+				region: app.HoyoLab.getRegion(account.region),
 				total: data.total + 1,
 				result: this.config.successMessage,
 				assets: {

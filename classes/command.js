@@ -90,7 +90,7 @@ module.exports = class Command extends require("./template.js") {
 						}
 
 						const choices = accounts.map(i => ({
-							name: `(${app.Utils.formattedAccountRegion(i.region)}) ${i.game.short} - (${i.uid}) ${i.nickname}`,
+							name: `(${app.HoyoLab.getRegion(i.region)}) ${i.game.short} - (${i.uid}) ${i.nickname}`,
 							value: i.uid
 						}));
 

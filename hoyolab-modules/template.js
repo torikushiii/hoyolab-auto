@@ -562,6 +562,31 @@ module.exports = class HoyoLab {
 		return accounts.find(account => account.uid === uid) ?? null;
 	}
 
+	static getRegion (region) {
+		switch (region) {
+			case "os_cht":
+			case "prod_gf_sg":
+			case "prod_official_cht":
+				return "TW";
+			case "os_asia":
+			case "prod_gf_jp":
+			case "prod_official_asia":
+				return "SEA";
+			case "eur01":
+			case "os_euro":
+			case "prod_gf_eu":
+			case "prod_official_eur":
+				return "EU";
+			case "usa01":
+			case "os_usa":
+			case "prod_gf_us":
+			case "prod_official_usa":
+				return "NA";
+			default:
+				return "Unknown";
+		}
+	}
+
 	static get (identifier) {
 		if (identifier instanceof HoyoLab) {
 			return identifier;

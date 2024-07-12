@@ -25,7 +25,7 @@ const formatStaminaMessage = (data, discord = false) => {
 	let text = "";
 	for (const { uid, region, username, currentStamina, maxStamina, recoveryTime, reserveStamina } of data) {
 		const delta = app.Utils.formatTime(recoveryTime);
-		const fixedRegion = app.Utils.formattedAccountRegion(region);
+		const fixedRegion = app.HoyoLab.getRegion(region);
 
 		const description = [
 			discord ? `\n\`\`\`yaml\n${username} (${uid}) - ${fixedRegion}\`\`\`` : `\n${username} (${uid}) - ${fixedRegion}`,

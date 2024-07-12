@@ -48,7 +48,7 @@ module.exports = {
 						fields: [
 							{ name: "UID", value: account.uid, inline: true },
 							{ name: "Username", value: account.nickname, inline: true },
-							{ name: "Region", value: app.Utils.formattedAccountRegion(account.region), inline: true },
+							{ name: "Region", value: app.HoyoLab.getRegion(account.region), inline: true },
 							{ name: "Completed Dailies", value: `${data.dailies.task}/${data.dailies.maxTask}`, inline: true },
 							{ name: "Current Stamina", value: `${current}/${max} (${delta})`, inline: true }
 						],
@@ -71,7 +71,7 @@ module.exports = {
 						`📢 Dailies Reminder, Don't Forget to Do Your Dailies!`,
 						`🎮 **Game**: ${data.assets.game}`,
 						`🆔 **UID**: ${account.uid} ${account.nickname}`,
-						`🌍 **Region**: ${app.Utils.formattedAccountRegion(account.region)}`,
+						`🌍 **Region**: ${app.HoyoLab.getRegion(account.region)}`,
 						`📅 **Completed Dailies**: ${data.dailies.task}/${data.dailies.maxTask}`,
 						`🔋 **Current Stamina**: ${current}/${max} (${delta})`
 					].join("\n");
