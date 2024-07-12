@@ -45,12 +45,20 @@ const buildMessage = (status, account, code) => {
 	const embed = {
 		color: account.assets.color,
 		title: `${gameName} Code Redeem`,
+		author: {
+			name: account.assets.author,
+			icon_url: account.assets.logo
+		},
 		description: `(${account.uid}) ${account.nickname}`
 		+ `\n${messageTitle}`
 		+ `\nCode: ${code.code}`
 		+ `${status === false ? `\nManually Redeem Here: ${redeemLink}` : ""}`
 		+ `${status === true ? `\nRewards: ${code.rewards.join(", ")}` : ""}`,
-		timestamp: new Date()
+		timestamp: new Date(),
+		footer: {
+			text: `${code}`,
+			icon_url: account.assets.logo
+		}
 	};
 
 	return {
