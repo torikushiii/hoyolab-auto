@@ -180,7 +180,9 @@ class Game {
 					assets: { ...this.config.assets },
 					account: {
 						uid: accountDetails.uid,
-						nickname: accountDetails.nickname
+						nickname: accountDetails.nickname,
+						rank: accountDetails.rank,
+						region: accountDetails.region
 					},
 					award: awardObject
 				});
@@ -218,7 +220,9 @@ class Game {
 
 			return {
 				uid: accountData.game_role_id,
-				nickname: accountData.nickname
+				nickname: accountData.nickname,
+				rank: accountData.level,
+				region: this.fixRegion(accountData.region)
 			};
 		}
 		catch (e) {
@@ -323,6 +327,31 @@ class Game {
 		}
 	}
 
+	fixRegion (region) {
+		switch (region) {
+			case "os_cht":
+			case "prod_gf_sg":
+			case "prod_official_cht":
+				return "TW";
+			case "os_asia":
+			case "prod_gf_jp":
+			case "prod_official_asia":
+				return "SEA";
+			case "eur01":
+			case "os_euro":
+			case "prod_gf_eu":
+			case "prod_official_eur":
+				return "EU";
+			case "usa01":
+			case "os_usa":
+			case "prod_gf_us":
+			case "prod_official_usa":
+				return "NA";
+			default:
+				return "Unknown";
+		}
+	}
+
 	get userAgent () {
 		return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36";
 	}
@@ -355,7 +384,12 @@ function sendDiscordNotification (success) {
 			name: `${success.account.uid} - ${success.account.nickname}`,
 			icon_url: success.assets.icon
 		},
-		description: `Today's Reward: ${success.award.name} x${success.award.count}\nTotal Check-Ins: ${success.total}`,
+		description: `Today's Reward: ${success.award.name} x${success.award.count}`
+		+ `\nTotal Check-Ins: ${success.total}`
+		+ `\n\nUID: ${success.account.uid}`
+		+ `\nNickname: ${success.account.nickname}`
+		+ `\nRegion: ${success.account.region}`
+		+ `\nRank: ${success.account.rank}`,
 		thumbnail: {
 			url: success.award.icon
 		},
