@@ -1,13 +1,16 @@
 module.exports = class Telegram extends require("./template.js") {
 	lastUpdatedId = 0;
+	firstRun = true;
+	disableNotification = false;
+	messageListeners = [];
 
-	gotModule;
-	gotRequestErrors;
+	handlingCallbackQuery = false;
 
 	static possibleCommands = [
 		"/stamina",
 		"/expedition",
-		"/notes"
+		"/notes",
+		"/redeem"
 	];
 
 	constructor (config) {
@@ -35,7 +38,8 @@ module.exports = class Telegram extends require("./template.js") {
 			responseType: "json",
 			throwHttpErrors: false,
 			json: {
-				offset: this.lastUpdatedId + 1
+				offset: this.lastUpdatedId + 1,
+				allowed_updates: ["message", "callback_query"]
 			}
 		});
 
@@ -50,56 +54,23 @@ module.exports = class Telegram extends require("./template.js") {
 			});
 		}
 
+		if (this.firstRun) {
+			this.firstRun = false;
+			return;
+		}
+
 		const { result } = res.body;
-		if (result.length === 0) {
-			this.firstRun = false;
-			return;
-		}
 
-		if (this.firstRun === true && result.length > 0) {
+		if (result.length > 0) {
+			await this.processMessageUpdates(result);
 			this.lastUpdatedId = result[result.length - 1].update_id;
-			this.firstRun = false;
-			return;
 		}
-
-		for (const update of result) {
-			const { message } = update;
-			if (!message) {
-				continue;
-			}
-
-			const { chat, text } = message;
-			if (chat.id !== this.chatId) {
-				continue;
-			}
-
-			this.lastUpdatedId = update.update_id;
-
-			const command = text.split(" ")[0];
-			if (!Telegram.possibleCommands.includes(command)) {
-				continue;
-			}
-
-			const args = text.split(" ").slice(1);
-			const channelData = {
-				id: chat.id,
-				name: chat.title ?? null
-			};
-			const userData = {
-				id: message.from.id,
-				username: message.from.first_name ?? null
-			};
-
-			await this.handleCommand({
-				command: command.slice(1),
-				args,
-				channelData,
-				userData
-			});
+		else {
+			this.lastUpdatedId = 0;
 		}
 	}
 
-	async send (message) {
+	async send (message, options = {}) {
 		if (typeof message !== "string") {
 			throw new app.Error({
 				message: "Provided message is not a string",
@@ -112,60 +83,81 @@ module.exports = class Telegram extends require("./template.js") {
 			});
 		}
 
-		try {
-			const res = await app.Got("API", {
-				url: `https://api.telegram.org/bot${this.token}/sendMessage`,
-				method: "POST",
-				responseType: "json",
-				throwHttpErrors: false,
-				json: {
-					chat_id: this.chatId,
-					text: message,
-					parse_mode: "MarkdownV2",
-					disable_notification: this.disableNotification
+		const res = await app.Got("API", {
+			url: `https://api.telegram.org/bot${this.token}/sendMessage`,
+			method: "POST",
+			responseType: "json",
+			throwHttpErrors: false,
+			json: {
+				chat_id: this.chatId,
+				text: message,
+				parse_mode: "MarkdownV2",
+				disable_notification: this.disableNotification,
+				...options
+			}
+		});
+
+		if (res.body.ok !== true) {
+			throw new app.Error({
+				message: "Failed to send telegram message",
+				args: {
+					statusCode: res.statusCode,
+					statusMessage: res.statusMessage,
+					body: res.body
 				}
 			});
-
-			if (res.body.ok !== true) {
-				throw new app.Error({
-					message: "Failed to send telegram message",
-					args: {
-						statusCode: res.statusCode,
-						statusMessage: res.statusMessage,
-						body: res.body
-					}
-				});
-			}
-
-			return true;
 		}
-		catch (e) {
-			const isGotRequestError = await this.isGotRequestError(e);
-			if (isGotRequestError) {
-				return app.Logger.log("Telegram", {
-					message: "Failed to send telegram message",
-					args: { error: e }
-				});
-			}
 
-			throw e;
-		}
+		return true;
 	}
 
 	async handleCommand (data) {
-		const {
+		const { command, args, channelData, userData } = data;
+
+		if (command === "redeem") {
+			const accounts = app.HoyoLab.getActiveAccounts({ blacklist: "honkai" });
+			if (accounts.length === 0) {
+				await this.send("There are no accounts available for redeeming codes.");
+				return;
+			}
+
+			const keyboard = [];
+			for (const account of accounts) {
+				const game = account.game.short.toLowerCase();
+				const region = app.HoyoLab.getRegion(account.region);
+
+				const text = `(${region}) ${account.game.short} - (${account.uid}) ${account.nickname}`;
+				keyboard.push([
+					{
+						text,
+						callback_data: `redeem:${game}:${account.uid}`
+					}
+				]);
+			}
+
+			await this.send(
+				"Please select the account you want to redeem the code for:",
+				{
+					reply_markup: {
+						inline_keyboard: keyboard
+					}
+				}
+			);
+			return;
+		}
+
+		const execution = await app.Command.checkAndRun(
 			command,
 			args,
 			channelData,
-			userData
-		} = data;
-
-		const execution = await app.Command.checkAndRun(command, args, channelData, userData, {
-			platform: {
-				id: 2,
-				name: "Telegram"
+			userData,
+			{
+				platform: {
+					id: 2,
+					name: "Telegram"
+				}
 			}
-		});
+		);
 
 		if (!execution) {
 			return;
@@ -180,6 +172,48 @@ module.exports = class Telegram extends require("./template.js") {
 	}
 
 	async handleMessage (messageData, options = {}) {
+		if (messageData.callback_query) {
+			this.handlingCallbackQuery = true;
+
+			const data = messageData.callback_query.data;
+			if (data.startsWith("redeem:")) {
+				const parts = data.split(":");
+
+				let game = parts[1];
+				const uid = parts[2];
+
+				await this.send("Please enter the code you want to redeem:");
+
+				const code = await this.waitForUserInput(
+					messageData.callback_query.from.id,
+					messageData.callback_query
+				);
+
+				if (code) {
+					if (game === "zzz") {
+						game = "nap";
+					}
+					else if (game === "hsr") {
+						game = "starrail";
+					}
+					else if (game === "gi") {
+						game = "genshin";
+					}
+
+					const res = await app.HoyoLab.redeemCode(game, uid, code);
+					if (!res.success) {
+						const reason = this.prepareMessage(res.data.reason);
+						await this.send(`Failed to redeem code: ${reason}`);
+					}
+					else {
+						await this.send(`Successfully redeemed code: ${code}`);
+					}
+				}
+				this.handlingCallbackQuery = false;
+				return;
+			}
+		}
+
 		const message = this.prepareMessage(messageData, options);
 		if (message) {
 			return message;
@@ -192,15 +226,58 @@ module.exports = class Telegram extends require("./template.js") {
 		return escapedMessage;
 	}
 
-	async isGotRequestError (error) {
-		this.gotModule ??= await import("got");
-		this.gotRequestErrors ??= [
-			this.gotModule.CancelError,
-			this.gotModule.HTTPError,
-			this.gotModule.RequestError,
-			this.gotModule.TimeoutError
-		];
+	addMessageListener (listener) {
+		this.messageListeners.push(listener);
+	}
 
-		return this.gotRequestErrors.some(err => error instanceof err);
+	removeMessageListener (listener) {
+		this.messageListeners = this.messageListeners.filter((l) => l !== listener);
+	}
+
+	async waitForUserInput (userId, callbackQuery) {
+		return new Promise((resolve, reject) => {
+			const listener = async (msgData) => {
+				if (msgData.message && msgData.message.from.id === userId) {
+					const code = msgData.message.text;
+					this.removeMessageListener(listener);
+					resolve(code);
+				}
+			};
+			this.addMessageListener(listener);
+		});
+	}
+
+	async processMessageUpdates (result) {
+		for (const update of result) {
+			if (update.callback_query && !this.handlingCallbackQuery) {
+				await this.handleMessage(update);
+			}
+			else if (update.message) {
+				const { message } = update;
+				const command = message.text.split(" ")[0];
+				if (Telegram.possibleCommands.includes(command)) {
+					const args = message.text.split(" ").slice(1);
+					const channelData = {
+						id: message.chat.id,
+						name: message.chat.title ?? null
+					};
+					const userData = {
+						id: message.from.id,
+						username: message.from.first_name ?? null
+					};
+					await this.handleCommand({
+						command: command.slice(1),
+						args,
+						channelData,
+						userData
+					});
+				}
+				else {
+					for (const listener of this.messageListeners) {
+						await listener(update);
+					}
+				}
+			}
+		}
 	}
 };
