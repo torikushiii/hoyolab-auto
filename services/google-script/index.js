@@ -384,12 +384,43 @@ function sendDiscordNotification (success) {
 			name: `${success.account.uid} - ${success.account.nickname}`,
 			icon_url: success.assets.icon
 		},
-		description: `Today's Reward: ${success.award.name} x${success.award.count}`
-		+ `\nTotal Check-Ins: ${success.total}`
-		+ `\n\nUID: ${success.account.uid}`
-		+ `\nNickname: ${success.account.nickname}`
-		+ `\nRegion: ${success.account.region}`
-		+ `\nRank: ${success.account.rank}`,
+		fields: [
+			{
+				name: "Nickname",
+				value: success.account.nickname,
+				inline: true
+			},
+			{
+				name: "UID",
+				value: success.account.uid,
+				inline: true
+			},
+			{
+				name: "Rank",
+				value: success.account.rank,
+				inline: true
+			},
+			{
+				name: "Region",
+				value: success.account.region,
+				inline: true
+			},
+			{
+				name: "Today's Reward",
+				value: `${success.award.name} x${success.award.count}`,
+				inline: true
+			},
+			{
+				name: "Total Check-Ins",
+				value: success.total,
+				inline: true
+			},
+			{
+				name: "Result",
+				value: success.result,
+				inline: false
+			}
+		],
 		thumbnail: {
 			url: success.award.icon
 		},
