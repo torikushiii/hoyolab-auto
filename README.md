@@ -13,6 +13,20 @@
 
 A multi-purpose tool for any supported Hoyoverse games. This tool is designed to assist with daily check-ins, stamina checks, expedition checks, automatic code-redemption, and more.
 
+## Table of Contents
+- [Google App Script](#google-app-script)
+- [Supported Games](#supported-games)
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Notifications Setup](#notifications-setup)
+- [Running with Docker](#running-with-docker)
+
+## Google App Script
+If you don't have a server to run this script and simply just want to use it for checking in, you can use Google App Script.
+  - [Google App Script](https://github.com/torikushiii/hoyolab-auto/tree/main/services)
+
 ## Supported Games
 - [x] Honkai Impact 3rd (Daily Check-In only)
 - [x] Genshin Impact
@@ -20,24 +34,30 @@ A multi-purpose tool for any supported Hoyoverse games. This tool is designed to
 - [x] Zenless Zone Zero
 
 ## Features
-- **Auto check-in**: Runs every midnight local time.
-- **Dailies check**: Reminds you to complete your daily tasks, such as daily commissions, at 09:00 local time.
-- **Weeklies check**: Reminds you to complete weekly tasks, such as weekly bosses and discounted resin usage, at 09:00 local time.
-- **Stamina check**: Monitors your Resin/Stamina every 30 minutes.
-  - **Customizable threshold**: Notifies you when your stamina is above your set threshold.
-- **Expedition check**: Checks your expeditions every 30 minutes.
-- **Shop status**: This will notify you when your shop has finished selling videos (ZZZ Feature).
-- **Code Redemption**: Automatically search and redeem codes for supported games.
-  - **Genshin Impact**
-  - **Honkai: Star Rail**
-  - **Zenless Zone Zero**
-- **Notifications**:
-  - Discord
-  - Telegram
+- **Honkai Impact 3rd**:
+  - **Daily check-in**: Runs every midnight local time.
 
-## Google App Script
-If you don't have a server to run this script and simply just want to use it for checking in, you can use Google App Script.
-  - [Google App Script](https://github.com/torikushiii/hoyolab-auto/tree/main/services)
+- **Genshin Impact**:
+  - **Daily check-in**: Runs every midnight local time.
+  - **Dailies**: Reminds you to do your dailies, such as commissions if you haven't done them at 09:00 (local time).
+  - **Weeklies**: Reminds you to do your weekly bosses/discounted resin if you haven't done them at 09:00 (local time).
+  - **Stamina check**: Reminds you to spend your resin if you're at your set threshold or capped.
+  - **Expedition check**: Check your expeditions and sends a notification if they're done.
+  - **Realm currency**: Sends a notification if your realm currency is capped.
+  - **Code Redeems**: Search for codes and redeem them automatically.
+- **Honkai: Star Rail**:
+  - **Daily check-in**: Runs every midnight local time.
+  - **Dailies**: Reminds you to do your dailies, such as commissions if you haven't done them at 09:00 (local time).
+  - **Stamina check**: Reminds you to spend your stamina if you're at your set threshold or capped.
+  - **Expedition check**: Check your expeditions and sends a notification if they're done.
+  - **Code Redeems**: Search for codes and redeem them automatically.
+- **Zenless Zone Zero**:
+  - **Daily check-in**: Runs every midnight local time.
+  - **Dailies**: Reminds you to do your dailies, such as commissions if you haven't done them at 09:00 (local time).
+  - **Stamina check**: Reminds you to spend your stamina if you're at your set threshold or capped.
+  - **Howl Scracth Card**: Notifies you if you haven't scratched the card for the day at 09:00 (local time).
+  - **Shop Status**: Notifies you if the shop has finished selling videos.
+  - **Code Redeems**: Search for codes and redeem them automatically.
 
 ## Prerequisites
 - [Git](https://git-scm.com/downloads)
