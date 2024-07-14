@@ -48,3 +48,4 @@ Here's a list of commands that you can use with the bot:
 - `/expedition` - Show the current expedition status
 - `/notes` - Shows your current in-game notes
 - `/stamina` - Shows your current stamina
+- `/redeem` - Redeem a code redemption
