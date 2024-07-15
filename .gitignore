@@ -183,3 +183,6 @@ cache.json
 # Cookie
 generated-cookie.txt
 diff.sh
+
+# npm
+package-lock.json

@@ -1,5 +1,8 @@
 FROM node:20-alpine
 
+# Install git
+RUN apk add --no-cache git
+
 WORKDIR /app
 
 COPY ["package.json", "./"]
@@ -15,4 +18,4 @@ USER hoyolab
 
 ENV TZ=Asia/Shanghai
 
-CMD ["npm", "start"] 
+CMD ["npm", "start"]
