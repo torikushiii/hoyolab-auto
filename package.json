@@ -12,9 +12,9 @@
     "node": ">=20.0"
   },
   "devDependencies": {
-    "@types/bun": "latest",
     "@babel/core": "^7.18.10",
     "@babel/eslint-parser": "^7.18.9",
+    "@types/bun": "latest",
     "eslint": "8.56.0",
     "eslint-plugin-unicorn": "^43.0.2"
   },
@@ -30,6 +30,7 @@
     "cron": "3.1.6",
     "discord.js": "14.14.1",
     "got": "14.2.1",
+    "jsonc": "^2.0.0",
     "keyv": "^4.5.4",
     "keyv-file": "^0.3.1",
     "winston": "3.13.0"

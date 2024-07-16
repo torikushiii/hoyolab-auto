@@ -174,7 +174,7 @@ dist
 # Finder (MacOS) folder config
 .DS_Store
 
-/config.js
+/config.jsonc
 types.js
 
 # Cache Path
