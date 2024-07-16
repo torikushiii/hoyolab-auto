@@ -66,8 +66,8 @@ If you don't have a server to run this script and simply just want to use it for
 ## Installation
 1. Clone the repository.
 2. Run `npm install` to install the dependencies.
-3. Create a `config.js` or rename `default.config.js` to `config.js`.
-4. Follow the instructions in the `default.config.js` or `config.js` file.
+3. Create a `config.jsonc` or rename `default.config.jsonc` to `config.jsonc`.
+4. Follow the instructions in the `default.config.jsonc` or `config.jsonc` file.
 
 ## Usage
 For a detailed usage guide, refer to this gist: [Cookie Guide](https://gist.github.com/torikushiii/59eff33fc8ea89dbc0b2e7652db9d3fd).
@@ -87,10 +87,10 @@ for convenience, but you can also use Docker commands directly.
 
 **2. Configuration**
 
-- **Rename `default.config.js`:** Create a copy of `default.config.js` named `config.js` and fill in your application's configuration:
+- **Rename `default.config.jsonc`:** Create a copy of `default.config.jsonc` named `config.jsonc` and fill in your application's configuration:
   ```bash
-  cp default.config.js config.js
-  # Edit config.js with your settings 
+  cp default.config.jsonc config.jsonc
+  # Edit config.jsonc with your settings 
   ```
 
 **3. Building and Running with Docker Compose**
