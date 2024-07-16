@@ -174,8 +174,10 @@ dist
 # Finder (MacOS) folder config
 .DS_Store
 
+# Misc
 /config.jsonc
 types.js
+bun.lockb
 
 # Cache Path
 cache.json
