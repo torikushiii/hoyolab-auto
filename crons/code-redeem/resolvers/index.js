@@ -65,6 +65,8 @@ const redeemGenshin = async (account, codeList) => {
 					code
 				}
 			});
+
+			await setTimeout(7000);
 			continue;
 		}
 
