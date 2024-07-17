@@ -26,7 +26,9 @@ const redeemGenshin = async (account, codeList) => {
 			whitelist: [
 				"cookie_token_v2",
 				"account_mid_v2",
-				"account_id_v2"
+				"account_id_v2",
+				"cookie_token",
+				"account_id"
 			]
 		});
 
@@ -99,7 +101,9 @@ const redeemStarRail = async (account, codeList) => {
 			whitelist: [
 				"cookie_token_v2",
 				"account_mid_v2",
-				"account_id_v2"
+				"account_id_v2",
+				"cookie_token",
+				"account_id"
 			]
 		});
 
@@ -173,7 +177,9 @@ const redeemZenless = async (account, codeList) => {
 			whitelist: [
 				"cookie_token_v2",
 				"account_mid_v2",
-				"account_id_v2"
+				"account_id_v2",
+				"cookie_token",
+				"account_id"
 			]
 		});
 

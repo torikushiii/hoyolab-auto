@@ -375,7 +375,9 @@ module.exports = class ZenlessZoneZero extends require("./template.js") {
 			whitelist: [
 				"cookie_token_v2",
 				"account_mid_v2",
-				"account_id_v2"
+				"account_id_v2",
+				"cookie_token",
+				"account_id"
 			]
 		});
 

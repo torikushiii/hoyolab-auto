@@ -142,6 +142,7 @@ module.exports = class HoyoLab {
 
 	/** @type {HoyoLab[]} */
 	static list = [];
+	static webAPI = "https://webapi-os.account.hoyoverse.com/Api/fetch_cookie_accountinfo";
 
 	constructor (name, config, defaults = {}) {
 		this.#name = name;
@@ -321,6 +322,7 @@ module.exports = class HoyoLab {
 	get config () { return this.#config; }
 	get type () { return this.#name; }
 	get dataCache () { return this.#dataCache; }
+	get webAPI () { return HoyoLab.webAPI; }
 
 	get fullName () {
 		const nameMap = {
@@ -398,7 +400,7 @@ module.exports = class HoyoLab {
 	}
 
 	static parseCookie (cookie, options = {}) {
-		const { whitelist = [], separator = ";" } = options;
+		const { whitelist = [], blacklist = [], separator = ";" } = options;
 
 		const cookiesArray = cookie.split(separator).map(c => c.trim());
 		const cookieMap = Object.fromEntries(
@@ -408,15 +410,22 @@ module.exports = class HoyoLab {
 			})
 		);
 
-		if (whitelist.length === 0) {
-			return cookieMap.join(`${separator} `);
+		if (whitelist.length !== 0) {
+			const filteredCookiesArray = Object.keys(cookieMap)
+				.filter(key => whitelist.includes(key))
+				.map(key => `${key}=${cookieMap[key]}`);
+
+			return filteredCookiesArray.join(`${separator} `);
+		}
+		if (blacklist.length !== 0) {
+			const filteredCookiesArray = Object.keys(cookieMap)
+				.filter(key => !blacklist.includes(key))
+				.map(key => `${key}=${cookieMap[key]}`);
+
+			return filteredCookiesArray.join(`${separator} `);
 		}
 
-		const filteredCookiesArray = Object.keys(cookieMap)
-			.filter(key => whitelist.includes(key))
-			.map(key => `${key}=${cookieMap[key]}`);
-
-		return filteredCookiesArray.join(`${separator} `);
+		return cookie;
 	}
 
 	update (account) {
@@ -618,6 +627,57 @@ module.exports = class HoyoLab {
 		throw new app.Error({
 			message: "This method is not implemented by the derived class."
 		});
+	}
+
+	async updateCookie (accountData) {
+		const res = await app.Got("MiHoYo", {
+			url: this.webAPI,
+			responseType: "json",
+			throwHttpErrors: false,
+			headers: {
+				Cookie: accountData.cookie
+			}
+		});
+
+		if (!res.ok) {
+			app.Logger.log(`${this.fullName}:UpdateCookie`, {
+				message: "Failed to update cookie",
+				args: {
+					platform: this.name,
+					uid: accountData.uid,
+					region: accountData.region,
+					body: res.body
+				}
+			});
+
+			return { success: false };
+		}
+
+		const data = res.body.data;
+		if (!data || data.status !== 1 || !data?.cookie_info) {
+			app.Logger.log(`${this.fullName}:UpdateCookie`, {
+				message: "Failed to update cookie",
+				args: {
+					platform: this.name,
+					uid: accountData.uid,
+					region: accountData.region,
+					body: res.body
+				}
+			});
+
+			return { success: false };
+		}
+
+		const accountId = data.cookie_info.account_id;
+		const token = data.cookie_info.cookie_token;
+
+		return {
+			success: true,
+			data: {
+				accountId,
+				token
+			}
+		};
 	}
 
 	static create (type, config) {
