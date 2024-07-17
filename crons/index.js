@@ -1,5 +1,7 @@
 const { CronJob } = require("cron");
-const { jsonc } = require("jsonc");
+
+const JSON5 = require("json5");
+const file = require("fs");
 
 const CheckIn = require("./check-in/index.js");
 const CodeRedeem = require("./code-redeem/index.js");
@@ -15,10 +17,10 @@ const WeekliesReminder = require("./weeklies-reminder/index.js");
 
 let config;
 try {
-	config = jsonc.readSync("./config.jsonc");
+	config = JSON5.parse(file.readFileSync("./config.json5"));
 }
 catch {
-	config = jsonc.readSync("./default.config.jsonc");
+	config = JSON5.parse(file.readFileSync("./default.config.json5"));
 }
 
 const definitions = [
