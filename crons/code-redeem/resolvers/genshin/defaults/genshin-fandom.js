@@ -20,32 +20,28 @@ exports.fetch = async () => {
 	const rewards = [];
 
 	for (const row of tableRows) {
-		const cells = $(row).find("td").toArray();
-		const rowData = cells
-			.filter((_, index) => index !== 1 && index !== 3)
-			.map(cell => $(cell).text().trim());
-
-		if (rowData.length > 0) {
-			const codeRegex = /GENSHINGIFT|[A-Z0-9]{12,15}/;
-			const code = rowData[0].match(codeRegex)?.[0];
-
-			const reward = rowData[1];
-			const rewardList = reward.split(/×\d+/g).filter(Boolean).map(i => i.trim());
-			const rewardAmount = reward.match(/×\d+/g).map(i => i.replace("×", "").trim());
-
-			if (code && reward) {
-				const joined = [];
-				for (let i = 0; i < rewardList.length; i++) {
-					joined.push(`${rewardList[i]} x${rewardAmount[i]}`);
-				}
-
-				rewards.push({
-					code,
-					rewards: joined,
-					source: "genshin-fandom"
-				});
-			}
+		// eslint-disable-next-line newline-per-chained-call
+		const codeElements = $(row).find("td").eq(0).find("a[href*=\"gift?code=\"]");
+		const code = codeElements.length > 0 ? codeElements.first().text().trim() : null;
+		if (!code) {
+			continue;
 		}
+
+		const rewardText = $(row).find("td").eq(2)
+			.find(".item-text")
+			.toArray();
+
+		const rewardsData = rewardText.map((i) => $(i).text().trim());
+		console.log(code, rewardsData);
+		if (rewardsData.length === 0) {
+			continue;
+		}
+
+		rewards.push({
+			code,
+			rewardsData,
+			source: "genshin-fandom"
+		});
 	}
 
 	app.Logger.debug("GenshinFandom", {
