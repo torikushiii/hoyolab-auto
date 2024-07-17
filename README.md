@@ -19,6 +19,7 @@ A multi-purpose tool for any supported Hoyoverse games. This tool is designed to
 - [Features](#features)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
+- [Migration](#migration)
 - [Usage](#usage)
 - [Notifications Setup](#notifications-setup)
 - [Running with Docker](#running-with-docker)
@@ -68,6 +69,11 @@ If you don't have a server to run this script and simply just want to use it for
 2. Run `npm install` to install the dependencies.
 3. Create a `config.jsonc` or rename `default.config.jsonc` to `config.jsonc`.
 4. Follow the instructions in the `default.config.jsonc` or `config.jsonc` file.
+
+## Migration
+
+> [!NOTE]
+> If you're using this project since the `config.js` file, and you're updating to the latest version, please follow this [guide](https://gist.github.com/torikushiii/36022ac2302c034c57cba699bdc15097) to update your configuration.
 
 ## Usage
 For a detailed usage guide, refer to this gist: [Cookie Guide](https://gist.github.com/torikushiii/59eff33fc8ea89dbc0b2e7652db9d3fd).
