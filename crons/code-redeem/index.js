@@ -7,7 +7,7 @@ const {
 } = require("./util.js");
 
 module.exports = {
-	name: "code-redeem",
+	name: "codeRedeem",
 	expression: "* * * * *",
 	description: "Check and redeem codes supported games from HoyoLab.",
 	code: (async function codeRedeem () {

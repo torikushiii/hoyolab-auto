@@ -1,5 +1,5 @@
 module.exports = {
-	name: "shop-status",
+	name: "shopStatus",
 	expression: "0 */1 * * *",
 	description: "This will check your current shop status and will fire a notification if your shop has finished selling.",
 	code: (async function shopStatus () {

@@ -1,5 +1,5 @@
 module.exports = {
-	name: "realm-currency",
+	name: "realmCurrency",
 	expression: "0 */1 * * *",
 	description: "This cron will check your Tea Pot Realm currency and notify you if it's full",
 	code: (async function realmCurrency () {
