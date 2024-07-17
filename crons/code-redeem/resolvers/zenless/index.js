@@ -12,7 +12,7 @@ const fetchAll = async () => {
 
 	const data = [...defaults, ...hoyolab]
 		.filter(i => i.code !== "")
-		.filter(i => i.rewards.length !== 0)
+		.filter(i => i.rewards?.length !== 0)
 		.filter((i, index, self) => self.findIndex(t => t.code === i.code) === index)
 		.filter(Boolean);
 
