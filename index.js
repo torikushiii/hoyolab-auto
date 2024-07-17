@@ -1,4 +1,4 @@
-const file = require("fs");
+const file = require("node:fs");
 const JSON5 = require("json5");
 
 const Command = require("./classes/command.js");

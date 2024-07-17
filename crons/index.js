@@ -1,7 +1,7 @@
 const { CronJob } = require("cron");
 
 const JSON5 = require("json5");
-const file = require("fs");
+const file = require("node:fs");
 
 const CheckIn = require("./check-in/index.js");
 const CodeRedeem = require("./code-redeem/index.js");
