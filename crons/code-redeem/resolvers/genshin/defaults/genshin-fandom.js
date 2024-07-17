@@ -32,7 +32,6 @@ exports.fetch = async () => {
 			.toArray();
 
 		const rewardsData = rewardText.map((i) => $(i).text().trim());
-		console.log(code, rewardsData);
 		if (rewardsData.length === 0) {
 			continue;
 		}
