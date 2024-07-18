@@ -9,7 +9,7 @@ services:
     container_name: hoyolab-auto
     network_mode: bridge
     volumes:
-      - ./config.jsonc:/app/config.jsonc:ro
+      - ./config.json5:/app/config.json5:ro
       - data:/app/data
     environment:
       TZ: Asia/Shanghai

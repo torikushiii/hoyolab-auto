@@ -1,5 +1,5 @@
 # Telegram
-This is an **OPTIONAL** feature. If you want to receive a Telegram notification when the check-in is successful and any other features that you have enabled, you can create a Telegram bot and paste the value into the `config.jsonc` file.
+This is an **OPTIONAL** feature. If you want to receive a Telegram notification when the check-in is successful and any other features that you have enabled, you can create a Telegram bot and paste the value into the `config.json5` file.
 
 1. Go to [@BotFather](https://t.me/BotFather) and type `/newbot`.
 2. Create a name for your bot
@@ -14,13 +14,13 @@ This is an **OPTIONAL** feature. If you want to receive a Telegram notification 
     ```
     123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ
     ```
-6. Paste the `token` into the `token` Telegram  field at the `config.jsonc` file.
+6. Paste the `token` into the `token` Telegram  field at the `config.json5` file.
 7. Next you need to get your `chatId`. You can send a message to [@getmyid_bot](https://t.me/getmyid_bot) and it will reply with your `chatId`.
 8. You will receive a message that will look like this:
     ```
     Your user ID: 123456789
     ```
-9. Paste your user ID into the `chatId` Telegram field at the `config.jsonc` file.
+9. Paste your user ID into the `chatId` Telegram field at the `config.json5` file.
 10. You should receive a Telegram notification when the check-in is successful and any other features that you have enabled.
 
 # Screenshots

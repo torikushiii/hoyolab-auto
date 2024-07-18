@@ -1,5 +1,5 @@
 # Discord Webhooks
-This is an **OPTIONAL** feature. If you want to receive a Discord notification when the check-in is successful or any other features that you have enabled, you can create a Discord webhook and paste the value into the `config.jsonc` file.
+This is an **OPTIONAL** feature. If you want to receive a Discord notification when the check-in is successful or any other features that you have enabled, you can create a Discord webhook and paste the value into the `config.json5` file.
 
 1. Go to edit channel settings. (Create your own server if you don't have one.)
 
@@ -17,7 +17,7 @@ This is an **OPTIONAL** feature. If you want to receive a Discord notification w
 
    ![](https://i.imgur.com/KFYeonU.png)
 
-5. Paste the URL into the `webhook > url` field at the `default.config.jsonc` or `config.jsonc` file.
+5. Paste the URL into the `webhook > url` field at the `default.config.json5` or `config.json5` file.
 
    ![](https://github.com/torikushiii/hoyolab-auto/assets/21153445/ed9960b4-447e-450a-860e-ae49b0610bcf)
 

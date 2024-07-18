@@ -1,5 +1,5 @@
 module.exports = {
-	name: "dailies-reminder",
+	name: "dailiesReminder",
 	expression: "0 0 21 * * *",
 	description: "Reminds you to complete your dailies.",
 	code: (async function dailiesReminder () {

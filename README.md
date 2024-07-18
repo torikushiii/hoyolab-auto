@@ -67,8 +67,8 @@ If you don't have a server to run this script and simply just want to use it for
 ## Installation
 1. Clone the repository.
 2. Run `npm install` to install the dependencies.
-3. Create a `config.jsonc` or rename `default.config.jsonc` to `config.jsonc`.
-4. Follow the instructions in the `default.config.jsonc` or `config.jsonc` file.
+3. Create a `config.json5` or rename `default.config.json5` to `config.json5`.
+4. Follow the instructions in the `default.config.json5` or `config.json5` file.
 
 ## Migration
 
@@ -93,10 +93,10 @@ for convenience, but you can also use Docker commands directly.
 
 **2. Configuration**
 
-- **Rename `default.config.jsonc`:** Create a copy of `default.config.jsonc` named `config.jsonc` and fill in your application's configuration:
+- **Rename `default.config.json5`:** Create a copy of `default.config.json5` named `config.json5` and fill in your application's configuration:
   ```bash
-  cp default.config.jsonc config.jsonc
-  # Edit config.jsonc with your settings 
+  cp default.config.json5 config.json5
+  # Edit config.json5 with your settings 
   ```
 
 **3. Building and Running with Docker Compose**
