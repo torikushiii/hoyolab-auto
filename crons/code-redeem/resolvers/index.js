@@ -71,7 +71,8 @@ const redeemGenshin = async (account, codeList) => {
 		}
 
 		if (retcode !== 0) {
-			app.Logger.log("CodeRedeem:Genshin", {
+			app.Logger.info("CodeRedeem:Genshin", `${code.code} ${res.body.message}`);
+			app.Logger.debug("CodeRedeem:Genshin", {
 				message: `Genshin API returned non-zero status code`,
 				args: {
 					retcode,
@@ -144,10 +145,13 @@ const redeemStarRail = async (account, codeList) => {
 					code: code.code
 				}
 			});
+
+			await setTimeout(7000);
 			continue;
 		}
 		if (retcode !== 0) {
-			app.Logger.log("CodeRedeem:StarRail", {
+			app.Logger.info("CodeRedeem:Genshin", `${code.code} ${res.body.message}`);
+			app.Logger.debug("CodeRedeem:StarRail", {
 				message: `Star Rail API returned non-zero status code`,
 				args: {
 					retcode,
@@ -218,11 +222,14 @@ const redeemZenless = async (account, codeList) => {
 					code
 				}
 			});
+
+			await setTimeout(7000);
 			continue;
 		}
 
 		if (retcode !== 0) {
-			app.Logger.log("CodeRedeem:Zenless", {
+			app.Logger.info("CodeRedeem:Genshin", `${code.code} ${res.body.message}`);
+			app.Logger.debug("CodeRedeem:Zenless", {
 				message: `Zenless API returned non-zero status code`,
 				args: {
 					retcode,
