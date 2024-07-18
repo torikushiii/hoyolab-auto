@@ -23,7 +23,6 @@ catch {
 		config = JSON5.parse(file.readFileSync("./default.config.json5"));
 	}
 	catch (e) {
-		throw e;
 		throw new Error({ message: "No default or custom configuration found." });
 	}
 }
