@@ -1,5 +1,5 @@
 module.exports = {
-	name: "weekliesReminder",
+	name: "weeklies-reminder",
 	expression: "0 0 21 * * 0",
 	description: "Reminds you to complete your weeklies.",
 	code: (async function weekliesReminder () {

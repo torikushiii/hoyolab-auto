@@ -1,5 +1,5 @@
 module.exports = {
-	name: "howlScratchCard",
+	name: "howl-scratch-card",
 	expression: "0 0 21 * * *",
 	description: "Reminds you if you haven't scratched the card at Howl's News Stand.",
 	code: (async function howlScratchCard () {

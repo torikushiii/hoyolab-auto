@@ -58,7 +58,9 @@ const initCrons = () => {
 			code: definition.code
 		};
 
-		const expression = config.crons[definition.name] || definition.expression;
+		const name = app.Utils.convertCase(definition.name, "kebab", "camel");
+
+		const expression = config.crons[name] || definition.expression;
 		const job = new CronJob(expression, () => cron.code(cron));
 		job.start();
 

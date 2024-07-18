@@ -1,5 +1,5 @@
 module.exports = {
-	name: "checkIn",
+	name: "check-in",
 	expression: "0 0 0 * * *",
 	description: "Run daily check-in every day at midnight or your specified time",
 	code: (async function checkIn () {
