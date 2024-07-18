@@ -76,6 +76,44 @@ module.exports = class UtilsSingleton {
 		return fields;
 	}
 
+	convertCase (text, caseFrom, caseTo) {
+		if (typeof text !== "string") {
+			throw new app.Error({
+				message: "Text must be typeof string",
+				args: { text, caseFrom, caseTo }
+			});
+		}
+
+		let words = [];
+		if (caseFrom === "camel" && caseTo === "snake") {
+			words = text.split(/(?=[A-Z])/);
+		}
+		else if (caseFrom === "snake" && caseTo === "camel") {
+			words = text.split("_");
+		}
+		else if (caseFrom === "kebab" && caseTo === "camel") {
+			words = text.split("-");
+		}
+		else if (caseFrom === "text" && caseTo === "camel") {
+			words = text.split(" ");
+		}
+
+		words = words.filter(Boolean);
+
+		let result = "";
+		if (caseTo === "snake") {
+			result = words.map(i => this.capitalize(i)).join("_");
+		}
+		else if (caseTo === "kebab") {
+			result = words.join("-");
+		}
+		else if (caseTo === "camel") {
+			result = words.map((i, ind) => (ind === 0) ? i.toLowerCase() : this.capitalize(i)).join("");
+		}
+
+		return result.replace(/id$/i, "ID");
+	}
+
 	capitalize (string) {
 		return string[0].toUpperCase() + string.substring(1);
 	}
