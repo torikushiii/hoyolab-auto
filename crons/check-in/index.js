@@ -14,7 +14,7 @@ module.exports = {
 		for (const name	of activeGameAccounts) {
 			const platform = app.HoyoLab.get(name);
 
-			const execution = await platform.checkAndExecute();
+			const execution = await platform.checkIn();
 			if (execution.length === 0) {
 				app.Logger.info("Cron:CheckIn", "All accounts either signed in or failed to sign in");
 				continue;

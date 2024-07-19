@@ -623,7 +623,16 @@ module.exports = class HoyoLab {
 	 * @abstract
 	 */
 	// eslint-disable-next-line no-unused-vars
-	static async notes (accountData) {
+	async notes (accountData) {
+		throw new app.Error({
+			message: "This method is not implemented by the derived class."
+		});
+	}
+
+	/**
+	 * @abstract
+	 */
+	async checkIn () {
 		throw new app.Error({
 			message: "This method is not implemented by the derived class."
 		});

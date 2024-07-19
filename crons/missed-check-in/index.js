@@ -12,7 +12,7 @@ module.exports = {
 		const activeGameAccounts = app.HoyoLab.getActivePlatform();
 		for (const name of activeGameAccounts) {
 			const platform = app.HoyoLab.get(name);
-			await platform.checkAndExecute();
+			await platform.checkIn();
 		}
 	})
 };
