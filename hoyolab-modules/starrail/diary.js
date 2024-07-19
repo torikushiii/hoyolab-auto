@@ -1,4 +1,4 @@
-module.exports = class RealtimeNotes {
+module.exports = class Diary {
 	/** @type {import("../template")} */
 	#instance;
 	#logo;

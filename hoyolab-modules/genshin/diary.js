@@ -1,6 +1,6 @@
 const { setTimeout } = require("node:timers/promises");
 
-module.exports = class RealtimeNotes {
+module.exports = class Diary {
 	/** @type {import("../template")} */
 	#instance;
 	#logo;
