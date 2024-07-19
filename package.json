@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node index.js",
     "watch": "nodemon index.js",
+    "migrate": "node convert.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },

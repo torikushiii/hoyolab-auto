@@ -73,7 +73,17 @@ If you don't have a server to run this script and simply just want to use it for
 ## Migration
 
 > [!NOTE]
-> If you're using this project since the `config.js` file, and you're updating to the latest version, please follow this [guide](https://gist.github.com/torikushiii/36022ac2302c034c57cba699bdc15097) to update your configuration.
+> If you're using this project since the `config.js` file or `config.jsonc` and you're updating to the latest version, please run the following command to migrate your configuration to the new format.
+
+```bash
+npm run migrate
+```
+
+or
+
+```bash
+node convert.js
+```
 
 ## Usage
 For a detailed usage guide, refer to this gist: [Cookie Guide](https://gist.github.com/torikushiii/59eff33fc8ea89dbc0b2e7652db9d3fd).
