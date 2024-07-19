@@ -24,6 +24,6 @@ module.exports = {
 			platform.update(account);
 		}
 
-		app.Logger.info("Cron:UpdateCookie", "Updated cookie for all accounts");
+		app.Logger.debug("Cron:UpdateCookie", "Updated cookie for all accounts");
 	})
 };
