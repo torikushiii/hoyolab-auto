@@ -56,7 +56,7 @@ const buildMessage = (status, account, code) => {
 		+ `${status === true ? `\nRewards: ${code.rewards.join(", ")}` : ""}`,
 		timestamp: new Date(),
 		footer: {
-			text: `${code}`,
+			text: `${code.code}`,
 			icon_url: account.assets.logo
 		}
 	};
