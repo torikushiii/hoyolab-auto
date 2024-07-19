@@ -682,7 +682,7 @@ module.exports = class HoyoLab {
 
 	static create (type, config) {
 		try {
-			const InstancePlatform = require(`./${type}.js`);
+			const InstancePlatform = require(`./${type}/index.js`);
 			return new InstancePlatform(config);
 		}
 		catch (e) {
