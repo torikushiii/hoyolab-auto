@@ -28,9 +28,12 @@ module.exports = class Diary {
 			};
 		}
 
+		const currentMonth = new Date().getMonth() + 1;
+		const lastMonth = (currentMonth === 1) ? 12 : currentMonth - 1;
+
 		const [primoPromises, moraPromises] = await Promise.allSettled([
-			this.fetchResultsForType(accountData, 1),
-			this.fetchResultsForType(accountData, 2)
+			this.fetchResultsForType(accountData, 1, { currentMonth, lastMonth }),
+			this.fetchResultsForType(accountData, 2, { currentMonth, lastMonth })
 		]);
 
 		if (primoPromises.status === "rejected" || moraPromises.status === "rejected") {
@@ -135,68 +138,84 @@ module.exports = class Diary {
 		};
 	}
 
-	async fetchResultsForType (accountData, type) {
-		const currentMonth = new Date().getMonth() + 1;
-		const lastMonth = (currentMonth === 1) ? 12 : currentMonth - 1;
+	async fetchResultsForType (accountData, type, options = {}) {
+		const fetchPage = async (type, month, currentPage) => {
+			const response = await app.Got("HoyoClient", {
+				url: "https://sg-hk4e-api.hoyolab.com/event/ysledgeros/month_detail",
+				responseType: "json",
+				searchParams: {
+					uid: accountData.uid,
+					region: accountData.region,
+					month,
+					current_page: currentPage,
+					type,
+					lang: "en-us"
+				},
+				headers: {
+					Referer: "https://act.hoyolab.com",
+					"x-rpc-app_version": "1.5.0",
+					"x-rpc-client_type": 5,
+					"x-rpc-language": "en-us",
+					"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+					Cookie: accountData.cookie,
+					DS: app.Utils.generateDS()
+				}
+			});
 
-		const fetchMonthData = async (month) => {
-			const searchParams = {
-				lang: "en-us",
-				uid: accountData.uid,
-				region: accountData.region,
-				month,
-				type,
-				current_page: 1,
-				page_size: 100,
-				total: 0
-			};
-
-			let allResults = [];
-			let currentPage = 1;
-			let totalResults = 0;
-
-			do {
-				searchParams.current_page = currentPage;
-
-				const res = await app.Got("HoyoClient", {
-					url: this.#instance.config.url.diary,
-					responseType: "json",
-					searchParams,
-					headers: {
-						Cookie: accountData.cookie,
-						DS: app.Utils.generateDS()
+			if (!response.ok) {
+				app.Logger.log(`${this.#instance.fullName}:Diary`, {
+					message: "Hoyolab API returned non-200 status code",
+					args: {
+						platform: this.#instance.name,
+						uid: accountData.uid,
+						response: response.body
 					}
 				});
+			}
 
-				if (res.body.retcode !== 0) {
-					app.Logger.log(`${this.#instance.fullName}:Diary`, {
-						message: "Failed to fetch diary data",
-						args: {
-							platform: this.#instance.name,
-							uid: accountData.uid,
-							region: accountData.region,
-							body: res.body
-						}
-					});
+			if (response.body.retcode !== 0) {
+				app.Logger.log(`${this.#instance.fullName}:Diary`, {
+					message: "Hoyolab API returned non-zero retcode",
+					args: {
+						platform: this.#instance.name,
+						uid: accountData.uid,
+						response: response.body
+					}
+				});
+			}
 
-					break;
-				}
-
-				await setTimeout(7500);
-
-				const data = res.body.data;
-				allResults = allResults.concat(data.list);
-				totalResults = data.total;
-				currentPage++;
-			} while (allResults.length < totalResults);
-
-			return allResults;
+			return response.body.data;
 		};
 
-		// Fetch data for current and last months
-		const currentMonthResults = await fetchMonthData(currentMonth);
-		const lastMonthResults = await fetchMonthData(lastMonth);
+		const fetchAllPages = async (type, month) => {
+			let currentPage = 1;
+			let hasMorePages = true;
+			let allData = [];
 
-		return { currentMonthResults, lastMonthResults };
+			while (hasMorePages) {
+				const data = await fetchPage(type, month, currentPage);
+
+				if (data && data.list && data.list.length > 0) {
+					allData = allData.concat(data.list);
+					currentPage++;
+				}
+				else {
+					hasMorePages = false;
+				}
+			}
+
+			return allData;
+		};
+
+		const { currentMonth, lastMonth } = options;
+
+		const currentMonthData = await fetchAllPages(type, currentMonth);
+		await setTimeout(10_000);
+		const lastMonthData = await fetchAllPages(type, lastMonth);
+
+		return {
+			currentMonthResults: currentMonthData,
+			lastMonthResults: lastMonthData
+		};
 	}
 };
