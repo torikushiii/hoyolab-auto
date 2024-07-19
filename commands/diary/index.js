@@ -140,10 +140,14 @@ module.exports = {
 			accounts: true
 		}
 	],
-	run: (async function notes (context, uid) {
+	run: (async function notes (context, game, uid) {
 		const { interaction } = context;
 
 		const account = app.HoyoLab.getAccountById(uid);
+		if (account.platform !== game) {
+			return interaction.reply({ content: "This account does not belong to the selected game.", ephemeral: true });
+		}
+
 		const platform = app.HoyoLab.get(account.platform);
 
 		await interaction.deferReply({ ephemeral: true });
