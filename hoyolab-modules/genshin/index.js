@@ -1,4 +1,5 @@
 const CheckIn = require("./check-in.js");
+const Diary = require("./diary.js");
 const Notes = require("./notes.js");
 const RedeemCode = require("./redeem-code.js");
 
@@ -17,6 +18,7 @@ const DEFAULT_CONSTANTS = {
 		home: "https://sg-hk4e-api.hoyolab.com/event/sol/home",
 		sign: "https://sg-hk4e-api.hoyolab.com/event/sol/sign",
 		notes: "https://bbs-api-os.mihoyo.com/game_record/genshin/api/dailyNote",
+		diary: "https://sg-hk4e-api.hoyolab.com/event/ysledgeros/month_detail",
 		redemption: "https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey"
 	}
 };
@@ -172,5 +174,14 @@ module.exports = class Genshin extends require("../template.js") {
 	async redeemCode (accountData, code) {
 		const rc = new RedeemCode(this);
 		return await rc.redeemCode(accountData, code);
+	}
+
+	async diary (accountData) {
+		const d = new Diary(this, {
+			logo: this.#logo,
+			color: this.#color
+		});
+
+		return await d.diary(accountData);
 	}
 };

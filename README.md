@@ -46,12 +46,14 @@ If you don't have a server to run this script and simply just want to use it for
   - **Expedition check**: Check your expeditions and sends a notification if they're done.
   - **Realm currency**: Sends a notification if your realm currency is capped.
   - **Code Redeems**: Search for codes and redeem them automatically.
+  - **Traveler's Diary**: Check your monthly currency income.
 - **Honkai: Star Rail**:
   - **Daily check-in**: Runs every midnight local time.
   - **Dailies**: Reminds you to do your dailies, such as commissions if you haven't done them at 09:00 (local time).
   - **Stamina check**: Reminds you to spend your stamina if you're at your set threshold or capped.
   - **Expedition check**: Check your expeditions and sends a notification if they're done.
   - **Code Redeems**: Search for codes and redeem them automatically.
+  - **Trailblazer Monthly Calendar**: Check your monthly currency income.
 - **Zenless Zone Zero**:
   - **Daily check-in**: Runs every midnight local time.
   - **Dailies**: Reminds you to do your dailies, such as commissions if you haven't done them at 09:00 (local time).

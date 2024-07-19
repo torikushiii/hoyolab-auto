@@ -1,4 +1,5 @@
 const CheckIn = require("./check-in.js");
+const Diary = require("./diary.js");
 const Notes = require("./notes.js");
 const RedeemCode = require("./redeem-code.js");
 
@@ -17,6 +18,7 @@ const DEFAULT_CONSTANTS = {
 		home: "https://sg-public-api.hoyolab.com/event/luna/os/home",
 		sign: "https://sg-public-api.hoyolab.com/event/luna/os/sign",
 		notes: "https://bbs-api-os.hoyolab.com/game_record/hkrpg/api/note",
+		diary: "https://sg-public-api.hoyolab.com/event/srledger/month_detail",
 		redemption: "https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey"
 	}
 };
@@ -167,5 +169,14 @@ module.exports = class StarRail extends require("../template.js") {
 	async redeemCode (accountData, code) {
 		const rc = new RedeemCode(this);
 		return await rc.redeemCode(accountData, code);
+	}
+
+	async diary (accountData) {
+		const d = new Diary(this, {
+			logo: this.#logo,
+			color: this.#color
+		});
+
+		return await d.diary(accountData);
 	}
 };
