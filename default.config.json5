@@ -1,146 +1,143 @@
 {
-    loglevel: 'info',
-    userAgent: 'Custom fork of HoyoLabAuto: github.com/torikushiii/hoyolab-auto',
-    platforms: [
-        {
-            id: 1,
-            active: true,
-            type: 'discord', // This platform is optional, only use this if you have want to access commands via Discord bot
-            botId: '123', // Your Discord bot ID
-            token: '(YOUR_DISCORD_BOT_TOKEN)',
+    log_level: 'info',
+    user_agent: 'HoyoLabAuto/1.0.0 (github.com/torikushiii/hoyolab-auto)',
+    integrations: {
+        // You can add multiple integrations by copying this sections and adding another one with a unique identifier, this identifier can be used in the accounts section
+        default_discord_bot: {
+            enabled: false,
+            type: 'discord_bot', // Discord bot which you can use to enable commands
+            options: {
+                id: '',
+                token: '',
+            },
         },
-        {
-            id: 2,
-            active: false, // Set to true if you want to enable Telegram bot
-            type: 'telegram',
-            chatId: 123, // You can follow this guide to create a bot: https://github.com/torikushiii/hoyolab-auto/blob/main/setup/TELEGRAM.md
-            token: '123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11',
-            disableNotification: false, // Set to true if you want to disable notification for Telegram bot (sounds, vibration, etc.)
+        default_discord_webhook: {
+            enabled: false,
+            type: 'discord_webhook', // Send notifications to Discord webhook, you can follow this guide: https://github.com/torikushiii/hoyolab-auto/blob/main/setup/DISCORD_WEBHOOK.md
+            options: {
+                url: '',
+            },
         },
+        default_telegram_bot: {
+            enabled: false,
+            type: 'telegram', // Set to true if you want to enable Telegram bot, you can follow this guide: https://github.com/torikushiii/hoyolab-auto/blob/main/setup/TELEGRAM.md
+            options: {
+                id: '',
+                token: '',
+                notifications: true, // Set to false if you want silent notifications
+            },
+        },
+    },
+    accounts: [
+        // You can add multiple accounts by copying this sections and adding another one underneath
         {
-            id: 3,
-            active: true, // Set to true if you want to send notification to Discord webhook
-            type: 'webhook',
-            url: '(YOUR_WEBHOOK_URL)', // You can follow this guide to create a webhook: https://github.com/torikushiii/hoyolab-auto/blob/main/setup/DISCORD_WEBHOOK.md
+            enabled: false,
+            cookie: '',
+            integrations: [
+                // Add the platform IDs that you want to use for this account here
+                'default_discord_bot',
+                'default_discord_webhook',
+                'default_telegram_bot',
+            ],
+            genshin_impact: {
+                enabled: false, // Set to true if you want to enable Genshin Impact
+                // Enable this if you want to automatically redeem codes
+                // Please note that if you have one account with characters in multiple servers
+                // the code will be redeemed but you won't get the reward
+                // so please be careful when enabling this, and only enable it on the account that you want to redeem the code
+                redeem_codes: true,
+                dailies: true, // Enable this if you want to get reminded to do your daily commissions
+                weeklies: true, // Enable this if you want to get reminded to do your weeklies
+                realm: {
+                    enabled: true,
+                    persistent: false,
+                },
+                stamina: {
+                    enabled: true, // Enable this if you want to get notified when your stamina is above the threshold
+                    threshold: 150, // Your stamina threshold, only fires notification when your stamina is above this value
+                    persistent: false, // Set to true if you want to get notified every time your stamina is above the threshold
+                },
+                expedition: {
+                    enabled: true, // Enable this if you want to get notified when your expedition is done
+                    persistent: false, // Set to true if you want to get notified every time your expedition is done
+                },
+            },
+            honkai_impact_third: {
+                enabled: false, // Set to true if you want to enable Honkai Impact 3rd
+            },
+            honkai_star_rail: {
+                enabled: false, // Set to true if you want to enable Honkai: Star Rail
+                // Enable this if you want to automatically redeem codes
+                // Please note that if you have one account with characters in multiple servers
+                // the code will be redeemed but you won't get the reward
+                // so please be careful when enabling this, and only enable it on the account that you want to redeem the code
+                redeem_codes: true,
+                dailies: true,
+                weeklies: true,
+                stamina: {
+                    enabled: true,
+                    threshold: 150,
+                    persistent: false,
+                },
+                expedition: {
+                    enabled: true,
+                    persistent: false,
+                },
+            },
+            zenless_zone_zero: {
+                enabled: false, // Set to true if you want to enable Zenless Zone Zero
+                redeem_codes: true,
+                shop_status: true, // This will check if your shop has finished selling videos
+                dailies: true,
+                stamina: {
+                    enabled: true,
+                    threshold: 200,
+                    persistent: false,
+                },
+            },
         },
     ],
     crons: {
-        whitelist: [], // You can whitelist some crons if you only want to run specific crons
-        blacklist: [], // You can blacklist some crons if you don't want to run them
         // You can use this site to generate cron expression: https://crontab.guru/
-        checkIn: '0 0 0 * * *',
-        codeRedeem: '*/15 * * * *',
-        dailiesReminder: '0 0 21 * * *',
-        howlScratchCard: '0 0 21 * * *',
-        expedition: '0 */30 * * * *',
-        missedCheckIn: '0 0 23 * * *',
-        realmCurrency: '0 */1 * * *',
-        shopStatus: '0 */1 * * *',
-        stamina: '0 */30 * * * *',
-        weekliesReminder: '0 0 21 * * 0',
+        check_in: {
+            enabled: true, // Check in on HoyoLab (all games)
+            cron: '0 0 * * *',
+        },
+        missed_check_in: {
+            enabled: true, // Check missed HoyoLab check in (all games)
+            cron: '0 23 * * *',
+        },
+        code_redeem: { // Redeem HoyoLab codes (all games)
+            enabled: true,
+            cron: '*/15 * * * *',
+        },
+        dailies_reminder: {
+            enabled: true, // Send daily reminders (all games)
+            cron: '0 21 * * *',
+        },
+        weeklies_reminder: {
+            enabled: true, // Send weekly reminders (all games)
+            cron: '0 21 * * 0',
+        },
+        expedition: {
+            enabled: true, // Check expedition status (all games)
+            cron: '*/30 * * * *',
+        },
+        stamina: {
+            enabled: true, // Check stamina (all games)
+            cron: '*/30 * * * *',
+        },
+        realm_currency: {
+            enabled: true, // Check realm currency (Genshin Impact)
+            cron: '*/1 * * * *',
+        },
+        howl_scratch_card: {
+            enabled: true, // Howl Scratch Card (Zenless Zone Zero)
+            cron: '0 21 * * *',
+        },
+        shop_status: {
+            enabled: true, // Check shop status (Zenless Zone Zero)
+            cron: '*/1 * * * *',
+        },
     },
-    accounts: [
-        {
-            id: 1,
-            active: false, // Set to true if you want to enable Honkai Impact 3rd
-            type: 'honkai',
-            data: [
-                {
-                    cookie: '',
-                },
-            ],
-        },
-        {
-            id: 2,
-            active: true, // Set to true if you want to enable Genshin Impact
-            type: 'genshin',
-            data: [
-                {
-                    cookie: '',
-                    // Enable this if you want to automatically redeem codes
-                    // Please note that if you have one account with characters in multiple servers
-                    // the code will be redeemed but you won't get the reward
-                    // so please be careful when enabling this, and only enable it on the account that you want to redeem the code
-                    redeemCode: false,
-                    dailiesCheck: true, // Enable this if you want to get reminded to do your daily commissions
-                    weekliesCheck: true, // Enable this if you want to get reminded to do your weeklies
-                    realm: {
-                        check: false,
-                        persistent: false,
-                    },
-                    stamina: {
-                        check: false, // Enable this if you want to get notified when your stamina is above the threshold
-                        threshold: 150, // Your stamina threshold, only fires notification when your stamina is above this value
-                        persistent: false, // Set to true if you want to get notified every time your stamina is above the threshold
-                    },
-                    expedition: {
-                        check: false, // Enable this if you want to get notified when your expedition is done
-                        persistent: false, // Set to true if you want to get notified every time your expedition is done
-                    },
-                },
-            ],
-        },
-        {
-            id: 3,
-            active: true, // Set to true if you want to enable Honkai: Star Rail
-            type: 'starrail',
-            data: [
-                // If you have same account for both genshin and starrail
-                // You can copy the cookie values from the genshin account
-                // Same goes for any other game that will be supported in the future
-                // Support multi-account for every type of game
-                // Just add another object inside the data array
-                // Account #1
-                {
-                    cookie: '',
-                    redeemCode: false,
-                    dailiesCheck: true,
-                    weekliesCheck: true,
-                    stamina: {
-                        check: true,
-                        threshold: 230,
-                        persistent: true,
-                    },
-                    expedition: {
-                        check: true,
-                        persistent: false,
-                    },
-                },
-                // Account #2
-                // Delete this if you only have one account
-                {
-                    cookie: '',
-                    dailiesCheck: false,
-                    weekliesCheck: false,
-                    stamina: {
-                        check: false,
-                        threshold: 150,
-                        persistent: false,
-                    },
-                    expedition: {
-                        check: false,
-                        persistent: false,
-                    },
-                },
-            ],
-        },
-        {
-            id: 4,
-            active: false,
-            type: 'zenless',
-            data: [
-                {
-                    cookie: '',
-                    redeemCode: false,
-                    shopStatus: false, // This will check if your shop has finished selling videos
-                    dailiesCheck: true,
-                    stamina: {
-                        check: true,
-                        threshold: 200,
-                        persistent: false,
-                    },
-                },
-            ],
-        },
-    ],
 }
