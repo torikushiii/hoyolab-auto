@@ -141,7 +141,7 @@ module.exports = class Diary {
 	async fetchResultsForType (accountData, type, options = {}) {
 		const fetchPage = async (type, month, currentPage) => {
 			const response = await app.Got("HoyoClient", {
-				url: "https://sg-hk4e-api.hoyolab.com/event/ysledgeros/month_detail",
+				url: this.#instance.config.url.diary,
 				responseType: "json",
 				searchParams: {
 					uid: accountData.uid,
