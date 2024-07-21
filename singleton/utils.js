@@ -21,6 +21,17 @@ module.exports = class UtilsSingleton {
 		return UtilsSingleton.module;
 	}
 
+	tag = {
+		trim: (strings, ...values) => {
+			const result = [];
+			for (let i = 0; i < strings.length; i++) {
+				result.push(strings[i].replace(/\s+/g, " "), values[i]);
+			}
+
+			return result.join("").trim();
+		}
+	};
+
 	formatTime (seconds = 0) {
 		const array = [];
 
