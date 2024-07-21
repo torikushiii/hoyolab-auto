@@ -52,6 +52,7 @@ module.exports = class RedeemCode {
 			app.Logger.log(`${this.#instance.fullName}:RedeemCode`, {
 				message: "Failed to redeem code",
 				args: {
+					cause: app.HoyoLab.errorMessage(this.#instance.name, res.body.retcode),
 					code,
 					status: res.body.retcode,
 					body: res.body

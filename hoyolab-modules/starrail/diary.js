@@ -174,6 +174,7 @@ module.exports = class Diary {
 					app.Logger.log(`${this.#instance.fullName}:Diary`, {
 						message: "Failed to fetch diary data",
 						args: {
+							cause: app.HoyoLab.errorMessage(this.#instance.name, res.body.retcode),
 							platform: this.#instance.name,
 							uid: accountData.uid,
 							region: accountData.region,

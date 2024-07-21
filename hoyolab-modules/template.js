@@ -1,4 +1,5 @@
 const DataCache = require("./cache.js");
+const CustomHoyoError = require("./error-messages.js");
 
 module.exports = class HoyoLab {
 	#id;
@@ -464,6 +465,20 @@ module.exports = class HoyoLab {
 			default:
 				return "Unknown";
 		}
+	}
+
+	static errorMessage (type, code) {
+		if (!type || !code) {
+			throw new app.Error({
+				message: "Invalid type or code provided for HoyoError.",
+				args: {
+					type,
+					code
+				}
+			});
+		}
+
+		return CustomHoyoError(type, code);
 	}
 
 	static get (identifier) {

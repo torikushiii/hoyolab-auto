@@ -65,6 +65,7 @@ module.exports = class RealtimeNotes {
 			app.Logger.log(`${this.#instance.fullName}:Notes`, {
 				message: "HoyoLab returned non-zero retcode",
 				args: {
+					cause: app.HoyoLab.errorMessage(this.#instance.name, res.body.retcode),
 					platform: this.#instance.name,
 					uid: accountData.uid,
 					region: accountData.region,

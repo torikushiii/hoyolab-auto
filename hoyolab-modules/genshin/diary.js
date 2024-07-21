@@ -177,6 +177,7 @@ module.exports = class Diary {
 				app.Logger.log(`${this.#instance.fullName}:Diary`, {
 					message: "Hoyolab API returned non-zero retcode",
 					args: {
+						cause: app.HoyoLab.errorMessage(this.#instance.name, response.body.retcode),
 						platform: this.#instance.name,
 						uid: accountData.uid,
 						response: response.body
