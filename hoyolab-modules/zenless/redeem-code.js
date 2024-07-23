@@ -17,7 +17,7 @@ module.exports = class RedeemCode {
 			]
 		});
 
-		const res = await app.Got("MiHoYo", {
+		const res = await app.Got("HoYoLab", {
 			url: this.#instance.config.url.redemption,
 			responseType: "json",
 			throwHttpErrors: false,

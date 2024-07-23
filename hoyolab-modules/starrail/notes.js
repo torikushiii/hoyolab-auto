@@ -34,7 +34,7 @@ module.exports = class RealtimeNotes {
 			]
 		});
 
-		const res = await app.Got("MiHoYo", {
+		const res = await app.Got("HoYoLab", {
 			url: this.#instance.config.url.notes,
 			responseType: "json",
 			throwHttpErrors: false,

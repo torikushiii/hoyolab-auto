@@ -524,7 +524,7 @@ module.exports = class HoyoLab {
 	}
 
 	async updateCookie (accountData) {
-		const res = await app.Got("MiHoYo", {
+		const res = await app.Got("HoYoLab", {
 			url: this.webAPI,
 			responseType: "json",
 			throwHttpErrors: false,

@@ -32,7 +32,7 @@ const redeemGenshin = async (account, codeList) => {
 			]
 		});
 
-		const res = await app.Got("MiHoYo", {
+		const res = await app.Got("HoYoLab", {
 			url: "https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey",
 			searchParams: {
 				uid: account.uid,
@@ -110,7 +110,7 @@ const redeemStarRail = async (account, codeList) => {
 			]
 		});
 
-		const res = await app.Got("MiHoYo", {
+		const res = await app.Got("HoYoLab", {
 			url: "https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey",
 			responseType: "json",
 			throwHttpErrors: false,
@@ -189,7 +189,7 @@ const redeemZenless = async (account, codeList) => {
 			]
 		});
 
-		const res = await app.Got("MiHoYo", {
+		const res = await app.Got("HoYoLab", {
 			url: "https://public-operation-nap.hoyoverse.com/common/apicdkey/api/webExchangeCdkey",
 			searchParams: {
 				t: Date.now(),

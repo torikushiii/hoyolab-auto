@@ -92,7 +92,7 @@ module.exports = class CheckIn {
 	}
 
 	async #sign (cookieData) {
-		const res = await app.Got("MiHoYo", {
+		const res = await app.Got("HoYoLab", {
 			url: this.#instance.config.url.sign,
 			method: "POST",
 			responseType: "json",
@@ -137,7 +137,7 @@ module.exports = class CheckIn {
 	}
 
 	async #getSignInfo (cookieData) {
-		const res = await app.Got("MiHoYo", {
+		const res = await app.Got("HoYoLab", {
 			url: this.#instance.config.url.info,
 			responseType: "json",
 			searchParams: {
@@ -187,7 +187,7 @@ module.exports = class CheckIn {
 	}
 
 	async #getAwardsData (cookieData) {
-		const res = await app.Got("MiHoYo", {
+		const res = await app.Got("HoYoLab", {
 			url: this.#instance.config.url.home,
 			responseType: "json",
 			searchParams: {

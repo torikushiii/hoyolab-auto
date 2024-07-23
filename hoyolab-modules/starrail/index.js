@@ -52,7 +52,7 @@ module.exports = class StarRail extends require("../template.js") {
 			const cookieData = account.cookie;
 			const ltuid = account.ltuid;
 
-			const { body, statusCode } = await app.Got("MiHoYo", {
+			const { body, statusCode } = await app.Got("HoYoLab", {
 				url: "https://bbs-api-os.hoyolab.com/game_record/card/wapi/getGameRecordCard",
 				responseType: "json",
 				throwHttpErrors: false,
