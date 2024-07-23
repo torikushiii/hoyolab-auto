@@ -95,7 +95,10 @@ module.exports = class RealtimeNotes {
 			weeklyBoss: data.weekly_cocoon_cnt,
 			weeklyBossLimit: data.weekly_cocoon_limit,
 			rogueScore: data.current_rogue_score,
-			maxScore: data.max_rogue_score
+			maxScore: data.max_rogue_score,
+			tournScore: data.rogue_tourn_weekly_cur,
+			tournMaxScore: data.rogue_tourn_weekly_max,
+			tournUnlocked: data.rogue_tourn_weekly_unlocked
 		};
 
 		await this.#instance.dataCache.set(accountData.uid, {

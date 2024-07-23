@@ -82,6 +82,10 @@ const getNotesEmbedData = async (accounts, game, platformId) => {
 						inline: true
 					}
 				);
+
+				if (weeklies.tournUnlocked) {
+					embed.fields[2].value += `\nDivergent Universe: ${weeklies.tournScore}/${weeklies.tournMaxScore}`;
+				}
 			}
 			else if (platform.gameId === 8) {
 				embed.fields.push(
@@ -134,6 +138,10 @@ const getNotesEmbedData = async (accounts, game, platformId) => {
 					`Boss: ${weeklies.weeklyBoss}/${weeklies.weeklyBossLimit}`
 					+ `\nSimulated Universe: ${weeklies.rogueScore}/${weeklies.maxScore}`
 				].join("\n");
+
+				if (weeklies.tournUnlocked) {
+					message += `\nDivergent Universe: ${weeklies.tournScore}/${weeklies.tournMaxScore}`;
+				}
 			}
 			else if (platform.gameId === 8) {
 				message = [

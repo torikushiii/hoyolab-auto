@@ -69,7 +69,8 @@ module.exports = {
 					if (platform.type === "starrail") {
 						const bossCompleted = (weeklies.weeklyBoss === 0);
 						const simCompleted = (weeklies.rogueScore === weeklies.maxScore);
-						if (bossCompleted && simCompleted) {
+						const divergent = (weeklies.tournScore === weeklies.tournMaxScore && weeklies.tournUnlocked);
+						if (bossCompleted && simCompleted && divergent) {
 							continue;
 						}
 
@@ -84,6 +85,13 @@ module.exports = {
 							embed.fields.push({
 								name: "Simulated Universe",
 								value: `${weeklies.rogueScore}/${weeklies.maxScore}`,
+								inline: true
+							});
+						}
+						if (!divergent) {
+							embed.fields.push({
+								name: "Divergent Universe",
+								value: `${weeklies.tournScore}/${weeklies.tournMaxScore}`,
 								inline: true
 							});
 						}
@@ -121,7 +129,8 @@ module.exports = {
 					if (platform.type === "starrail") {
 						const bossCompleted = (weeklies.weeklyBoss === 0);
 						const simCompleted = (weeklies.rogueScore === weeklies.maxScore);
-						if (bossCompleted && simCompleted) {
+						const divergent = (weeklies.tournScore === weeklies.tournMaxScore && weeklies.tournUnlocked);
+						if (bossCompleted && simCompleted && divergent) {
 							continue;
 						}
 
@@ -130,6 +139,9 @@ module.exports = {
 						}
 						if (!simCompleted) {
 							message.push(`- **Simulated Universe**: ${weeklies.rogueScore}/${weeklies.maxScore}`);
+						}
+						if (!divergent) {
+							message.push(`- **Divergent Universe**: ${weeklies.tournScore}/${weeklies.tournMaxScore}`);
 						}
 					}
 
