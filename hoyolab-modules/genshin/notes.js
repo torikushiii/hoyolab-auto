@@ -84,9 +84,12 @@ module.exports = class RealtimeNotes {
 			recoveryTime: data.resin_recovery_time
 		};
 
+		const { daily_task } = data;
 		const dailies = {
-			task: data.finished_task_num,
-			maxTask: data.total_task_num
+			task: daily_task.finished_num,
+			maxTask: daily_task.total_num,
+			storedAttendance: daily_task.stored_attendance,
+			storedAttendanceRefresh: daily_task.stored_attendance_refresh_countdown
 		};
 
 		const weeklies = {

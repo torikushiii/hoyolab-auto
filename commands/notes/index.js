@@ -39,10 +39,20 @@ const getNotesEmbedData = async (accounts, game, platformId) => {
 			};
 
 			if (platform.gameId === 2) {
+				const { task, maxTask, storedAttendance, storedAttendanceRefresh } = dailies;
+
+				const storedAttendanceText = `Stored Attendance: ${storedAttendance}`;
+				const refreshText = `Refresh in: ${app.Utils.formatTime(storedAttendanceRefresh)}`;
+
 				embed.fields.push(
 					{
 						name: "Dailies",
-						value: `${dailies.task}/${dailies.maxTask}`,
+						value: `${task}/${maxTask}`,
+						inline: true
+					},
+					{
+						name: "Stored Attendance",
+						value: `${storedAttendanceText}\n${refreshText}`,
 						inline: true
 					},
 					{
@@ -116,13 +126,17 @@ const getNotesEmbedData = async (accounts, game, platformId) => {
 
 			let message = "";
 			if (platform.gameId === 2) {
+				const { task, maxTask, storedAttendance, storedAttendanceRefresh } = dailies;
+
 				message = [
 					`${account.nickname} - ${account.uid}`,
 					`Current Stamina: ${stamina.currentStamina}/${stamina.maxStamina}`
 					+ `\nFull in: ${app.Utils.formatTime(stamina.recoveryTime)}`,
 					"Expedition Status",
 					expedition.list.map((i, idx) => `Account ${idx + 1} - ${app.Utils.formatTime(i.remaining_time)}`).join("\n"),
-					`Dailies: ${dailies.task}/${dailies.maxTask}`,
+					`Dailies: ${task}/${maxTask}`,
+					`Stored Attendance: ${storedAttendance}`,
+					`Refresh in: ${app.Utils.formatTime(storedAttendanceRefresh)}`,
 					`Weekly Boss Chance Remaining: ${weeklies.resinDiscount}/${weeklies.resinDiscountLimit}`
 				].join("\n");
 			}
