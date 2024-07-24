@@ -4,6 +4,7 @@ module.exports = class UtilsSingleton {
 	static DS_SALT = "6s25p5ox5y14umn1p61aqyyvbvvl3lrt";
 
 	static timeUnits = {
+		d: { h: 24, m: 1440, s: 86400, ms: 86400.0e3 },
 		h: { m: 60, s: 3600, ms: 3600.0e3 },
 		m: { s: 60, ms: 60.0e3 },
 		s: { ms: 1.0e3 }
@@ -35,18 +36,21 @@ module.exports = class UtilsSingleton {
 	formatTime (seconds = 0) {
 		const array = [];
 
+		if (seconds >= UtilsSingleton.timeUnits.d.s) {
+			const days = Math.floor(seconds / UtilsSingleton.timeUnits.d.s);
+			array.push(`${days} days`);
+			seconds -= (days * UtilsSingleton.timeUnits.d.s);
+		}
 		if (seconds >= UtilsSingleton.timeUnits.h.s) {
-			const hours = Math.floor(seconds / UtilsSingleton.timeUnits.h.s);
-			seconds -= hours * UtilsSingleton.timeUnits.h.s;
-			array.push(`${hours} hr`);
+			const hr = Math.floor(seconds / UtilsSingleton.timeUnits.h.s);
+			array.push(`${hr} hr`);
+			seconds -= (hr * UtilsSingleton.timeUnits.h.s);
 		}
-
 		if (seconds >= UtilsSingleton.timeUnits.m.s) {
-			const minutes = Math.floor(seconds / UtilsSingleton.timeUnits.m.s);
-			seconds -= minutes * UtilsSingleton.timeUnits.m.s;
-			array.push(`${minutes} min`);
+			const min = Math.floor(seconds / UtilsSingleton.timeUnits.m.s);
+			array.push(`${min} min`);
+			seconds -= (min * UtilsSingleton.timeUnits.m.s);
 		}
-
 		if (seconds >= 0 || array.length === 0) {
 			array.push(`${this.round(seconds, 3)} sec`);
 		}
