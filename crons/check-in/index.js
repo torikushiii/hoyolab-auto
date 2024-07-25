@@ -54,7 +54,7 @@ module.exports = {
 					],
 					timestamp: new Date(),
 					footer: {
-						text: `HoyoLab Auto Check-In (${i + 1}/${messages.length}) Excecuted`,
+						text: `HoyoLab Auto Check-In (${i + 1}/${messages.length}) Executed`,
 						icon_url: message.assets.logo
 					}
 				};
