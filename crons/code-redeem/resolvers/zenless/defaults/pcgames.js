@@ -30,7 +30,7 @@ exports.fetch = async () => {
 			continue;
 		}
 
-		const code = codePart.split(" or ")[0];
+		const code = codePart.split(" or ")[0].replace(/\s*\(.*?\)\s*/g, "").trim();
 
 		let formattedRewardsPart = rewardsPart.replace(/\s*\(NEW\)/gi, "");
 		for (const [word, num] of Object.entries(numberWords)) {
