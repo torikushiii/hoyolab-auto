@@ -38,7 +38,7 @@ exports.fetch = async () => {
 
 		rewards.push({
 			code,
-			rewardsData,
+			rewards: rewardsData,
 			source: "genshin-fandom"
 		});
 	}
