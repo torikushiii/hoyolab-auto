@@ -58,8 +58,9 @@ module.exports = class DataCache {
 
 		const isMaxStamina = cachedData.stamina.currentStamina === cachedData.stamina.maxStamina;
 		const isAboveThreshold = cachedData.stamina.currentStamina > account.stamina.threshold;
+		const staminaAlmostFull = (cachedData.stamina.maxStamina - cachedData.stamina.currentStamina) <= 10 && isAboveThreshold;
 
-		if (isMaxStamina || isAboveThreshold) {
+		if (isMaxStamina || isAboveThreshold || staminaAlmostFull) {
 			await DataCache.invalidateCache(cachedData.uid);
 			return null;
 		}
