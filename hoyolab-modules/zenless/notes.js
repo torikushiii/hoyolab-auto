@@ -90,6 +90,13 @@ module.exports = class RealtimeNotes {
 			maxTask: data.vitality.max
 		};
 
+		const weeklies = {
+			bounty: data.bounty_commission.num,
+			bountyTotal: data.bounty_commission.total,
+			surveyPoints: data.survey_points.num,
+			surveyPointsTotal: data.survey_points.total
+		};
+
 		const ShopState = {
 			SaleStateNo: "Closed",
 			SaleStateDoing: "Open",
@@ -107,6 +114,7 @@ module.exports = class RealtimeNotes {
 			cardSign,
 			stamina,
 			dailies,
+			weeklies,
 			shop
 		});
 
