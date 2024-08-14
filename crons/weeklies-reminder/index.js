@@ -96,6 +96,28 @@ module.exports = {
 							});
 						}
 					}
+					if (platform.type === "nap") {
+						const bountiesCompleted = (weeklies.bounties === weeklies.bountyTotal);
+						const surveyCompleted = (weeklies.surveyPoints === weeklies.surveyPointsTotal);
+						if (bountiesCompleted && surveyCompleted) {
+							continue;
+						}
+
+						if (!bountiesCompleted) {
+							embed.fields.push({
+								name: "Bounty Comission",
+								value: `${weeklies.bounties}/${weeklies.bountyTotal}`,
+								inline: true
+							});
+						}
+						if (!surveyCompleted) {
+							embed.fields.push({
+								name: "Survey Points",
+								value: `${weeklies.surveyPoints}/${weeklies.surveyPointsTotal}`,
+								inline: true
+							});
+						}
+					}
 
 					await webhook.send(embed, {
 						author: data.assets.author,
@@ -142,6 +164,20 @@ module.exports = {
 						}
 						if (!divergent) {
 							message.push(`- **Divergent Universe**: ${weeklies.tournScore}/${weeklies.tournMaxScore}`);
+						}
+					}
+					if (platform.type === "nap") {
+						const bountiesCompleted = (weeklies.bounties === weeklies.bountyTotal);
+						const surveyCompleted = (weeklies.surveyPoints === weeklies.surveyPointsTotal);
+						if (bountiesCompleted && surveyCompleted) {
+							continue;
+						}
+
+						if (!bountiesCompleted) {
+							message.push(`- **Bounty Comission**: ${weeklies.bounties}/${weeklies.bountyTotal}`);
+						}
+						if (!surveyCompleted) {
+							message.push(`- **Survey Points**: ${weeklies.surveyPoints}/${weeklies.surveyPointsTotal}`);
 						}
 					}
 
