@@ -110,6 +110,12 @@ const getNotesEmbedData = async (accounts, game, platformId) => {
 						inline: true
 					},
 					{
+						name: "Weeklies",
+						value: `Bounty Commission: ${weeklies.bounty}/${weeklies.bountyTotal}`
+						+ `\nSurvey Points: ${weeklies.surveyPoints}/${weeklies.surveyPointsTotal}`,
+						inline: true
+					},
+					{
 						name: "Scratch Card",
 						value: data.cardSign,
 						inline: true
@@ -163,6 +169,8 @@ const getNotesEmbedData = async (accounts, game, platformId) => {
 					`Current Stamina: ${stamina.currentStamina}/${stamina.maxStamina}`
 					+ `\nFull in: ${app.Utils.formatTime(stamina.recoveryTime)}`,
 					`Dailies: ${dailies.task}/${dailies.maxTask}`,
+					`Bounty Commission: ${weeklies.bounty}/${weeklies.bountyTotal}`,
+					`Survey Points: ${weeklies.surveyPoints}/${weeklies.surveyPointsTotal}`,
 					`Shop Status: ${data.shop.state}`,
 					`Howl Scratch Card: ${data.cardSign}`
 				].join("\n");
