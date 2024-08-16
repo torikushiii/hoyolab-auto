@@ -6,7 +6,7 @@ exports.fetch = async () => {
 	});
 
 	if (res.statusCode !== 200) {
-		app.Logger.log("Game8", {
+		app.Logger.log("ZenlessZoneZero:Game8", {
 			message: "Failed to fetch data from Game8.",
 			statusCode: res.statusCode
 		});
@@ -39,7 +39,7 @@ exports.fetch = async () => {
 		});
 	}
 
-	app.Logger.debug("Game8", {
+	app.Logger.debug("ZenlessZoneZero:Game8", {
 		message: `Found ${data.length} rewards.`,
 		data
 	});

@@ -23,7 +23,7 @@ exports.fetch = async () => {
 	});
 
 	if (res.statusCode !== 200) {
-		app.Logger.log("StarRail", {
+		app.Logger.log("StarRail:StarRailAPI", {
 			statusCode: res.statusCode,
 			body: res.body
 		});
@@ -36,7 +36,7 @@ exports.fetch = async () => {
 		return [];
 	}
 
-	app.Logger.debug("StarRailAPI", {
+	app.Logger.debug("StarRail:StarRailAPI", {
 		message: `Found ${codes.length} codes.`,
 		codes
 	});

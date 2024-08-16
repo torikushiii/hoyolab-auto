@@ -32,7 +32,7 @@ exports.fetch = async () => {
 	});
 
 	if (res.statusCode !== 200) {
-		app.Logger.log("HoyoLabAPI", {
+		app.Logger.log("ZenlessZoneZero:HoyoLabAPI", {
 			message: "Failed to fetch data from Hoyolab API.",
 			statusCode: res.statusCode,
 			response: res.body
@@ -42,7 +42,7 @@ exports.fetch = async () => {
 
 	const exchangeGroup = res.body.data.modules.find(i => i.exchange_group !== null);
 	if (!exchangeGroup) {
-		app.Logger.debug("HoyoLabAPI", {
+		app.Logger.debug("ZenlessZoneZero:HoyoLabAPI", {
 			message: "No exchange group found.",
 			body: res.body
 		});

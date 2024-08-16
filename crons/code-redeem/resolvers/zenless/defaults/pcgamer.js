@@ -6,7 +6,7 @@ exports.fetch = async () => {
 	});
 
 	if (res.statusCode !== 200) {
-		app.Logger.log("PCGamer", {
+		app.Logger.log("ZenlessZoneZero:PCGamer", {
 			message: "Failed to fetch data from PCGamer.",
 			statusCode: res.statusCode
 		});
@@ -48,7 +48,7 @@ exports.fetch = async () => {
 		});
 	}
 
-	app.Logger.debug("PCGamer", {
+	app.Logger.debug("ZenlessZoneZero:PCGamer", {
 		message: `Found ${rewards.length} rewards.`,
 		rewards
 	});

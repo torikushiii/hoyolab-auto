@@ -6,7 +6,7 @@ exports.fetch = async () => {
 	});
 
 	if (res.statusCode !== 200) {
-		app.Logger.log("GenshinFandom", {
+		app.Logger.log("Genshin:GenshinFandom", {
 			message: "Failed to fetch data from Genshin Fandom.",
 			statusCode: res.statusCode
 		});
@@ -43,7 +43,7 @@ exports.fetch = async () => {
 		});
 	}
 
-	app.Logger.debug("GenshinFandom", {
+	app.Logger.debug("Genshin:GenshinFandom", {
 		message: `Found ${rewards.length} codes.`,
 		rewards
 	});

@@ -6,7 +6,7 @@ exports.fetch = async () => {
 	});
 
 	if (res.statusCode !== 200) {
-		app.Logger.log("Game8", {
+		app.Logger.log("StarRail:Game8", {
 			message: "Failed to fetch data.",
 			statusCode: res.statusCode
 		});
@@ -21,7 +21,7 @@ exports.fetch = async () => {
 	const table = $("body > div.l-content > div.l-3col > div.l-3colMain > div.l-3colMain__center.l-3colMain__center--shadow > div.archive-style-wrapper > ul");
 	const codeList = table.find(".a-listItem");
 	if (codeList.length === 0) {
-		app.Logger.debug("Game8", {
+		app.Logger.debug("StarRail:Game8", {
 			message: "No codes found.",
 			args: {
 				body: res.body
@@ -47,7 +47,7 @@ exports.fetch = async () => {
 		});
 	}
 
-	app.Logger.debug("Game8", {
+	app.Logger.debug("StarRail:Game8", {
 		message: `Found ${codes.length} codes.`,
 		codes
 	});
