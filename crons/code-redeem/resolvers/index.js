@@ -80,7 +80,7 @@ const redeemGenshin = async (account, codeList) => {
 				}
 			});
 
-			failed.push(code);
+			failed.push({ ...code, reason: res.body.message });
 			await setTimeout(7000);
 			continue;
 		}
@@ -159,7 +159,7 @@ const redeemStarRail = async (account, codeList) => {
 				}
 			});
 
-			failed.push(code);
+			failed.push({ ...code, reason: res.body.message });
 			await setTimeout(7000);
 			continue;
 		}
@@ -237,7 +237,7 @@ const redeemZenless = async (account, codeList) => {
 				}
 			});
 
-			failed.push(code);
+			failed.push({ ...code, reason: res.body.message });
 			await setTimeout(7000);
 			continue;
 		}
