@@ -124,6 +124,7 @@ module.exports = class RealtimeNotes {
 				cardSign,
 				stamina,
 				dailies,
+				weeklies,
 				shop,
 				assets: {
 					...this.#instance.config.assets,
