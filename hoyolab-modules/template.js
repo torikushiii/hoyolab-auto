@@ -447,7 +447,7 @@ module.exports = class HoyoLab {
 			case "os_cht":
 			case "prod_gf_sg":
 			case "prod_official_cht":
-				return "TW";
+				return "TW/HK/MO";
 			case "os_asia":
 			case "prod_gf_jp":
 			case "prod_official_asia":
