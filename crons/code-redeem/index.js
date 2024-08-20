@@ -23,7 +23,7 @@ module.exports = {
 			return;
 		}
 
-		const codeData = await fetchCodes();
+		const codeData = await fetchCodes(accountData);
 		if (!codeData) {
 			app.Logger.debug("CodeRedeem", "No codes found.");
 			return;

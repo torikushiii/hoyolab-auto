@@ -3,12 +3,31 @@ const StarRail = require("./star-rail");
 const ZenlessZoneZero = require("./zenless");
 const { setTimeout } = require("node:timers/promises");
 
-const fetchAll = async () => {
-	const [genshin, starrail, zenless] = await Promise.all([
-		Genshin.fetchAll(),
-		StarRail.fetchAll(),
-		ZenlessZoneZero.fetchAll()
-	]);
+const fetchAll = async (accounts) => {
+	const filteredAccounts = accounts.filter(account => account.redeemCode);
+
+	const fetchPromises = filteredAccounts.map(account => {
+		const fetchPromise = (() => {
+			switch (account.platform) {
+				case "genshin":
+					return Genshin.fetchAll(account);
+				case "starrail":
+					return StarRail.fetchAll(account);
+				case "nap":
+					return ZenlessZoneZero.fetchAll(account);
+				default:
+					return Promise.resolve(null);
+			}
+		})();
+
+		return fetchPromise.then(result => ({ platform: account.platform, result }));
+	});
+
+	const results = await Promise.all(fetchPromises);
+
+	const genshin = results.find(result => result.platform === "genshin")?.result ?? [];
+	const starrail = results.find(result => result.platform === "starrail")?.result ?? [];
+	const zenless = results.find(result => result.platform === "nap")?.result ?? [];
 
 	return {
 		genshin,

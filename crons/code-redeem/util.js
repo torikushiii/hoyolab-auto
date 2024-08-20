@@ -5,8 +5,8 @@ const REDEMPTION_LINKS = {
 	nap: "https://zenless.hoyoverse.com/redemption"
 };
 
-const fetchCodes = async () => {
-	const { genshin, starrail, zenless } = await CodeResolver.fetchAll();
+const fetchCodes = async (accountData) => {
+	const { genshin, starrail, zenless } = await CodeResolver.fetchAll(accountData);
 	if (starrail.length === 0 && genshin.length === 0 && zenless.length === 0) {
 		return false;
 	}
