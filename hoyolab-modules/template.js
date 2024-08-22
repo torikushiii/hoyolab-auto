@@ -58,7 +58,7 @@ module.exports = class HoyoLab {
 				continue;
 			}
 
-			if (this.#name === "honkai") {
+			if (this.#name === "honkai" || this.#name === "tot") {
 				const parsedCookie = this.#parseCookie(account.cookie);
 				const ltuid = account.cookie.match(/ltuid_v2=([^;]+)/)[1];
 				this.#data.push({
@@ -203,7 +203,8 @@ module.exports = class HoyoLab {
 			honkai: "HonkaiImpact",
 			genshin: "GenshinImpact",
 			starrail: "StarRail",
-			nap: "ZenlessZoneZero"
+			nap: "ZenlessZoneZero",
+			tot: "TearsOfThemis"
 		};
 
 		return nameMap[this.name] || this.name;

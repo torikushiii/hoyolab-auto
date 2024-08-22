@@ -52,6 +52,16 @@
         },
         {
             id: 2,
+            active: false, // Set to true if you want to enable Tears of Themis
+            type: 'termis',
+            data: [
+                {
+                    cookie: ''
+                }
+            ]
+        },
+        {
+            id: 3,
             active: true, // Set to true if you want to enable Genshin Impact
             type: 'genshin',
             data: [
