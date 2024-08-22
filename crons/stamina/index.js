@@ -21,13 +21,13 @@ module.exports = {
 					continue;
 				}
 
-				const { fired, persistent } = account.stamina;
-				if (fired && !persistent) {
+				const notes = await platform.notes(account);
+				if (notes.success === false) {
 					continue;
 				}
 
-				const notes = await platform.notes(account);
-				if (notes.success === false) {
+				const { fired, persistent } = account.stamina;
+				if (fired && !persistent) {
 					continue;
 				}
 
