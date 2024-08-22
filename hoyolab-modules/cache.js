@@ -50,7 +50,10 @@ module.exports = class DataCache {
 				app.Logger.debug("Cache", `Cache hit for key: ${key} (memory)`);
 
 				const updatedData = await this.#updateCachedData(cachedData);
+
 				DataCache.data.set(key, updatedData);
+				await app.Cache.set({ key, value: updatedData, expiry: this.expiration });
+
 				return updatedData;
 			}
 
@@ -61,7 +64,10 @@ module.exports = class DataCache {
 					app.Logger.debug("Cache", `Cache hit for key: ${key} (keyv)`);
 
 					const updatedData = await this.#updateCachedData(cachedData);
+
 					DataCache.data.set(key, updatedData);
+					await app.Cache.set({ key, value: updatedData, expiry: this.expiration });
+
 					return updatedData;
 				}
 			}
@@ -77,16 +83,40 @@ module.exports = class DataCache {
 
 	async #updateCachedData (cachedData) {
 		const now = Date.now();
+		const secondsSinceLastUpdate = (now - cachedData.lastUpdate) / 1000;
 
 		if (now - cachedData.lastUpdate > this.expiration) {
 			await DataCache.invalidateCache(cachedData.uid);
 			return null;
 		}
 
-		const secondsSinceLastUpdate = (now - cachedData.lastUpdate) / 1000;
+		if (cachedData.stamina) {
+			const account = app.HoyoLab.getAccountById(cachedData.uid);
 
-		if (this.#shouldInvalidateStamina(cachedData, secondsSinceLastUpdate)
-            || this.#shouldInvalidateExpedition(cachedData, secondsSinceLastUpdate)
+			const staminaGained = (secondsSinceLastUpdate / this.rate);
+
+			cachedData.stamina.fractionalStamina = (cachedData.stamina.fractionalStamina || 0) + staminaGained;
+
+			const staminaToAdd = Math.floor(cachedData.stamina.fractionalStamina);
+			cachedData.stamina.currentStamina = Math.min(
+				cachedData.stamina.maxStamina,
+				cachedData.stamina.currentStamina + staminaToAdd
+			);
+
+			cachedData.stamina.fractionalStamina -= staminaToAdd;
+			cachedData.stamina.recoveryTime = Math.max(0, cachedData.stamina.recoveryTime - Math.round(secondsSinceLastUpdate));
+
+			const isMaxStamina = (cachedData.stamina.currentStamina === cachedData.stamina.maxStamina);
+			const isAboveThreshold = (cachedData.stamina.currentStamina > account.stamina.threshold);
+			const staminaAlmostFull = (cachedData.stamina.maxStamina - cachedData.stamina.currentStamina) <= 10 && isAboveThreshold;
+
+			if (isMaxStamina || isAboveThreshold || staminaAlmostFull) {
+				await DataCache.invalidateCache(cachedData.uid);
+				return null;
+			}
+		}
+
+		if (this.#shouldInvalidateExpedition(cachedData, secondsSinceLastUpdate)
             || this.#shouldInvalidateShop(cachedData)
             || this.#shouldInvalidateRealm(cachedData, secondsSinceLastUpdate)) {
 			await DataCache.invalidateCache(cachedData.uid);
@@ -95,29 +125,6 @@ module.exports = class DataCache {
 
 		cachedData.lastUpdate = now;
 		return cachedData;
-	}
-
-	#shouldInvalidateStamina (cachedData, secondsSinceLastUpdate) {
-		if (!cachedData.stamina) {
-			return false;
-		}
-
-		const account = app.HoyoLab.getAccountById(cachedData.uid);
-		const recoveredStamina = Math.floor(secondsSinceLastUpdate / this.rate);
-
-		const expectedStamina = Math.min(
-			cachedData.stamina.maxStamina,
-			cachedData.stamina.currentStamina + recoveredStamina
-		);
-
-		cachedData.stamina.currentStamina = expectedStamina;
-		cachedData.stamina.recoveryTime = Math.max(0, cachedData.stamina.recoveryTime - Math.round(secondsSinceLastUpdate));
-
-		const isMaxStamina = cachedData.stamina.currentStamina === cachedData.stamina.maxStamina;
-		const isAboveThreshold = cachedData.stamina.currentStamina > account.stamina.threshold;
-		const staminaAlmostFull = (cachedData.stamina.maxStamina - cachedData.stamina.currentStamina) <= 10 && isAboveThreshold;
-
-		return isMaxStamina || isAboveThreshold || staminaAlmostFull || cachedData.stamina.recoveryTime <= 0;
 	}
 
 	#shouldInvalidateExpedition (cachedData, secondsSinceLastUpdate) {
