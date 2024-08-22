@@ -181,7 +181,10 @@ module.exports = class HoyoLab {
 
 		this.#gameId = defaults.gameId;
 		this.#config = defaults.config ?? {};
-		this.#dataCache = new DataCache(600_000, this.#config.regenRate);
+
+		if (this.#config.regenRate) {
+			this.#dataCache = new DataCache(600_000, this.#config.regenRate);
+		}
 
 		HoyoLab.list.push(this);
 	}
@@ -430,7 +433,7 @@ module.exports = class HoyoLab {
 	static getAccountById (uid) {
 		if (typeof uid !== "string") {
 			throw new app.Error({
-				message: "Invalid UID provided for getAccountById expected number.",
+				message: "Invalid UID provided for getAccountById expected string.",
 				args: {
 					uid,
 					type: typeof uid
