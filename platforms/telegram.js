@@ -115,7 +115,8 @@ module.exports = class Telegram extends require("./template.js") {
 		const { command, args, channelData, userData } = data;
 
 		if (command === "redeem") {
-			const accounts = app.HoyoLab.getActiveAccounts({ blacklist: "honkai" });
+			// eslint-disable-next-line object-curly-spacing
+			const accounts = app.HoyoLab.getActiveAccounts({ blacklist: ["honkai", "tot"] });
 			if (accounts.length === 0) {
 				await this.send("There are no accounts available for redeeming codes.");
 				return;

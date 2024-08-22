@@ -85,6 +85,7 @@ module.exports = {
 		const { interaction } = context;
 		const supportedGames = app.HoyoLab.supportedGames({ blacklist: [
 			"honkai",
+			"tot",
 			"nap"
 		]});
 

@@ -4,7 +4,11 @@ module.exports = {
 	description: "Reminds you to complete your dailies.",
 	code: (async function dailiesReminder () {
 		// eslint-disable-next-line object-curly-spacing
-		const accountsList = app.HoyoLab.getActiveAccounts({ blacklist: ["honkai"] });
+		const accountsList = app.HoyoLab.getActiveAccounts({ blacklist: [
+			"honkai",
+			"tot"
+		]});
+
 		if (accountsList.length === 0) {
 			app.Logger.warn("Cron:DailiesReminder", "No active accounts found to run dailies reminder for.");
 			return;

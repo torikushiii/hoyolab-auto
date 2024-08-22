@@ -210,7 +210,10 @@ module.exports = {
 	run: (async function notes (context, game, uid) {
 		const { interaction } = context;
 
-		const supportedGames = app.HoyoLab.supportedGames({ blacklist: "honkai" });
+		const supportedGames = app.HoyoLab.supportedGames({ blacklist: [
+			"honkai",
+			"tot"
+		]});
 
 		if (supportedGames.length === 0) {
 			const message = "There are no accounts available for checking notes.";

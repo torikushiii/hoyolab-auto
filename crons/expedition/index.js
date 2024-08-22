@@ -4,7 +4,7 @@ module.exports = {
 	description: "Check for ongoing expeditions every 30 minutes and send a notification if all expeditions are completed.",
 	code: (async function expedition () {
 		// eslint-disable-next-line object-curly-spacing
-		const accountList = app.HoyoLab.getActiveAccounts({ blacklist: ["honkai", "nap"] });
+		const accountList = app.HoyoLab.getActiveAccounts({ blacklist: ["honkai", "nap", "tot"] });
 		if (accountList.length === 0) {
 			app.Logger.warn("Cron:Expedition", "No active accounts found to run expedition check for.");
 			return;

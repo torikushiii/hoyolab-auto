@@ -3,7 +3,8 @@ module.exports = {
 	expression: "0 */2 * * *",
 	description: "Update cookie for all accounts",
 	code: (async function updateCookie () {
-		const accounts = app.HoyoLab.getActiveAccounts({ blacklist: "honkai" });
+		// eslint-disable-next-line object-curly-spacing
+		const accounts = app.HoyoLab.getActiveAccounts({ blacklist: ["honkai", "tot"] });
 		if (accounts.length === 0) {
 			return;
 		}
