@@ -33,6 +33,20 @@ module.exports = {
 
 			const webhook = app.Platform.get(3);
 			if (webhook) {
+				let fields = [
+					{ name: "UID", value: message.uid, inline: true },
+					{ name: "Username", value: message.username, inline: true },
+					{ name: "Region", value: message.region, inline: true },
+					{ name: "Rank", value: message.rank, inline: true },
+					{ name: "Today's Reward", value: `${message.award.name} x${message.award.count}`, inline: true },
+					{ name: "Total Sign-ins", value: message.total, inline: true },
+					{ name: "Result", value: message.result, inline: true }
+				];
+
+				if (message.platform === "tot") {
+					fields = fields.filter(i => i.name !== "Username" && i.name !== "Rank");
+				}
+
 				const embed = {
 					color: message.assets.color,
 					title: message.assets.game,
@@ -43,15 +57,7 @@ module.exports = {
 					thumbnail: {
 						url: message.award.icon
 					},
-					fields: [
-						{ name: "UID", value: message.uid, inline: true },
-						{ name: "Username", value: message.username, inline: true },
-						{ name: "Region", value: message.region, inline: true },
-						{ name: "Rank", value: message.rank, inline: true },
-						{ name: "Today's Reward", value: `${message.award.name} x${message.award.count}`, inline: true },
-						{ name: "Total Sign-ins", value: message.total, inline: true },
-						{ name: "Result", value: message.result, inline: true }
-					],
+					fields,
 					timestamp: new Date(),
 					footer: {
 						text: `HoyoLab Auto Check-In (${i + 1}/${messages.length}) Executed`,
