@@ -49,12 +49,7 @@ module.exports = class DataCache {
 			if (cachedData) {
 				app.Logger.debug("Cache", `Cache hit for key: ${key} (memory)`);
 
-				const updatedData = await this.#updateCachedData(cachedData);
-
-				DataCache.data.set(key, updatedData);
-				await app.Cache.set({ key, value: updatedData, expiry: this.expiration });
-
-				return updatedData;
+				return await this.#updateCachedData(cachedData);
 			}
 
 			// 2. Attempt to get data from keyv cache
@@ -64,9 +59,7 @@ module.exports = class DataCache {
 					app.Logger.debug("Cache", `Cache hit for key: ${key} (keyv)`);
 
 					const updatedData = await this.#updateCachedData(cachedData);
-
 					DataCache.data.set(key, updatedData);
-					await app.Cache.set({ key, value: updatedData, expiry: this.expiration });
 
 					return updatedData;
 				}
