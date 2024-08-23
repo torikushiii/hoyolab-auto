@@ -120,6 +120,7 @@ module.exports = class ZenlessZoneZero extends require("../template.js") {
 					name: "Zenless Zone Zero",
 					short: "ZZZ"
 				},
+				discord: (account?.discord?.userId?.length === 0) ? null : account.discord,
 				assets: {
 					...this.config.assets,
 					...this.config.url,

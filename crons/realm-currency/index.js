@@ -66,6 +66,7 @@ module.exports = {
 					};
 
 					await webhook.send(embed, {
+						content: (account?.discord?.userId) ? `<@${account.discord.userId}>` : null,
 						author: data.assets.author,
 						icon: data.assets.logo
 					});

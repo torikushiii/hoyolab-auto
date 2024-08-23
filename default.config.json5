@@ -87,6 +87,12 @@
                         check: false, // Enable this if you want to get notified when your expedition is done
                         persistent: false, // Set to true if you want to get notified every time your expedition is done
                     },
+                    discord: {
+                        // Your Discord user ID to ping you when to do your dailies/weeklies
+                        // or when your stamina is above the threshold and your expedition is done
+                        // this is optional, you can leave it as null if you don't want to get pinged
+                        userId: null,
+                    }
                 },
             ],
         },
@@ -115,6 +121,12 @@
                         check: true,
                         persistent: false,
                     },
+                    discord: {
+                        // Your Discord user ID to ping you when to do your dailies/weeklies
+                        // or when your stamina is above the threshold and your expedition is done
+                        // this is optional, you can leave it as null if you don't want to get pinged
+                        userId: null,
+                    }
                 },
                 // Account #2
                 // Delete this if you only have one account
@@ -131,6 +143,12 @@
                         check: false,
                         persistent: false,
                     },
+                    discord: {
+                        // Your Discord user ID to ping you when to do your dailies/weeklies
+                        // or when your stamina is above the threshold and your expedition is done
+                        // this is optional, you can leave it as null if you don't want to get pinged
+                        userId: null,
+                    }
                 },
             ],
         },
@@ -149,6 +167,12 @@
                         threshold: 200,
                         persistent: false,
                     },
+                    discord: {
+                        // Your Discord user ID to ping you when to do your dailies/weeklies
+                        // or when your stamina is above the threshold and your expedition is done
+                        // this is optional, you can leave it as null if you don't want to get pinged
+                        userId: null,
+                    }
                 },
             ],
         },

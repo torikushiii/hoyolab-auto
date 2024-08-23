@@ -124,6 +124,7 @@ module.exports = class StarRail extends require("../template.js") {
 					name: "Honkai: Star Rail",
 					short: "HSR"
 				},
+				discord: (account?.discord?.userId?.length === 0) ? null : account.discord,
 				assets: {
 					...this.config.assets,
 					...this.config.url,

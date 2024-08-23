@@ -166,6 +166,7 @@ module.exports = class HoyoLab {
 
 			const parsedCookie = this.#parseCookie(account.cookie);
 			const ltuid = account.cookie.match(/ltuid_v2=([^;]+)/)[1];
+
 			this.#data.push({
 				cookie: parsedCookie.cookie,
 				ltuid,
@@ -175,7 +176,8 @@ module.exports = class HoyoLab {
 				dailiesCheck,
 				weekliesCheck,
 				stamina,
-				expedition
+				expedition,
+				discord: account.discord ?? null
 			});
 		}
 

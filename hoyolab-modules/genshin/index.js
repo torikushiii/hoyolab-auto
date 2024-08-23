@@ -124,6 +124,7 @@ module.exports = class Genshin extends require("../template.js") {
 					name: "Genshin Impact",
 					short: "GI"
 				},
+				discord: (account?.discord?.userId?.length === 0) ? null : account.discord,
 				assets: {
 					...this.config.assets,
 					...this.config.url,
