@@ -30,12 +30,16 @@ If you don't have a server to run this script and simply just want to use it for
 
 ## Supported Games
 - [x] Honkai Impact 3rd (Daily Check-In only)
+- [x] Tears of Themis (Daily Check-In only)
 - [x] Genshin Impact
 - [x] Honkai: Star Rail
 - [x] Zenless Zone Zero
 
 ## Features
 - **Honkai Impact 3rd**:
+  - **Daily check-in**: Runs every midnight local time.
+
+- **Tears of Themis**:
   - **Daily check-in**: Runs every midnight local time.
 
 - **Genshin Impact**:
