@@ -185,7 +185,7 @@ module.exports = class HoyoLab {
 		this.#config = defaults.config ?? {};
 
 		if (this.#config.regenRate) {
-			this.#dataCache = new DataCache(600_000, this.#config.regenRate);
+			this.#dataCache = new DataCache(300_000, this.#config.regenRate);
 		}
 
 		HoyoLab.list.push(this);

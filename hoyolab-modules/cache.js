@@ -1,8 +1,10 @@
 module.exports = class DataCache {
+	static keyvCacheExpiration = 3_600_000;
+
 	static data = new Map();
 	static expirationInterval;
 
-	constructor (expiration = 3_600_000, rate) {
+	constructor (expiration, rate) {
 		this.expiration = expiration;
 		this.rate = rate;
 
@@ -15,7 +17,7 @@ module.exports = class DataCache {
 		const now = Date.now();
 		let clearedCount = 0;
 		for (const [key, value] of DataCache.data.entries()) {
-			if (now - value.lastUpdate > this.expiration) {
+			if (now - value.lastUpdate > DataCache.keyvCacheExpiration) {
 				DataCache.data.delete(key);
 				clearedCount++;
 			}
@@ -27,18 +29,12 @@ module.exports = class DataCache {
 		const data = { ...value, lastUpdate };
 		DataCache.data.set(key, data);
 
-		try {
-			if (app.Cache) {
-				await app.Cache.set({
-					key,
-					value: data,
-					expiry: this.expiration
-				});
-			}
-			app.Logger.debug("Cache", `Set cache for key: ${key}`);
-		}
-		catch (e) {
-			app.Logger.error("Cache", `Error setting cache for key ${key}: ${e.message}`);
+		if (app.Cache) {
+			await app.Cache.set({
+				key,
+				value: data,
+				expiry: DataCache.keyvCacheExpiration
+			});
 		}
 	}
 
@@ -78,7 +74,7 @@ module.exports = class DataCache {
 		const now = Date.now();
 		const secondsSinceLastUpdate = (now - cachedData.lastUpdate) / 1000;
 
-		if (now - cachedData.lastUpdate > this.expiration) {
+		if (now - cachedData.lastUpdate > DataCache.keyvCacheExpiration) {
 			await DataCache.invalidateCache(cachedData.uid);
 			return null;
 		}
@@ -116,7 +112,8 @@ module.exports = class DataCache {
 			return null;
 		}
 
-		await app.Cache.set({ key: cachedData.uid, value: cachedData, expiry: this.expiration });
+		const expiration = Math.max(0, DataCache.keyvCacheExpiration - (now - cachedData.lastUpdate));
+		await app.Cache.set({ key: cachedData.uid, value: cachedData, expiry: expiration });
 
 		cachedData.lastUpdate = now;
 		return cachedData;
