@@ -10,85 +10,83 @@ module.exports = class CheckIn {
 		this.#color = options.color;
 	}
 
-	async checkAndExecute () {
-		const accounts = this.#instance.accounts;
-		if (accounts.length === 0) {
-			app.Logger.warn("No active accounts found for Tears of Themis");
-			return;
+	async checkAndExecute (accountData) {
+		if (!accountData) {
+			throw new app.Error({
+				message: "No account data provided",
+				args: {
+					platform: this.#instance.name
+				}
+			});
 		}
 
-		const success = [];
-		for (const account of accounts) {
-			const info = await this.#getSignInfo(account.cookie);
-			if (!info.success) {
-				continue;
-			}
+		const account = accountData;
+		const info = await this.#getSignInfo(account.cookie);
+		if (!info.success) {
+			return false;
+		}
 
-			const awardsData = await this.#getAwardsData(account.cookie);
-			if (!awardsData.success) {
-				continue;
-			}
+		const awardsData = await this.#getAwardsData(account.cookie);
+		if (!awardsData.success) {
+			return false;
+		}
 
-			const awards = awardsData.data;
-			const data = {
-				total: info.data.total,
-				today: info.data.today,
-				isSigned: info.data.issign
-			};
+		const awards = awardsData.data;
+		const data = {
+			total: info.data.total,
+			today: info.data.today,
+			isSigned: info.data.issign
+		};
 
-			const totalSigned = data.total;
-			const awardObject = {
-				name: awards[totalSigned].name,
-				count: awards[totalSigned].cnt,
-				icon: awards[totalSigned].icon
-			};
+		const totalSigned = data.total;
+		const awardObject = {
+			name: awards[totalSigned].name,
+			count: awards[totalSigned].cnt,
+			icon: awards[totalSigned].icon
+		};
 
-			if (data.isSigned) {
-				app.Logger.info(`${this.#instance.fullName}:CheckIn`, `Already signed in today`);
+		if (data.isSigned) {
+			app.Logger.info(`${this.#instance.fullName}:CheckIn`, `Already signed in today`);
 
-				success.push({
-					uid: account.uid,
-					platform: this.#instance.name,
-					rank: account.level,
-					username: account.nickname,
-					region: "Global",
-					total: data.total,
-					result: this.#instance.config.signedMessage,
-					assets: {
-						...this.#instance.config.assets,
-						logo: this.#logo,
-						color: this.#color
-					},
-					award: awardObject
-				});
-				continue;
-			}
-
-			const sign = await this.#sign(account.cookie);
-			if (!sign.success) {
-				continue;
-			}
-
-			app.Logger.info(`${this.#instance.fullName}:CheckIn`, `Today's Reward: ${awardObject.name} x${awardObject.count}`);
-
-			success.push({
+			return {
 				uid: account.uid,
 				platform: this.#instance.name,
 				rank: account.level,
 				username: account.nickname,
 				region: "Global",
-				total: data.total + 1,
-				result: this.#instance.config.successMessage,
+				total: data.total,
+				result: this.#instance.config.signedMessage,
 				assets: {
 					...this.#instance.config.assets,
 					logo: this.#logo,
 					color: this.#color
 				},
 				award: awardObject
-			});
+			};
 		}
 
-		return success;
+		const sign = await this.#sign(account.cookie);
+		if (!sign.success) {
+			return false;
+		}
+
+		app.Logger.info(`${this.#instance.fullName}:CheckIn`, `Today's Reward: ${awardObject.name} x${awardObject.count}`);
+
+		return {
+			uid: account.uid,
+			platform: this.#instance.name,
+			rank: account.level,
+			username: account.nickname,
+			region: "Global",
+			total: data.total + 1,
+			result: this.#instance.config.successMessage,
+			assets: {
+				...this.#instance.config.assets,
+				logo: this.#logo,
+				color: this.#color
+			},
+			award: awardObject
+		};
 	}
 
 	async #sign (cookieData) {

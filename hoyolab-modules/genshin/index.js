@@ -110,11 +110,13 @@ module.exports = class Genshin extends require("../template.js") {
 			this.#logo = data.logo;
 			this.#color = 0x0099FF;
 
+			const offset = app.HoyoLab.getRegion(data.region);
 			this.accounts.push({
 				platform: this.name,
 				uid: data.game_role_id,
 				nickname: data.nickname,
 				region: data.region,
+				timezone: (offset === "TW/HK/MO") ? "SEA" : offset,
 				level: data.level,
 				redeemCode: account.redeemCode,
 				dailiesCheck: account.dailiesCheck,
@@ -154,13 +156,13 @@ module.exports = class Genshin extends require("../template.js") {
 	get logo () { return this.#logo; }
 	get color () { return this.#color; }
 
-	async checkIn () {
+	async checkIn (accountData) {
 		const ci = new CheckIn(this, {
 			logo: this.#logo,
 			color: this.#color
 		});
 
-		return await ci.checkAndExecute();
+		return await ci.checkAndExecute(accountData);
 	}
 
 	async notes (accountData) {

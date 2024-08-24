@@ -108,11 +108,13 @@ module.exports = class ZenlessZoneZero extends require("../template.js") {
 			this.#logo = data.logo;
 			this.#color = 0xFF8300;
 
+			const offset = app.HoyoLab.getRegion(data.region);
 			this.accounts.push({
 				platform: this.name,
 				uid: data.game_role_id,
 				nickname: data.nickname,
 				region: data.region,
+				timezone: (offset === "TW/HK/MO") ? "SEA" : offset,
 				level: data.level,
 				redeemCode: account.redeemCode,
 				dailiesCheck: account.dailiesCheck,

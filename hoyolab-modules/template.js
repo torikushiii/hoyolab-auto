@@ -561,7 +561,7 @@ module.exports = class HoyoLab {
 					platform: this.name,
 					uid: accountData.uid,
 					region: accountData.region,
-					body: res.body
+					body: JSON.parse(res.body)
 				}
 			});
 

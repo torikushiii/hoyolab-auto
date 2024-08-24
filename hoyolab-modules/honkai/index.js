@@ -102,11 +102,13 @@ module.exports = class HonkaiImpact extends require("../template.js") {
 			this.#logo = data.logo;
 			this.#color = 0xF7E000;
 
+			const offset = app.HoyoLab.getRegion(data.region);
 			this.accounts.push({
 				platform: this.name,
 				uid: data.game_role_id,
 				nickname: data.nickname,
 				region: data.region,
+				timezone: offset,
 				level: data.level,
 				cookie: cookieData
 			});
@@ -119,12 +121,12 @@ module.exports = class HonkaiImpact extends require("../template.js") {
 	get logo () { return this.#logo; }
 	get color () { return this.#color; }
 
-	async checkIn () {
+	async checkIn (accountData) {
 		const ci = new CheckIn(this, {
-			logo: this.logo,
-			color: this.color
+			logo: this.#logo,
+			color: this.#color
 		});
 
-		return await ci.checkAndExecute();
+		return await ci.checkAndExecute(accountData);
 	}
 };

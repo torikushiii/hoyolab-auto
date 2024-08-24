@@ -116,6 +116,8 @@ module.exports = class DataCache {
 			return null;
 		}
 
+		await app.Cache.set({ key: cachedData.uid, value: cachedData, expiry: this.expiration });
+
 		cachedData.lastUpdate = now;
 		return cachedData;
 	}

@@ -12,7 +12,9 @@ const Utils = require("./singleton/utils.js");
 const HoyoLab = require("./hoyolab-modules/template.js");
 const Platform = require("./platforms/template.js");
 
+const Date = require("./object/date.js");
 const Error = require("./object/error.js");
+const RegionalTaskManager = require("./object/regional-task-manager.js");
 
 let config;
 try {
@@ -37,7 +39,9 @@ catch {
 	}
 
 	globalThis.app = {
+		Date,
 		Error,
+		RegionalTaskManager,
 
 		Config,
 		Command,
