@@ -2,15 +2,9 @@ module.exports = class DataCache {
 	static keyvCacheExpiration = 3_600_000;
 
 	static data = new Map();
-	static expirationInterval;
 
-	constructor (expiration, rate) {
-		this.expiration = expiration;
+	constructor (rate) {
 		this.rate = rate;
-
-		if (!DataCache.expirationInterval) {
-			DataCache.expirationInterval = setInterval(() => this.clearExpiredData(), this.expiration);
-		}
 	}
 
 	clearExpiredData () {
@@ -22,7 +16,7 @@ module.exports = class DataCache {
 				clearedCount++;
 			}
 		}
-		app.Logger.debug("Cache", `Cleared ${clearedCount} expired items from cache`);
+		app.Logger.log("Cache", `Cleared ${clearedCount} expired items from cache`);
 	}
 
 	async set (key, value, lastUpdate = Date.now()) {
@@ -40,23 +34,12 @@ module.exports = class DataCache {
 
 	async get (key) {
 		try {
-			// 1. Attempt to get data from memory cache
-			let cachedData = DataCache.data.get(key);
-			if (cachedData) {
-				app.Logger.debug("Cache", `Cache hit for key: ${key} (memory)`);
-
-				return await this.#updateCachedData(cachedData);
-			}
-
-			// 2. Attempt to get data from keyv cache
 			if (app.Cache) {
-				cachedData = await app.Cache.get(key);
+				const cachedData = await app.Cache.get(key);
 				if (cachedData) {
 					app.Logger.debug("Cache", `Cache hit for key: ${key} (keyv)`);
 
 					const updatedData = await this.#updateCachedData(cachedData);
-					DataCache.data.set(key, updatedData);
-
 					return updatedData;
 				}
 			}
