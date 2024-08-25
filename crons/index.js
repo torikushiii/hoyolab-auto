@@ -38,7 +38,6 @@ const definitions = [
 ];
 
 const BlacklistedCrons = [
-	"checkIn",
 	"dailiesReminder",
 	"howlScratchCard",
 	"weekliesReminder"
