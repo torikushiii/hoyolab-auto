@@ -28,6 +28,7 @@
         whitelist: [], // You can whitelist some crons if you only want to run specific crons
         blacklist: [], // You can blacklist some crons if you don't want to run them
         // You can use this site to generate cron expression: https://crontab.guru/
+        checkIn: '0 0 0 * * *',
         codeRedeem: '*/15 * * * *',
         expedition: '0 */30 * * * *',
         missedCheckIn: '0 0 23 * * *',
