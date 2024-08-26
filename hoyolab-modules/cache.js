@@ -1,32 +1,15 @@
 module.exports = class DataCache {
 	static keyvCacheExpiration = 3_600_000;
 
-	static data = new Map();
-
 	constructor (rate) {
 		this.rate = rate;
 	}
 
-	clearExpiredData () {
-		const now = Date.now();
-		let clearedCount = 0;
-		for (const [key, value] of DataCache.data.entries()) {
-			if (now - value.lastUpdate > DataCache.keyvCacheExpiration) {
-				DataCache.data.delete(key);
-				clearedCount++;
-			}
-		}
-		app.Logger.log("Cache", `Cleared ${clearedCount} expired items from cache`);
-	}
-
-	async set (key, value, lastUpdate = Date.now()) {
-		const data = { ...value, lastUpdate };
-		DataCache.data.set(key, data);
-
+	async set (key, value) {
 		if (app.Cache) {
 			await app.Cache.set({
 				key,
-				value: data,
+				value,
 				expiry: DataCache.keyvCacheExpiration
 			});
 		}
@@ -48,14 +31,17 @@ module.exports = class DataCache {
 			return null;
 		}
 		catch (e) {
-			app.Logger.error("Cache", `Error getting cache for key ${key}: ${e.message}`);
+			console.error({
+				message: "An error while getting the key",
+				e
+			});
 			return null;
 		}
 	}
 
 	async #updateCachedData (cachedData) {
 		const now = Date.now();
-		const secondsSinceLastUpdate = (now - cachedData.lastUpdate) / 1000;
+		const secondsSinceLastUpdate = Math.floor((now - cachedData.lastUpdate) / 1000);
 
 		if (now - cachedData.lastUpdate > DataCache.keyvCacheExpiration) {
 			await DataCache.invalidateCache(cachedData.uid);
@@ -65,18 +51,13 @@ module.exports = class DataCache {
 		if (cachedData.stamina) {
 			const account = app.HoyoLab.getAccountById(cachedData.uid);
 
-			const staminaGained = (secondsSinceLastUpdate / this.rate);
-
-			cachedData.stamina.fractionalStamina = (cachedData.stamina.fractionalStamina || 0) + staminaGained;
-
-			const staminaToAdd = Math.floor(cachedData.stamina.fractionalStamina);
+			const staminaToAdd = Math.floor(secondsSinceLastUpdate / this.rate);
 			cachedData.stamina.currentStamina = Math.min(
 				cachedData.stamina.maxStamina,
 				cachedData.stamina.currentStamina + staminaToAdd
 			);
 
-			cachedData.stamina.fractionalStamina -= staminaToAdd;
-			cachedData.stamina.recoveryTime = Math.max(0, cachedData.stamina.recoveryTime - Math.round(secondsSinceLastUpdate));
+			cachedData.stamina.recoveryTime = Math.max(0, cachedData.stamina.recoveryTime - secondsSinceLastUpdate);
 
 			const isMaxStamina = (cachedData.stamina.currentStamina === cachedData.stamina.maxStamina);
 			const isAboveThreshold = (cachedData.stamina.currentStamina > account.stamina.threshold);
@@ -136,8 +117,6 @@ module.exports = class DataCache {
 	}
 
 	static async invalidateCache (key) {
-		DataCache.data.delete(key);
-
 		try {
 			if (app.Cache) {
 				await app.Cache.delete(key);
