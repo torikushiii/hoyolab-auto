@@ -34,8 +34,9 @@ RegionalTaskManager.registerTask("HowlScratchCard", 21, 0, async (account) => {
 			}
 		};
 
+		const userId = webhook.createUserMention(account.discord);
 		await webhook.send(embed, {
-			content: (account?.discord?.userId) ? `<@${account.discord.userId}>` : null,
+			content: userId,
 			author: data.assets.author,
 			icon: data.assets.logo
 		});

@@ -63,4 +63,17 @@ module.exports = class Webhook extends require("./template.js") {
 			return messages;
 		}
 	}
+
+	createUserMention (userData) {
+		if (!userData || typeof userData !== "object") {
+			return null;
+		}
+
+		const userId = userData?.userId;
+		if (!userId || userId === null) {
+			return null;
+		}
+
+		return `<@${String(userId)}>`;
+	}
 };

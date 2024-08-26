@@ -65,8 +65,9 @@ module.exports = {
 						}
 					};
 
+					const userId = webhook.createUserMention(account.discord);
 					await webhook.send(embed, {
-						content: (account?.discord?.userId) ? `<@${account.discord.userId}>` : null,
+						content: userId,
 						author: data.assets.author,
 						icon: data.assets.logo
 					});

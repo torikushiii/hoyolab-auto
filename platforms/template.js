@@ -116,6 +116,13 @@ module.exports = class Platform {
 		return messageData;
 	}
 
+	// eslint-disable-next-line no-unused-vars
+	createUserMention (userData) {
+		throw new app.Error({
+			message: "This method must be implemented at the derived platofrm"
+		});
+	}
+
 	restart () {}
 
 	destroy () {}

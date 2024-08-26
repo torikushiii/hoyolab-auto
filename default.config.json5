@@ -88,6 +88,7 @@
                         // Your Discord user ID to ping you when to do your dailies/weeklies
                         // or when your stamina is above the threshold and your expedition is done
                         // this is optional, you can leave it as null if you don't want to get pinged
+                        // e.g userId: '123456789'
                         userId: null,
                     }
                 },
@@ -122,6 +123,7 @@
                         // Your Discord user ID to ping you when to do your dailies/weeklies
                         // or when your stamina is above the threshold and your expedition is done
                         // this is optional, you can leave it as null if you don't want to get pinged
+                        // e.g userId: '123456789'
                         userId: null,
                     }
                 },
@@ -144,6 +146,7 @@
                         // Your Discord user ID to ping you when to do your dailies/weeklies
                         // or when your stamina is above the threshold and your expedition is done
                         // this is optional, you can leave it as null if you don't want to get pinged
+                        // e.g userId: '123456789'
                         userId: null,
                     }
                 },
@@ -168,6 +171,7 @@
                         // Your Discord user ID to ping you when to do your dailies/weeklies
                         // or when your stamina is above the threshold and your expedition is done
                         // this is optional, you can leave it as null if you don't want to get pinged
+                        // e.g userId: '123456789'
                         userId: null,
                     }
                 },
