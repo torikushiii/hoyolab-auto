@@ -17,6 +17,7 @@ const getNotesEmbedData = async (accounts, game, platformId) => {
 			const { data } = notes;
 			const { stamina, dailies, weeklies, expedition, realm } = data;
 
+			const currentStamina = Math.round(stamina.currentStamina);
 			const embed = {
 				color: data.assets.color,
 				author: {
@@ -26,7 +27,7 @@ const getNotesEmbedData = async (accounts, game, platformId) => {
 				fields: [
 					{
 						name: `Current Stamina:`,
-						value: `${stamina.currentStamina}/${stamina.maxStamina}`
+						value: `${currentStamina}/${stamina.maxStamina}`
 						+ `\nFull in:\n${app.Utils.formatTime(stamina.recoveryTime)}`,
 						inline: true
 					}
@@ -134,9 +135,10 @@ const getNotesEmbedData = async (accounts, game, platformId) => {
 			if (platform.gameId === 2) {
 				const { task, maxTask, storedAttendance, storedAttendanceRefresh } = dailies;
 
+				const currentStamina = Math.floor(stamina.currentStamina);
 				message = [
 					`${account.nickname} - ${account.uid}`,
-					`Current Stamina: ${stamina.currentStamina}/${stamina.maxStamina}`
+					`Current Stamina: ${currentStamina}/${stamina.maxStamina}`
 					+ `\nFull in: ${app.Utils.formatTime(stamina.recoveryTime)}`,
 					"Expedition Status",
 					expedition.list.map((i, idx) => `Account ${idx + 1} - ${app.Utils.formatTime(i.remaining_time)}`).join("\n"),

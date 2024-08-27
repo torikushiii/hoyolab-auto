@@ -29,7 +29,7 @@ const formatStaminaMessage = (data, discord = false) => {
 
 		const description = [
 			discord ? `\n\`\`\`yaml\n${username} (${uid}) - ${fixedRegion}\`\`\`` : `\n${username} (${uid}) - ${fixedRegion}`,
-			`Current: ${currentStamina}/${maxStamina}`,
+			`Current: ${Math.floor(currentStamina)}/${maxStamina}`,
 			`Recovery Time: ${delta}`
 		];
 
