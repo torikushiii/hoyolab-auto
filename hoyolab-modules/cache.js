@@ -41,23 +41,35 @@ module.exports = class DataCache {
 
 	async #updateCachedData (cachedData) {
 		const now = Date.now();
-		const secondsSinceLastUpdate = Math.floor((now - cachedData.lastUpdate) / 1000);
 
-		if (now - cachedData.lastUpdate > DataCache.keyvCacheExpiration) {
-			await DataCache.invalidateCache(cachedData.uid);
-			return null;
+		let secondsSinceLastUpdate;
+		if (cachedData.lastUpdate === undefined) {
+			secondsSinceLastUpdate = 0;
+			cachedData.lastUpdate = now;
+		}
+		else {
+			secondsSinceLastUpdate = Math.floor((now - cachedData.lastUpdate) / 1000) + 1;
 		}
 
 		if (cachedData.stamina) {
 			const account = app.HoyoLab.getAccountById(cachedData.uid);
 
-			const staminaToAdd = Math.floor(secondsSinceLastUpdate / this.rate);
+			cachedData.stamina.currentStamina = Number(cachedData.stamina.currentStamina) || 0;
+			cachedData.stamina.recoveryTime = Number(cachedData.stamina.recoveryTime) || 0;
+
+			const staminaToAdd = (secondsSinceLastUpdate / this.rate);
 			cachedData.stamina.currentStamina = Math.min(
 				cachedData.stamina.maxStamina,
 				cachedData.stamina.currentStamina + staminaToAdd
 			);
 
 			cachedData.stamina.recoveryTime = Math.max(0, cachedData.stamina.recoveryTime - secondsSinceLastUpdate);
+			cachedData.stamina.currentStamina = Math.round(cachedData.stamina.currentStamina * 100) / 100;
+
+			if (cachedData.stamina.currentStamina >= cachedData.stamina.maxStamina) {
+				cachedData.stamina.currentStamina = cachedData.stamina.maxStamina;
+				cachedData.stamina.recoveryTime = 0;
+			}
 
 			const isMaxStamina = (cachedData.stamina.currentStamina === cachedData.stamina.maxStamina);
 			const isAboveThreshold = (cachedData.stamina.currentStamina > account.stamina.threshold);
@@ -70,16 +82,16 @@ module.exports = class DataCache {
 		}
 
 		if (this.#shouldInvalidateExpedition(cachedData, secondsSinceLastUpdate)
-            || this.#shouldInvalidateShop(cachedData)
-            || this.#shouldInvalidateRealm(cachedData, secondsSinceLastUpdate)) {
+			|| this.#shouldInvalidateShop(cachedData)
+			|| this.#shouldInvalidateRealm(cachedData, secondsSinceLastUpdate)) {
 			await DataCache.invalidateCache(cachedData.uid);
 			return null;
 		}
 
-		const expiration = Math.max(0, DataCache.keyvCacheExpiration - (now - cachedData.lastUpdate));
+		cachedData.lastUpdate = now;
+		const expiration = Math.max(0, DataCache.keyvCacheExpiration - (now - cachedData.expires));
 		await app.Cache.set({ key: cachedData.uid, value: cachedData, expiry: expiration });
 
-		cachedData.lastUpdate = now;
 		return cachedData;
 	}
 

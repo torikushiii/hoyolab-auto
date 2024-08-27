@@ -108,7 +108,8 @@ module.exports = class RealtimeNotes {
 		this.#instance.dataCache.set(accountData.uid, {
 			uid: accountData.uid,
 			nickname: accountData.nickname,
-			lastUpdated: Date.now(),
+			lastUpdated: app.Date.now(),
+			expires: app.Date.now(),
 			stamina,
 			dailies,
 			weeklies,
