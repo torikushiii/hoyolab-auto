@@ -7,7 +7,9 @@
     "watch": "nodemon index.js",
     "migrate": "node convert.js",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "setup:windows": "start setup/config/index.html",
+    "setup:linux": "xdg-open setup/config/index.html"
   },
   "engines": {
     "node": ">=20.0"

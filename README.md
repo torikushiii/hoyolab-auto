@@ -109,11 +109,25 @@ for convenience, but you can also use Docker commands directly.
 
 **2. Configuration**
 
-- **Rename `default.config.json5`:** Create a copy of `default.config.json5` named `config.json5` and fill in your application's configuration:
-  ```bash
-  cp default.config.json5 config.json5
-  # Edit config.json5 with your settings 
-  ```
+You can configure your application using one of the following methods:
+
+1. **Using the Setup Script:**
+   - For Windows, run the following npm script from the project root:
+     ```bash
+     npm run setup:windows
+     ```
+   - For Linux, use this command:
+     ```bash
+     npm run setup:linux
+     ```
+   - These commands will automatically open your default web browser to help you configure your settings through a web-based interface.
+
+2. **Manual Configuration:**
+   - Copy the `default.config.json5` file to create a `config.json5` file:
+     ```bash
+     cp default.config.json5 config.json5
+     ```
+   - Open `config.json5` and update it with your application's configuration settings.
 
 **3. Building and Running with Docker Compose**
 

@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<HTML lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <h1>Config.json5 Generator</h1>
+    <p class="small-text">
+        created by <a href="https://github.com/Capoouo">Capoouo</a> |
+        source code: <a href="https://github.com/torikushiii/hoyolab-auto/tree/main/setup/config">GitHub</a>
+    </p>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .dark-mode {
+            background-color: #2c2c2c;
+            color: #f5f5f5;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            background-color: inherit;
+            color: inherit;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .platform-section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        .platform-section:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .platform-section h3 {
+            margin-top: 0;
+            font-size: 1.25em;
+            color: #007bff;
+            border-left: 5px solid #007bff;
+            padding-left: 10px;
+        }
+
+        .description {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .small-text {
+            font-size: 0.8em;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .dark-mode .description,
+        .dark-mode .small-text {
+            color: #aaa;
+        }
+
+        .dark-mode .platform-section {
+            border-color: #555;
+            background-color: #3b3b3b;
+        }
+
+        .dark-mode input,
+        .dark-mode select,
+        .dark-mode textarea {
+            border-color: #666;
+            background-color: #444;
+            color: #f5f5f5;
+        }
+
+        .dark-mode select option {
+            background-color: #444;
+            color: #f5f5f5;
+        }
+
+        .dark-mode button {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .dark-mode button:hover {
+            background-color: #0056b3;
+        }
+
+        .dark-mode-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #444;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1000;
+            transition: background-color 0.3s ease;
+        }
+
+        .dark-mode-toggle:hover {
+            background-color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+
+    <h1>Config.json5 Generator</h1>
+
+    <!-- Form Fields 
+    <label for="loglevel">Log Level:</label>
+    <select id="loglevel">
+        <option value="select">Select log level</option>
+        <option value="info">info</option>
+        <option value="warn">warn</option>
+        <option value="error">error</option>
+    </select>
+
+    <label for="userAgent">User Agent:</label>
+    <input type="text" id="userAgent" placeholder="Custom fork of HoyoLabAuto: github.com/torikushiii/hoyolab-auto">
+
+    <h2>Platforms</h2>
+-->
+    <!-- Platform 1: Discord Bot -->
+    <div class="platform-section">
+        <h3>Discord Bot</h3>
+        <div class="small-text">This platform is optional, only use this if you have want to access commands via Discord
+            bot</div>
+        <label for="discordActive">Discord Bot:</label>
+        <select id="discordActive">
+            <option value="select">Select option </option>
+            <option value="true">true</option>
+            <option value="false">false</option>
+        </select>
+        <div class="small-text">false by default</div>
+
+        <label for="discordBotId">Discord Bot ID:</label>
+        <input type="text" id="discordBotId" placeholder="123">
+        <div class="small-text">Your Discord bot ID</div>
+
+        <label for="discordToken">Discord Bot Token:</label>
+        <input type="text" id="discordToken" placeholder="YOUR_DISCORD_BOT_TOKEN">
+    </div>
+
+    <!-- Platform 2: Telegram Bot -->
+    <div class="platform-section">
+        <h3>Telegram Bot</h3>
+        <label for="telegramActive">Telegram Bot:</label>
+        <select id="telegramActive">
+            <option value="select">Select option </option>
+            <option value="true">true</option>
+            <option value="false">false</option>
+        </select>
+        <div class="small-text">Set to true if you want to enable Telegram bot (false by default)</div>
+
+        <label for="telegramChatId">Telegram Chat ID:</label>
+        <input type="text" id="telegramChatId" placeholder="123">
+        <div class="small-text">You can follow this guide to create a bot:
+            https://github.com/torikushiii/hoyolab-auto/blob/main/setup/TELEGRAM.md</div>
+
+        <label for="telegramToken">Telegram Bot Token:</label>
+        <input type="text" id="telegramToken" placeholder="123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11">
+
+        <label for="disableNotification">Disable Telegram Notification:</label>
+        <select id="disableNotification">
+            <option value="select">Select option</option>
+            <option value="true">true</option>
+            <option value="false">false</option>
+        </select>
+        <div class="small-text">Set to true if you want to disable notification for Telegram bot (sounds, vibration,
+            etc.)(false by default)</div>
+
+    </div>
+
+    <!-- Platform 3: Discord Webhook -->
+    <div class="platform-section">
+        <h3>Discord Webhook</h3>
+        <label for="webhookActive">Discord Webhook:</label>
+        <select id="webhookActive">
+            <option value="select">Select option</option>
+            <option value="true">true</option>
+            <option value="false">false</option>
+        </select>
+        <div class="small-text">Set to true if you want to send notification to Discord webhook(false by default)</div>
+
+        <label for="webhookUrl">Webhook URL:</label>
+        <input type="text" id="webhookUrl" placeholder="YOUR_WEBHOOK_URL">
+        <div class="small-text">You can follow this guide to create a webhook:
+            https://github.com/torikushiii/hoyolab-auto/blob/main/setup/DISCORD_WEBHOOK.md</div>
+    </div>
+
+    <!-- Cron Settings -->
+    <h2>Crons</h2>
+    <div class="platform-section">
+        <label for="whitelist">whitelist:</label>
+        <input type="text" id="whitelist" placeholder="ex:checkIn,codeRedeem">
+        <div class="small-text">You can whitelist some crons if you only want to run specific crons(empty by default)
+        </div>
+
+        <label for="blacklist">blacklist:</label>
+        <input type="text" id="blacklist" placeholder="ex:checkIn,codeRedeem">
+        <div class="small-text">You can blacklist some crons if you don't want to run them (empty by default)</div>
+
+    </div>
+
+    <div class="platform-section">
+        <div class="small-text">You can use this site to generate cron expression: https://crontab.guru/</div>
+        <label for="checkIn">checkIn:</label>
+        <input type="text" id="checkInCron" placeholder="0 0 0 * * *">
+
+        <label for="codeRedeem">codeRedeem:</label>
+        <input type="text" id="codeRedeemCron" placeholder="*/15 * * * *">
+
+        <label for="expedition">expedition:</label>
+        <input type="text" id="expeditionCron" placeholder="0 */30 * * * *">
+
+        <label for="missedCheckIn">missedCheckIn:</label>
+        <input type="text" id="missedCheckInCron" placeholder="0 0 23 * * *">
+
+        <label for="realmCurrency">realmCurrency:</label>
+        <input type="text" id="realmCurrencyCron" placeholder="0 */1 * * *">
+
+        <label for="shopStatus">shopStatus:</label>
+        <input type="text" id="shopStatusCron" placeholder="0 */1 * * *">
+
+        <label for="stamina">stamina:</label>
+        <input type="text" id="staminaCron" placeholder="0 */30 * * * *">
+    </div>
+
+    <!-- Account Settings -->
+    <h2>Accounts</h2>
+    <!-- Honkai Impact 3rd -->
+    <button id="copy-settings-honkai">Add Honkai Impact 3rd accounts</button>
+    <div id="honkaiaccounts">
+        <div class="platform-section">
+            <div class="account">
+                <h3>Honkai Impact 3rd accounts 1</h3>
+                <label for="honkaiActive">Honkai Impact 3rd Active:</label>
+                <select id="honkaiActive">
+                    <option value="select">Select option</option>
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+                <div class="small-text">Set to true if you want to enable Honkai Impact 3rd (false by default)</div>
+
+                <label for="honkaiCookie">Cookie:</label>
+                <input type="text" id="honkaiCookie" placeholder="">
+            </div>
+        </div>
+    </div>
+
+    <!-- Tears of Themis -->
+    <button id="copy-settings-tears">Add Tears of Themis accounts</button>
+    <div id="tearsaccounts">
+        <div class="platform-section">
+            <div class="account">
+                <h3>Tears of Themis accounts 1</h3>
+                <label for="tearsActive">Tears of Themis Active:</label>
+                <select id="tearsActive">
+                    <option value="select">Select option</option>
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+                <div class="small-text">Set to true if you want to enable Tears of Themis (false by default)</div>
+
+                <label for="tearsCookie">Cookie:</label>
+                <input type="text" id="tearsCookie" placeholder="">
+            </div>
+        </div>
+    </div>
+    <!-- Genshin Impact -->
+    <button id="copy-settings">Add Genshin Impact accounts</button>
+    <div class="platform-section">
+        <div id="genshinaccounts">
+            <div class='account'>
+                <h3>Genshin Impact accounts 1</h3>
+                <label for="genshinActive">Genshin Impact Active:</label>
+                <select id="genshinActive">
+                    <option value="select">Select option</option>
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+                <div class="small-text">Set to true if you want to enable Genshin Impact (false by default)</div>
+
+                <label for="genshinCookie">Genshin Impact Cookie:</label>
+                <input type="text" id="genshinCookie" placeholder="">
+
+                <label for="genshinredeemCode">redeemCode:</label>
+                <div class="small-text">false by default</div>
+                <select id="genshinredeemCode">
+                    <option value="select">Select option</option>
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+                <div class="small-text">Enable this if you want to automatically redeem codes</div>
+                <div class="small-text">Please note that if you have one account with characters in multiple servers
+                </div>
+                <div class="small-text">the code will be redeemed but you won't get the reward</div>
+                <div class="small-text">so please be careful when enabling this, and only enable it on the account that
+                    you want to redeem the code</div>
+
+                <label for="genshindailiesCheck">DailiesCheck:</label>
+                <select id="genshindailiesCheck">
+                    <option value="select">Select option</option>
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+                <div class="small-text">Enable this if you want to get reminded to do your daily commissions (false by
+                    default)</div>
+
+                <label for="genshinweekliesCheck">weekliesCheck:</label>
+                <select id="genshinweekliesCheck">
+                    <option value="select">Select option</option>
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+                <div class="small-text">Enable this if you want to get reminded to do your weeklies (false by default)
+                </div>
+
+                <div class="platform-section">
+                    <h3><label for="genshinrealm">Realm:</label></h3>
+
+                    <label for="genshinrealmCheck">Check:</label>
+                    <select id="genshinrealmCheck">
+                        <option value="select">Select option</option>
+                        <option value="true">true</option>
+                        <option value="false">false</option>
+                    </select>
+                    <div class="small-text">(false by default)</div>
+
+                    <label for="genshinrealmpersistent">persistent:</label>
+                    <select id="genshinrealmpersistent">
+                        <option value="select">Select option</option>
+                        <option value="true">true</option>
+                        <option value="false">false</option>
+                    </select>
+                    <div class="small-text">(false by default)</div>
+                </div>
+
+                <div class="platform-section">
+                    <h3><label for="genshinstamina">Stamina:</label></h3>
+
+                    <label for="genshinstaminaCheck">Check:</label>
+                    <select id="genshinstaminaCheck">
+                        <option value="select">Select option</option>
+                        <option value="true">true</option>
+                        <option value="false">false</option>
+                    </select>
+                    <div class="small-text">Enable this if you want to get notified when your stamina is above the
+                        threshold (false by default)</div>
+
+                    <label for="genshinthreshold">threshold:</label>
+                    <input type="text" id="genshinthreshold" placeholder="150">
+                    <div class="small-text">Your stamina threshold, only fires notification when your stamina is above
+                        this value (150 by default)</div>
+
+                    <label for="genshinstaminapersistent">persistent:</label>
+                    <select id="genshinstaminapersistent">
+                        <option value="select">Select option</option>
+                        <option value="true">true</option>
+                        <option value="false">false</option>
+                    </select>
+                    <div class="small-text">Set to true if you want to get notified every time your stamina is above the
+                        threshold (false by default)</div>
+                </div>
+
+                <div class="platform-section">
+                    <h3><label for="genshinexpedition">Expedition:</label></h3>
+
+                    <label for="genshinexpeditionCheck">Check:</label>
+                    <select id="genshinexpeditionCheck">
+                        <option value="select">Select option</option>
+                        <option value="true">true</option>
+                        <option value="false">false</option>
+                    </select>
+                    <div class="small-text">Enable this if you want to get notified when your expedition is done (false
+                        by default)</div>
+
+                    <label for="genshinexpeditionpersistent">persistent:</label>
+                    <select id="genshinexpeditionpersistent">
+                        <option value="select">Select option</option>
+                        <option value="true">true</option>
+                        <option value="false">false</option>
+                    </select>
+                    <div class="small-text">Set to true if you want to get notified every time your expedition is done
+                        (false by default)</div>
+                </div>
+                <div class="platform-section">
+                    <h3><label for="genshindiscord">Discord:</label></h3>
+                    <label for="genshinuserId">userId:</label>
+                    <input type="text" id="genshinuserId" placeholder="null">
+                    <div class="small-text">Your Discord user ID to ping you when to do your dailies/weeklies</div>
+                    <div class="small-text">or when your stamina is above the threshold and your expedition is done
+                    </div>
+                    <div class="small-text">this is optional, you can leave it as null if you don't want to get pinged
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Honkai: Star Rail -->
+    <button id="copy-settings-starrail">Add Honkai: Star Rail accounts</button>
+
+    <div id="starrailaccounts">
+        <div class="platform-section">
+            <div class="account">
+                <h3>Honkai: Star Rail accounts 1</h3>
+                <label for="starrailActive">Honkai: Star Rail Active:</label>
+                <select id="starrailActive">
+                    <option value="select">Select option</option>
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+                <div class="small-text">Set to true if you want to enable Honkai: Star Rail (false by default)</div>
+
+                <label for="starrailCookie">Honkai: Star Rail Cookie:</label>
+                <input type="text" id="starrailCookie" placeholder="">
+                <div class="small-text">If you have same account for both genshin and starrail</div>
+                <div class="small-text">You can copy the cookie values from the genshin account</div>
+                <div class="small-text">Same goes for any other game that will be supported in the future</div>
+                <div class="small-text">Support multi-account for every type of game</div>
+                <div class="small-text">Just add another object inside the data array</div>
+                <label for="starrailredeemCode">redeemCode:</label>
+                <select id="starrailredeemCode">
+                    <option value="select">Select option</option>
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+
+                <label for="starraildailiesCheck">DailiesCheck:</label>
+                <select id="starraildailiesCheck">
+                    <option value="select">Select option</option>
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+                <div class="small-text">Enable this if you want to get reminded to do your daily tasks (false by
+                    default)</div>
+
+                <label for="starrailweekliesCheck">weekliesCheck:</label>
+                <select id="starrailweekliesCheck">
+                    <option value="select">Select option</option>
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+                <div class="small-text">Enable this if you want to get reminded to do your weekly tasks (false by
+                    default)</div>
+
+                <div class="platform-section">
+                    <h3><label for="starrailstamina">Stamina:</label></h3>
+
+                    <label for="starrailstaminaCheck">Check:</label>
+                    <select id="starrailstaminaCheck">
+                        <option value="select">Select option</option>
+                        <option value="true">true</option>
+                        <option value="false">false</option>
+                    </select>
+                    <div class="small-text">Enable this if you want to get notified when your stamina is above the
+                        threshold (false by default)</div>
+
+                    <label for="starrailthreshold">Threshold:</label>
+                    <input type="text" id="starrailthreshold" placeholder="150">
+                    <div class="small-text">Your stamina threshold, only fires notification when your stamina is above
+                        this value (150 by default)</div>
+
+                    <label for="starrailstaminapersistent">Persistent:</label>
+                    <select id="starrailstaminapersistent">
+                        <option value="select">Select option</option>
+                        <option value="true">true</option>
+                        <option value="false">false</option>
+                    </select>
+                    <div class="small-text">Set to true if you want to get notified every time your stamina is above the
+                        threshold (false by default)</div>
+                </div>
+
+                <div class="platform-section">
+                    <h3><label for="starrailexpedition">Expedition:</label></h3>
+
+                    <label for="starrailexpeditionCheck">Check:</label>
+                    <select id="starrailexpeditionCheck">
+                        <option value="select">Select option</option>
+                        <option value="true">true</option>
+                        <option value="false">false</option>
+                    </select>
+                    <div class="small-text">Enable this if you want to get notified when your expedition is done (false
+                        by default)</div>
+
+                    <label for="starrailexpeditionpersistent">Persistent:</label>
+                    <select id="starrailexpeditionpersistent">
+                        <option value="select">Select option</option>
+                        <option value="true">true</option>
+                        <option value="false">false</option>
+                    </select>
+                    <div class="small-text">Set to true if you want to get notified every time your expedition is done
+                        (false by default)</div>
+                </div>
+
+                <div class="platform-section">
+                    <h3><label for="starraildiscord">Discord:</label></h3>
+
+                    <label for="starrailuserId">User ID:</label>
+                    <input type="text" id="starrailuserId" placeholder="null">
+                    <div class="small-text">Your Discord user ID to ping you when to do your dailies/weeklies or when
+                        your stamina is above the threshold and your expedition is done. This is optional, you can leave
+                        it as null if you don't want to get pinged.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Zenless Zone Zero -->
+    <button id="copy-settings-zenless">Add Zenless Zone Zero accounts</button>
+    <div id="zenlessaccounts">
+        <div class="platform-section">
+            <div class="account">
+                <h3>Zenless Zone Zero accounts 1</h3>
+                <label for="zenlessActive">Zenless Zone Zero Active:</label>
+                <select id="zenlessActive">
+                    <option value="select">Select option</option>
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+                <div class="small-text">Set to true if you want to enable Zenless Zone Zero (false by default)</div>
+
+                <label for="zenlessCookie">Zenless Zone Zero Cookie:</label>
+                <input type="text" id="zenlessCookie" placeholder="">
+
+                <label for="zenlessredeemCode">redeemCode:</label>
+                <select id="zenlessredeemCode">
+                    <option value="select">Select option</option>
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+                <div class="small-text">(false by default)</div>
+
+                <label for="zenlessshopStatus">shopStatus:</label>
+                <select id="zenlessshopStatus">
+                    <option value="select">Select option</option>
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+                <div class="small-text">This will check if your shop has finished selling videos (false by default)
+                </div>
+                <label for="zenlessdailiesCheck">DailiesCheck:</label>
+                <select id="zenlessdailiesCheck">
+                    <option value="select">Select option</option>
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+                <div class="small-text">(false by default)</div>
+
+                <label for="zenlessstaminaCheck">Stamina Check:</label>
+                <select id="zenlessstaminaCheck">
+                    <option value="select">Select option</option>
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+                <div class="small-text">(false by default)</div>
+
+                <label for="zenlessthreshold">Stamina Threshold:</label>
+                <input type="text" id="zenlessthreshold" placeholder="200">
+
+                <label for="zenlessstaminapersistent">Stamina Persistent:</label>
+                <select id="zenlessstaminapersistent">
+                    <option value="select">Select option</option>
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+                <div class="small-text">(false by default)</div>
+
+                <label for="zenlessuserId">Discord User ID:</label>
+                <input type="text" id="zenlessuserId" placeholder="null">
+            </div>
+        </div>
+    </div>
+
+    <!-- Generate and Download Config Button -->
+    <button onclick="generateConfig()">Generate and Download config.json5</button>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/json5@2.2.1/dist/index.min.js"></script>
+    <script>
+        let genshinAccountCount = 1;
+        let starrailAccountCount = 1;
+        let honkaiAccountCount = 1;
+        let tearsAccountCount = 1;
+        let zenlessAccountCount = 1;
+
+        document.getElementById('copy-settings-zenless').onclick = function () {
+            const originalAccount = document.querySelector('#zenlessaccounts .account');
+            const newAccountContainer = document.createElement('div');
+            newAccountContainer.classList.add('platform-section');
+            const newAccount = document.createElement('div');
+            newAccount.classList.add('account');
+
+            newAccount.innerHTML = originalAccount.innerHTML;
+
+            zenlessAccountCount += 1;
+            const newTitle = `Zenless Zone Zero accounts ${zenlessAccountCount}`;
+
+            newAccount.querySelector('h3').textContent = newTitle;
+
+            const activeElements = newAccount.querySelectorAll('#zenlessActive, label[for="zenlessActive"], .small-text');
+            activeElements.forEach(element => element.remove());
+
+            // Add delete button to the new account
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.classList.add('delete-account');
+            deleteButton.onclick = function () {
+                deleteAccount(deleteButton);
+                recalculateAccountNumbers(); // Recalculate after deletion
+            };
+            newAccount.appendChild(deleteButton);
+
+            newAccountContainer.appendChild(newAccount);
+            document.getElementById('zenlessaccounts').appendChild(newAccountContainer);
+            recalculateAccountNumbers(); // Recalculate after addition
+        };
+
+        function recalculateAccountNumbers() {
+            // Recalculate Genshin Impact accounts
+            const genshinAccounts = document.querySelectorAll('#genshinaccounts .account');
+            genshinAccounts.forEach((account, index) => {
+                account.querySelector('h3').textContent = `Genshin Impact accounts ${index + 1}`;
+            });
+            genshinAccountCount = genshinAccounts.length;
+
+            // Recalculate Honkai Impact 3rd accounts
+            const honkaiAccounts = document.querySelectorAll('#honkaiaccounts .account');
+            honkaiAccounts.forEach((account, index) => {
+                account.querySelector('h3').textContent = `Honkai Impact 3rd accounts ${index + 1}`;
+            });
+            honkaiAccountCount = honkaiAccounts.length;
+
+            // Recalculate Honkai: Star Rail accounts
+            const starrailAccounts = document.querySelectorAll('#starrailaccounts .account');
+            starrailAccounts.forEach((account, index) => {
+                account.querySelector('h3').textContent = `Honkai: Star Rail accounts ${index + 1}`;
+            });
+            starrailAccountCount = starrailAccounts.length;
+
+            // Recalculate Tears of Themis accounts
+            const tearsAccounts = document.querySelectorAll('#tearsaccounts .account');
+            tearsAccounts.forEach((account, index) => {
+                account.querySelector('h3').textContent = `Tears of Themis accounts ${index + 1}`;
+            });
+            tearsAccountCount = tearsAccounts.length;
+
+            // Recalculate Zenless Zone Zero accounts
+            const zenlessAccounts = document.querySelectorAll('#zenlessaccounts .account');
+            zenlessAccounts.forEach((account, index) => {
+                account.querySelector('h3').textContent = `Zenless Zone Zero accounts ${index + 1}`;
+            });
+            zenlessAccountCount = zenlessAccounts.length;
+        }
+
+        document.getElementById('copy-settings-tears').onclick = function () {
+            const originalAccount = document.querySelector('#tearsaccounts .account');
+            const newAccountContainer = document.createElement('div');
+            newAccountContainer.classList.add('platform-section');
+            const newAccount = document.createElement('div');
+            newAccount.classList.add('account');
+
+            // Copy fields
+            newAccount.innerHTML = originalAccount.innerHTML;
+
+            // Update the account number and title
+            tearsAccountCount += 1;
+            const newTitle = `Tears of Themis accounts ${tearsAccountCount}`;
+            newAccount.querySelector('h3').textContent = newTitle;
+
+            // Remove the 'active' dropdown from the copied account
+            const activeElements = newAccount.querySelectorAll('#tearsActive, label[for="tearsActive"], .small-text');
+            activeElements.forEach(element => element.remove());
+
+            // Add delete button to the new account
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.classList.add('delete-account');
+            deleteButton.onclick = function () {
+                deleteAccount(deleteButton);
+                recalculateAccountNumbers(); // Recalculate after deletion
+            };
+            newAccount.appendChild(deleteButton);
+
+            // Append the new account section
+            newAccountContainer.appendChild(newAccount);
+            document.getElementById('tearsaccounts').appendChild(newAccountContainer);
+            recalculateAccountNumbers(); // Recalculate after addition
+        };
+
+        function generateConfig() {
+            const config = {
+                loglevel: 'info',
+                userAgent: 'Custom fork of HoyoLabAuto: github.com/torikushiii/hoyolab-auto',
+                platforms: [
+                    {
+                        id: 1,
+                        active: document.getElementById('discordActive').value === 'true',
+                        type: 'discord',
+                        botId: document.getElementById('discordBotId').value || document.getElementById('discordBotId').placeholder,
+                        token: document.getElementById('discordToken').value || document.getElementById('discordToken').placeholder,
+                    },
+                    {
+                        id: 2,
+                        active: document.getElementById('telegramActive').value === 'true',
+                        type: 'telegram',
+                        chatId: parseInt(document.getElementById('telegramChatId').value) || document.getElementById('telegramChatId').placeholder,
+                        token: document.getElementById('telegramToken').value || document.getElementById('telegramToken').placeholder,
+                        disableNotification: document.getElementById('disableNotification').value === 'true',
+                    },
+                    {
+                        id: 3,
+                        active: document.getElementById('webhookActive').value === 'true',
+                        type: 'webhook',
+                        url: document.getElementById('webhookUrl').value || document.getElementById('webhookUrl').placeholder,
+                    }
+                ],
+                crons: {
+                    whitelist: document.getElementById('whitelist').value.split(',').map(item => item.trim()).filter(item => item),
+                    blacklist: document.getElementById('blacklist').value.split(',').map(item => item.trim()).filter(item => item),
+                    checkIn: document.getElementById('checkInCron').value || document.getElementById('checkInCron').placeholder,
+                    codeRedeem: document.getElementById('codeRedeemCron').value || document.getElementById('codeRedeemCron').placeholder,
+                    expedition: document.getElementById('expeditionCron').value || document.getElementById('expeditionCron').placeholder,
+                    missedCheckIn: document.getElementById('missedCheckInCron').value || document.getElementById('missedCheckInCron').placeholder,
+                    realmCurrency: document.getElementById('realmCurrencyCron').value || document.getElementById('realmCurrencyCron').placeholder,
+                    shopStatus: document.getElementById('shopStatusCron').value || document.getElementById('shopStatusCron').placeholder,
+                    stamina: document.getElementById('staminaCron').value || document.getElementById('staminaCron').placeholder,
+                },
+                accounts: [
+                    {
+                        id: 1,
+                        active: document.getElementById('honkaiActive')?.value === 'true',
+                        type: 'honkai',
+                        data: []
+                    },
+                    {
+                        id: 2,
+                        active: document.getElementById('tearsActive')?.value === 'true',
+                        type: 'termis',
+                        data: []
+                    },
+                    {
+                        id: 3,
+                        active: document.getElementById('genshinActive')?.value === 'true',
+                        type: 'genshin',
+                        data: [] // Genshin Impact account data will be added here
+                    },
+                    {
+                        id: 4,
+                        active: document.getElementById('starrailActive')?.value === 'true',
+                        type: 'starrail',
+                        data: [] // Honkai: Star Rail account data will be added here
+                    },
+                    {
+                        id: 5,
+                        active: document.getElementById('zenlessActive')?.value === 'true',
+                        type: 'zenless',
+                        data: [] // Zenless Zone Zero account data will be added here
+                    }
+                ]
+            };
+
+            // Genshin Impact accounts
+            const genshinAccounts = document.querySelectorAll('#genshinaccounts .account');
+            genshinAccounts.forEach(accountElement => {
+                const accountData = extractAccountData(accountElement, true);
+                config.accounts[2].data.push(accountData);
+            });
+
+            // Honkai: Star Rail accounts
+            const starrailAccounts = document.querySelectorAll('#starrailaccounts .account');
+            starrailAccounts.forEach(accountElement => {
+                const accountData = extractAccountData(accountElement, false);
+                config.accounts[3].data.push(accountData);
+            });
+
+            // Zenless accounts
+            const zenlessAccounts = document.querySelectorAll('#zenlessaccounts .account');
+            zenlessAccounts.forEach(accountElement => {
+                const accountData = {
+                    cookie: accountElement.querySelector('input[id*="zenlessCookie"]').value || '',
+                    redeemCode: accountElement.querySelector('select[id*="zenlessredeemCode"]').value === 'true',
+                    shopStatus: accountElement.querySelector('select[id*="zenlessshopStatus"]').value === 'true',
+                    dailiesCheck: accountElement.querySelector('select[id*="zenlessdailiesCheck"]').value === 'true',
+                    stamina: {
+                        check: accountElement.querySelector('select[id*="zenlessstaminaCheck"]').value === 'true',
+                        threshold: parseInt(accountElement.querySelector('input[id*="zenlessthreshold"]').value || '200', 10),
+                        persistent: accountElement.querySelector('select[id*="zenlessstaminapersistent"]').value === 'true',
+                    },
+                    discord: {
+                        userId: accountElement.querySelector('input[id*="zenlessuserId"]').value || null,
+                    }
+                };
+                config.accounts[4].data.push(accountData);
+            });
+
+            // Honkai Impact 3rd accounts
+            const honkaiAccounts = document.querySelectorAll('#honkaiaccounts .account');
+            honkaiAccounts.forEach(accountElement => {
+                const accountData = {
+                    cookie: accountElement.querySelector('input[id*="honkaiCookie"]').value || '',
+                };
+                config.accounts[0].data.push(accountData);
+            });
+
+            // Tears of Themis accounts
+            const tearsAccounts = document.querySelectorAll('#tearsaccounts .account');
+            tearsAccounts.forEach(accountElement => {
+                const accountData = {
+                    cookie: accountElement.querySelector('input[id*="tearsCookie"]').value || '',
+                };
+                config.accounts[1].data.push(accountData);
+            });
+
+            const json5Str = JSON5.stringify(config, null, 2);
+            const blob = new Blob([json5Str], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "config.json5";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function extractAccountData(accountElement, isGenshin) {
+            const cookieElement = accountElement.querySelector('input[placeholder=""]');
+            const redeemCodeElement = accountElement.querySelector('select[id*="redeemCode"]');
+            const dailiesCheckElement = accountElement.querySelector('select[id*="dailiesCheck"]');
+            const weekliesCheckElement = accountElement.querySelector('select[id*="weekliesCheck"]');
+            const thresholdElement = accountElement.querySelector('input[id*="threshold"]');
+            const staminaCheckElement = accountElement.querySelector('select[id*="staminaCheck"]');
+            const staminaPersistentElement = accountElement.querySelector('select[id*="staminapersistent"]');
+            const expeditionCheckElement = accountElement.querySelector('select[id*="expeditionCheck"]');
+            const expeditionPersistentElement = accountElement.querySelector('select[id*="expeditionpersistent"]');
+            const userIdElement = accountElement.querySelector('input[id*="userId"]');
+
+            let realmCheck = false;
+            let realmPersistent = false;
+
+            if (isGenshin) {
+                const realmCheckElement = accountElement.querySelector('select[id*="realmCheck"]');
+                const realmPersistentElement = accountElement.querySelector('select[id*="realmpersistent"]');
+                realmCheck = realmCheckElement ? realmCheckElement.value === 'true' : false;
+                realmPersistent = realmPersistentElement ? realmPersistentElement.value === 'true' : false;
+            }
+
+            const cookie = cookieElement ? cookieElement.value : '';
+            const redeemCode = redeemCodeElement ? redeemCodeElement.value === 'true' : false;
+            const dailiesCheck = dailiesCheckElement ? dailiesCheckElement.value === 'true' : false;
+            const weekliesCheck = weekliesCheckElement ? weekliesCheckElement.value === 'true' : false;
+            const threshold = thresholdElement ? parseInt(thresholdElement.value || '150', 10) : 150;
+            const staminaCheck = staminaCheckElement ? staminaCheckElement.value === 'true' : false;
+            const staminaPersistent = staminaPersistentElement ? staminaPersistentElement.value === 'true' : false;
+            const expeditionCheck = expeditionCheckElement ? expeditionCheckElement.value === 'true' : false;
+            const expeditionPersistent = expeditionPersistentElement ? expeditionPersistentElement.value === 'true' : false;
+            let userId = userIdElement ? userIdElement.value : '';
+
+            if (userId === '') {
+                userId = null;
+            }
+
+            const accountData = {
+                cookie: cookie,
+                redeemCode: redeemCode,
+                dailiesCheck: dailiesCheck,
+                weekliesCheck: weekliesCheck,
+            };
+
+            if (isGenshin) {
+                accountData.realm = {
+                    check: realmCheck,
+                    persistent: realmPersistent,
+                };
+            }
+
+            accountData.stamina = {
+                check: staminaCheck,
+                threshold: threshold,
+                persistent: staminaPersistent,
+            };
+
+            accountData.expedition = {
+                check: expeditionCheck,
+                persistent: expeditionPersistent,
+            };
+
+            accountData.discord = {
+                userId: userId,
+            };
+
+            return accountData;
+        }
+
+        // Existing code to add new accounts goes here
+        document.getElementById('copy-settings').onclick = function () {
+            const originalAccount = document.querySelector('#genshinaccounts .account');
+            const newAccountContainer = document.createElement('div');
+            newAccountContainer.classList.add('platform-section');
+            const newAccount = document.createElement('div');
+            newAccount.classList.add('account');
+
+            newAccount.innerHTML = originalAccount.innerHTML;
+
+            genshinAccountCount += 1;
+            const newTitle = `Genshin Impact accounts ${genshinAccountCount}`;
+
+            newAccount.querySelector('h3').textContent = newTitle;
+
+            const activeElements = newAccount.querySelectorAll('#genshinActive, label[for="genshinActive"], .small-text');
+            activeElements.forEach(element => element.remove());
+
+            // Add delete button to the new account
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.classList.add('delete-account');
+            deleteButton.onclick = function () {
+                deleteAccount(deleteButton);
+                recalculateAccountNumbers(); // Recalculate after deletion
+            };
+            newAccount.appendChild(deleteButton);
+
+            newAccountContainer.appendChild(newAccount);
+            document.getElementById('genshinaccounts').appendChild(newAccountContainer);
+            recalculateAccountNumbers(); // Recalculate after addition
+        };
+
+        document.getElementById('copy-settings-starrail').onclick = function () {
+            const originalAccount = document.querySelector('#starrailaccounts .account');
+            if (!originalAccount) return;
+
+            const newAccountContainer = document.createElement('div');
+            newAccountContainer.classList.add('platform-section');
+            const newAccount = document.createElement('div');
+            newAccount.classList.add('account');
+
+            newAccount.innerHTML = originalAccount.innerHTML;
+
+            starrailAccountCount += 1;
+            const newTitle = `Honkai: Star Rail accounts ${starrailAccountCount}`;
+
+            newAccount.querySelector('h3').textContent = newTitle;
+
+            const activeElements = newAccount.querySelectorAll('#starrailActive, label[for="starrailActive"], .small-text');
+            activeElements.forEach(element => element.remove());
+
+            // Add delete button to the new account
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.classList.add('delete-account');
+            deleteButton.onclick = function () {
+                deleteAccount(deleteButton);
+                recalculateAccountNumbers(); // Recalculate after deletion
+            };
+            newAccount.appendChild(deleteButton);
+
+
+            newAccountContainer.appendChild(newAccount);
+            document.getElementById('starrailaccounts').appendChild(newAccountContainer);
+            recalculateAccountNumbers(); // Recalculate after addition
+        };
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        document.getElementById('copy-settings-honkai').onclick = function () {
+            const originalAccount = document.querySelector('#honkaiaccounts .account');
+            if (!originalAccount) return;
+
+            const newAccountContainer = document.createElement('div');
+            newAccountContainer.classList.add('platform-section');
+            const newAccount = document.createElement('div');
+            newAccount.classList.add('account');
+
+            newAccount.innerHTML = originalAccount.innerHTML;
+
+            honkaiAccountCount += 1;
+            const newTitle = `Honkai Impact 3rd accounts ${honkaiAccountCount}`;
+            newAccount.querySelector('h3').textContent = newTitle;
+
+            const activeElements = newAccount.querySelectorAll('#honkaiActive, label[for="honkaiActive"], .small-text');
+            activeElements.forEach(element => element.remove());
+
+            // Add delete button to the new account
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.classList.add('delete-account');
+            deleteButton.onclick = function () {
+                deleteAccount(deleteButton);
+            };
+            newAccount.appendChild(deleteButton);
+
+            newAccountContainer.appendChild(newAccount);
+            document.getElementById('honkaiaccounts').appendChild(newAccountContainer);
+        };
+
+        function deleteAccount(button) {
+            const accountDiv = button.closest('.platform-section');
+            accountDiv.remove();
+            recalculateAccountNumbers(); // Recalculate after deletion
+        }
+    </script>
+</body>
+</html>
