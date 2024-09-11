@@ -19,6 +19,7 @@ module.exports = class RedeemCode {
 
 		const res = await app.Got("HoYoLab", {
 			url: this.#instance.config.url.redemption,
+			method: "POST",
 			responseType: "json",
 			throwHttpErrors: false,
 			searchParams: {

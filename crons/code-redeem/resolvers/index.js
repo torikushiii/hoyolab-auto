@@ -130,7 +130,8 @@ const redeemStarRail = async (account, codeList) => {
 		});
 
 		const res = await app.Got("HoYoLab", {
-			url: "https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey",
+			url: "https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkeyRisk",
+			method: "POST",
 			responseType: "json",
 			throwHttpErrors: false,
 			searchParams: {

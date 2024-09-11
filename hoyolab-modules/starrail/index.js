@@ -19,7 +19,7 @@ const DEFAULT_CONSTANTS = {
 		sign: "https://sg-public-api.hoyolab.com/event/luna/os/sign",
 		notes: "https://bbs-api-os.hoyolab.com/game_record/hkrpg/api/note",
 		diary: "https://sg-public-api.hoyolab.com/event/srledger/month_detail",
-		redemption: "https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey"
+		redemption: "https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkeyRisk"
 	}
 };
 
