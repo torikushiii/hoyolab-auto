@@ -16,20 +16,54 @@ exports.fetch = async () => {
 		}
 
 		const $ = app.Utils.cheerio(res.body);
-		const elements = $(".archive-style-wrapper > ol > li");
 
 		const data = [];
-		for (let i = 0; i < elements.length; i++) {
-			const $code = $(elements[i]);
-			const code = $code.text().split(" ")[0].trim();
-			const rewards = $code.text()
-				.split(/\s?- ?\s?/)[1]
-				.split(", ")
-				.map((reward) => reward.trim());
 
-			data.push({
-				code,
-				rewards: rewards.flatMap(i => i.split(" and ").map(i => i.trim()))
+		const extractCodes = (ol) => {
+			ol.find("li").each((index, element) => {
+				const $code = $(element);
+				const codeText = $code.text().trim();
+				const [codeWithExpired, rewardsText] = codeText.split(/\s?- ?\s?/);
+
+				const code = codeWithExpired.replace(/\s*\(EXPIRED\)\s*$/, "").trim();
+				const rewards = rewardsText
+					? rewardsText.replace(/ and /g, ", ").split(", ").map(item => item.trim())
+					: [];
+
+				data.push({
+					code,
+					rewards
+				});
+			});
+		};
+
+		const latestCodesHeader = $("h3.a-header--3:contains(\"Latest Redeem Codes in Version 5.0\")");
+		if (latestCodesHeader.length > 0) {
+			const latestCodesList = latestCodesHeader.nextAll("ol").first();
+			extractCodes(latestCodesList);
+		}
+		else {
+			app.Logger.debug("Genshin:Game8", {
+				message: "Could not find 'Latest Redeem Codes in Version 5.0' section."
+			});
+		}
+
+		const specialProgramHeader = $("h2.a-header--2:contains(\"Special Program Codes\")");
+		if (specialProgramHeader.length > 0) {
+			const globalExclusiveHeader = specialProgramHeader.nextAll("h4.a-header--4:contains(\"Global-Exclusive Codes\")").first();
+			if (globalExclusiveHeader.length > 0) {
+				const globalCodesList = globalExclusiveHeader.nextAll("ol").first();
+				extractCodes(globalCodesList);
+			}
+			else {
+				app.Logger.debug("Genshin:Game8", {
+					message: "Could not find 'Global-Exclusive Codes' section."
+				});
+			}
+		}
+		else {
+			app.Logger.debug("Genshin:Game8", {
+				message: "Could not find 'Special Program Codes' section."
 			});
 		}
 
