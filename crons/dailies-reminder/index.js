@@ -12,7 +12,7 @@ RegionalTaskManager.registerTask("DailiesReminder", 21, 0, async (account) => {
 	}
 
 	const { data } = notes;
-	const current = data.stamina.currentStamina;
+	const current = Math.floor(data.stamina.currentStamina);
 	const max = data.stamina.maxStamina;
 	const delta = app.Utils.formatTime(data.stamina.recoveryTime);
 

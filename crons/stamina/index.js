@@ -34,7 +34,7 @@ module.exports = {
 				const { data } = notes;
 				const stamina = data.stamina;
 
-				const current = stamina.currentStamina;
+				const current = Math.floor(stamina.currentStamina);
 				if (current < account.stamina.threshold) {
 					account.stamina.fired = false;
 					platform.update(account);
