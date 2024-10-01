@@ -18,39 +18,36 @@ const fetchAll = async () => {
 
 		app.Logger.debug("StarRailResolver", `Fetched ${data.length} codes`);
 
+		let newCodes = [];
+
 		if (cachedCodes.length === 0) {
 			app.Logger.warn("StarRailResolver", "No cached codes found, caching all codes");
-			const newCodes = data.map(i => ({
+			newCodes = data.map(i => ({
 				...i,
-				date: Date.now(),
-				active: false
+				date: Date.now()
 			}));
+		}
+		else {
+			newCodes = data.filter(i => !codes.has(i.code)).map(i => ({
+				...i,
+				date: Date.now()
+			}));
+		}
+
+		if (newCodes.length > 0) {
+			app.Logger.info("StarRailResolver", `Found ${newCodes.length} new code(s)`);
+			console.log("Star Rail - New codes found:", newCodes.map(code => code.code).join(", "));
+
+			const updatedCachedCodes = [...cachedCodes, ...newCodes];
 			await app.Cache.set({
 				key: "starrail-code",
-				value: newCodes
+				value: updatedCachedCodes
 			});
-
-			return newCodes;
 		}
-
-		const filteredData = data.filter(i => !codes.has(i.code));
-		if (filteredData.length === 0) {
+		else {
 			app.Logger.debug("StarRailResolver", "No new codes found");
-			return [];
 		}
 
-		app.Logger.info("StarRailResolver", `Found ${filteredData.length} new code(s)`);
-
-		const newCodes = filteredData.map(i => ({ ...i, date: Date.now(), active: false }));
-		await app.Cache.set({
-			key: "starrail-code",
-			value: [
-				...cachedCodes,
-				...newCodes
-			]
-		});
-
-		console.log("Star Rail - New codes found:", newCodes.map(code => code.code).join(", "));
 		return newCodes;
 	}
 	catch (e) {

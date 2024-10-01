@@ -29,7 +29,7 @@ module.exports = {
 
 		const codeData = await fetchCodes(accountData);
 		if (!codeData) {
-			app.Logger.debug("CodeRedeem", "No codes found.");
+			app.Logger.debug("CodeRedeem", "No new codes found.");
 			return;
 		}
 
@@ -37,127 +37,36 @@ module.exports = {
 		const webhook = app.Platform.get(3);
 
 		const { genshin, starrail, zenless } = codeData;
-		if (genshin.length !== 0) {
-			const accounts = app.HoyoLab.getActiveAccounts({ whitelist: "genshin" });
+
+		const processCodesForGame = async (gameName, codes, redeemFunction) => {
+			if (codes.length === 0) return;
+
+			const accounts = app.HoyoLab.getActiveAccounts({ whitelist: gameName });
 			if (accounts.length === 0) {
-				app.Logger.debug("CodeRedeem", "No active accounts found for Genshin Impact.");
+				app.Logger.debug("CodeRedeem", `No active accounts found for ${gameName}.`);
 				return;
 			}
 
 			for (const account of accounts) {
-				if (account.redeemCode === false) {
-					continue;
-				}
+				if (account.redeemCode === false) continue;
 
-				const { success, failed } = await redeemGenshin(account, genshin);
-				if (success.length !== 0) {
-					for (const code of success) {
-						const message = buildMessage(true, account, code);
-						if (webhook) {
-							await webhook.send(message.embed);
-						}
-						if (telegram) {
-							const escapedMessage = app.Utils.escapeCharacters(message.telegram);
-							await telegram.send(escapedMessage);
-						}
+				const { success, failed } = await redeemFunction(account, codes);
+
+				for (const code of [...success, ...failed]) {
+					const message = buildMessage(success.includes(code), account, code);
+					if (webhook) {
+						await webhook.send(message.embed);
 					}
-				}
-
-				if (failed.length !== 0) {
-					for (const code of failed) {
-						const message = buildMessage(false, account, code);
-						if (webhook) {
-							await webhook.send(message.embed);
-						}
-						if (telegram) {
-							const escapedMessage = app.Utils.escapeCharacters(message.telegram);
-							await telegram.send(escapedMessage);
-						}
+					if (telegram) {
+						const escapedMessage = app.Utils.escapeCharacters(message.telegram);
+						await telegram.send(escapedMessage);
 					}
 				}
 			}
-		}
+		};
 
-		if (starrail.length !== 0) {
-			const accounts = app.HoyoLab.getActiveAccounts({ whitelist: "starrail" });
-			if (accounts.length === 0) {
-				app.Logger.debug("CodeRedeem", "No active accounts found for Star Rail.");
-				return;
-			}
-
-			for (const account of accounts) {
-				if (account.redeemCode === false) {
-					continue;
-				}
-
-				const { success, failed } = await redeemStarRail(account, starrail);
-				if (success.length !== 0) {
-					for (const code of success) {
-						const message = buildMessage(true, account, code);
-						if (webhook) {
-							await webhook.send(message.embed);
-						}
-						if (telegram) {
-							const escapedMessage = app.Utils.escapeCharacters(message.telegram);
-							await telegram.send(escapedMessage);
-						}
-					}
-				}
-
-				if (failed.length !== 0) {
-					for (const code of failed) {
-						const message = buildMessage(false, account, code);
-						if (webhook) {
-							await webhook.send(message.embed);
-						}
-						if (telegram) {
-							const escapedMessage = app.Utils.escapeCharacters(message.telegram);
-							await telegram.send(escapedMessage);
-						}
-					}
-				}
-			}
-		}
-
-		if (zenless.length !== 0) {
-			const accounts = app.HoyoLab.getActiveAccounts({ whitelist: "nap" });
-			if (accounts.length === 0) {
-				app.Logger.debug("CodeRedeem", "No active accounts found for Zenless Zone Zero.");
-				return;
-			}
-
-			for (const account of accounts) {
-				if (account.redeemCode === false) {
-					continue;
-				}
-
-				const { success, failed } = await redeemZenless(account, zenless);
-				if (success.length !== 0) {
-					for (const code of success) {
-						const message = buildMessage(true, account, code);
-						if (webhook) {
-							await webhook.send(message.embed);
-						}
-						if (telegram) {
-							const escapedMessage = app.Utils.escapeCharacters(message.telegram);
-							await telegram.send(escapedMessage);
-						}
-					}
-				}
-
-				if (failed.length !== 0) {
-					for (const code of failed) {
-						const message = buildMessage(false, account, code);
-						if (webhook) {
-							await webhook.send(message.embed);
-						}
-						if (telegram) {
-							const escapedMessage = app.Utils.escapeCharacters(message.telegram);
-							await telegram.send(escapedMessage);
-						}
-					}
-				}
-			}
-		}
+		await processCodesForGame("genshin", genshin, redeemGenshin);
+		await processCodesForGame("starrail", starrail, redeemStarRail);
+		await processCodesForGame("nap", zenless, redeemZenless);
 	})
 };
