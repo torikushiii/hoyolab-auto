@@ -368,7 +368,7 @@ class Game {
 			}
 
 			await this.redeemCode(account, code.code);
-			await this.delay(10_000);
+			await this.delay(10000);
 
 			this.saveRedeemedCode(code.code);
 		}
