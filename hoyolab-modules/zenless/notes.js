@@ -78,25 +78,26 @@ module.exports = class RealtimeNotes {
 		}
 
 		const data = res.body.data;
+		if (!data) {
+			return { success: false, error: "No data received from API" };
+		}
 
 		// Howl daily scratch card.
-		const cardSign = (data.card_sign === "CardSignDone") ? "Completed" : "Not Completed";
-		const stamina = {
-			currentStamina: data.energy.progress.current,
-			maxStamina: data.energy.progress.max,
-			recoveryTime: data.energy.restore
-		};
+		const cardSign = (data.card_sign && data.card_sign === "CardSignDone") ? "Completed" : "Not Completed";
 
-		const dailies = {
-			task: data.vitality.current,
-			maxTask: data.vitality.max
-		};
+		const stamina = data.energy
+			? { currentStamina: data.energy.progress?.current ?? 0, maxStamina: data.energy.progress?.max ?? 0, recoveryTime: data.energy.restore ?? 0 }
+			: null;
+
+		const dailies = data.vitality
+			? { task: data.vitality.current ?? 0, maxTask: data.vitality.max ?? 0 }
+			: null;
 
 		const weeklies = {
-			bounty: data.bounty_commission.num,
-			bountyTotal: data.bounty_commission.total,
-			surveyPoints: data.survey_points.num,
-			surveyPointsTotal: data.survey_points.total
+			bounty: data.bounty_commission?.num ?? 0,
+			bountyTotal: data.bounty_commission?.total ?? 0,
+			surveyPoints: data.survey_points?.num ?? 0,
+			surveyPointsTotal: data.survey_points?.total ?? 0
 		};
 
 		const ShopState = {
@@ -105,9 +106,21 @@ module.exports = class RealtimeNotes {
 			SaleStateDone: "Finished"
 		};
 
-		const shop = {
-			state: ShopState[data.vhs_sale.sale_state]
-		};
+		const shop = data.vhs_sale ? { state: ShopState[data.vhs_sale.sale_state] ?? "Unknown" } : null;
+
+		if (!stamina || !dailies || !weeklies) {
+			app.Logger.warn(`${this.#instance.fullName}:Notes`, {
+				message: "No necessary data was received from hoyolab",
+				args: {
+					platform: this.#instance.name,
+					uid: accountData.uid,
+					region: accountData.region,
+					body: res.body
+				}
+			});
+
+			return { success: false };
+		}
 
 		await this.#instance.dataCache.set(accountData.uid, {
 			uid: accountData.uid,
