@@ -182,7 +182,8 @@ class Game {
 						uid: accountDetails.uid,
 						nickname: accountDetails.nickname,
 						rank: accountDetails.rank,
-						region: accountDetails.region
+						region: accountDetails.region,
+						cookie
 					},
 					award: awardObject
 				});
@@ -355,24 +356,179 @@ class Game {
 	get userAgent () {
 		return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36";
 	}
+
+	async redeemCodes (account) {
+		const codes = await this.fetchCodes();
+		const redeemedCodes = this.getRedeemedCodes();
+
+		for (const code of codes) {
+			if (redeemedCodes.includes(code.code)) {
+				console.log(`Code ${code.code} already redeemed for ${this.fullName}`);
+				continue;
+			}
+
+			await this.redeemCode(account, code.code);
+			await this.delay(10_000);
+
+			this.saveRedeemedCode(code.code);
+		}
+	}
+
+	async fetchCodes () {
+		const gameParam = this.getGameParam();
+		const url = `https://hoyo-codes.seria.moe/codes?game=${gameParam}`;
+		const response = await UrlFetchApp.fetch(url);
+		const data = JSON.parse(response.getContentText());
+		return data.codes;
+	}
+
+	getGameParam () {
+		switch (this.name) {
+			case "genshin": return "genshin";
+			case "starrail": return "hkrpg";
+			case "zenless": return "nap";
+			default: throw new Error(`Unknown game: ${this.name}`);
+		}
+	}
+
+	async redeemCode (account, code) {
+		const url = this.getRedemptionUrl(account, code);
+		const options = {
+			method: this.name === "starrail" ? "POST" : "GET",
+			headers: {
+				"User-Agent": this.userAgent,
+				Cookie: account.cookie
+			}
+		};
+
+		try {
+			const response = await UrlFetchApp.fetch(url, options);
+			const data = JSON.parse(response.getContentText());
+			console.log(`Code ${code} redemption result for ${this.fullName}:`, data);
+		}
+		catch (e) {
+			console.error(`Error redeeming code ${code} for ${this.fullName}:`, e);
+		}
+	}
+
+	getRedemptionUrl (account, code) {
+		const baseUrl = this.getBaseRedemptionUrl();
+		const internalRegion = this.mapToInternalRegion(account.region);
+		const params = [
+			`t=${Date.now()}`,
+			`lang=en`,
+			`uid=${account.uid}`,
+			`region=${internalRegion}`,
+			`cdkey=${code}`
+		];
+
+		switch (this.name) {
+			case "genshin":
+				params.push("sLangKey=en-us", "game_biz=hk4e_global");
+				break;
+			case "starrail":
+				params.push("game_biz=hkrpg_global");
+				break;
+			case "zenless":
+				params.push("game_biz=nap_global");
+				break;
+		}
+
+		return `${baseUrl}?${params.join("&")}`;
+	}
+
+	mapToInternalRegion (region) {
+		const regionMappings = {
+			genshin: {
+				SEA: "os_asia",
+				NA: "os_usa",
+				EU: "os_euro",
+				TW: "os_cht"
+			},
+			starrail: {
+				NA: "prod_official_usa",
+				EU: "prod_official_eur",
+				SEA: "prod_official_asia",
+				TW: "prod_official_cht"
+			},
+			zenless: {
+				TW: "prod_gf_sg",
+				SEA: "prod_gf_jp",
+				EU: "prod_gf_eu",
+				NA: "prod_gf_us"
+			}
+		};
+
+		const gameMapping = regionMappings[this.name];
+		if (!gameMapping) {
+			throw new Error(`Unknown game: ${this.name}`);
+		}
+
+		const internalRegion = gameMapping[region];
+		if (!internalRegion) {
+			throw new Error(`Unknown region ${region} for game ${this.name}`);
+		}
+
+		return internalRegion;
+	}
+
+	getBaseRedemptionUrl () {
+		switch (this.name) {
+			case "genshin": return "https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey";
+			case "starrail": return "https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkeyRisk";
+			case "zenless": return "https://public-operation-nap.hoyoverse.com/common/apicdkey/api/webExchangeCdkey";
+			default: throw new Error(`Unknown game: ${this.name}`);
+		}
+	}
+
+	getRedeemedCodes () {
+		const redeemedCodes = PropertiesService.getScriptProperties().getProperty(`${this.name}_redeemed_codes`);
+		return redeemedCodes ? JSON.parse(redeemedCodes) : [];
+	}
+
+	saveRedeemedCode (code) {
+		const redeemedCodes = this.getRedeemedCodes();
+		redeemedCodes.push(code);
+		PropertiesService.getScriptProperties().setProperty(`${this.name}_redeemed_codes`, JSON.stringify(redeemedCodes));
+	}
+
+	delay (ms) {
+		return new Promise(resolve => {
+			setTimeout(() => {
+				resolve();
+			}, ms);
+		});
+	}
+}
+
+function setTimeout (func, timeout) {
+	const lock = LockService.getScriptLock();
+	lock.waitLock(timeout);
+
+	func();
+
+	lock.releaseLock();
 }
 
 function checkInGame (gameName) {
-	const game = new Game(gameName, config[gameName]); // Create a Game instance
+	const game = new Game(gameName, config[gameName]);
 
-	game
-		.checkAndExecute()
-		.then((successes) => {
-			console.log("Successful check-ins:", successes);
+	return game.checkAndExecute()
+		.then(async (successes) => {
+			console.log(`Successful check-ins for ${gameName}:`, successes);
+
+			for (const success of successes) {
+				await game.redeemCodes(success.account);
+			}
 
 			if (DISCORD_WEBHOOK) {
-				for (const success of successes) {
-					sendDiscordNotification(success);
-				}
+				return Promise.all(successes.map(sendDiscordNotification));
 			}
+			return successes;
 		})
 		.catch((e) => {
-			console.error("An error occurred during check-in:", e);
+			console.error(`An error occurred during ${gameName} check-in:`, e);
+			throw e;
 		});
 }
 
@@ -441,11 +597,15 @@ function sendDiscordNotification (success) {
 	});
 }
 
-
-// Example usage: check in for Genshin, Honkai, and Star Rail
 function checkInAllGames () {
-	checkInGame("genshin");
-	checkInGame("honkai");
-	checkInGame("starrail");
-	checkInGame("zenless");
+	const games = ["genshin", "honkai", "starrail", "zenless"];
+
+	return Promise.all(games.map(checkInGame))
+		.then((results) => {
+			console.log("All games checked in successfully");
+			return results.flat();
+		})
+		.catch((e) => {
+			console.error("Error during check-in process:", e);
+		});
 }
