@@ -518,6 +518,10 @@ function checkInGame (gameName) {
 			console.log(`Successful check-ins for ${gameName}:`, successes);
 
 			for (const success of successes) {
+				if (gameName === "honkai") {
+					continue;
+				}
+
 				await game.redeemCodes(success.account);
 			}
 
