@@ -3,322 +3,132 @@ const StarRail = require("./star-rail");
 const ZenlessZoneZero = require("./zenless");
 const { setTimeout } = require("node:timers/promises");
 
+const TIMEOUT_DURATION = 30_000;
+const RETRY_DELAY = 7000;
+
 const fetchAll = async (accounts) => {
 	const filteredAccounts = accounts.filter(account => account.redeemCode);
 
-	const fetchPromises = filteredAccounts.map(account => {
-		const fetchPromise = (() => {
-			switch (account.platform) {
-				case "genshin":
-					return Genshin.fetchAll(account);
-				case "starrail":
-					return StarRail.fetchAll(account);
-				case "nap":
-					return ZenlessZoneZero.fetchAll(account);
-				default:
-					return Promise.resolve(null);
-			}
-		})();
+	const fetchPromises = filteredAccounts.map(account => fetchForPlatform(account));
 
-		return fetchPromise.then(result => ({ platform: account.platform, result }));
+	const results = await Promise.allSettled(fetchPromises);
+
+	return {
+		genshin: results.find(result => result.value?.platform === "genshin")?.value?.result ?? [],
+		starrail: results.find(result => result.value?.platform === "starrail")?.value?.result ?? [],
+		zenless: results.find(result => result.value?.platform === "nap")?.value?.result ?? []
+	};
+};
+
+const fetchForPlatform = async (account) => {
+	try {
+		let fetchFunction;
+		switch (account.platform) {
+			case "genshin":
+				fetchFunction = Genshin.fetchAll;
+				break;
+			case "starrail":
+				fetchFunction = StarRail.fetchAll;
+				break;
+			case "nap":
+				fetchFunction = ZenlessZoneZero.fetchAll;
+				break;
+			default:
+				return null;
+		}
+
+		const result = await Promise.race([
+			fetchFunction(account),
+			new Promise((_, reject) => setTimeout(TIMEOUT_DURATION).then(() => reject(new Error("Fetch operation timed out"))))
+		]);
+
+		return { platform: account.platform, result };
+	}
+	catch (e) {
+		app.Logger.error(`CodeRedeem:${account.platform}`, `Error fetching codes`, e);
+		return null;
+	}
+};
+
+const redeemCode = async (account, code, redeemFunction) => {
+	const cookieData = app.HoyoLab.parseCookie(account.cookie, {
+		whitelist: [
+			"cookie_token_v2",
+			"account_mid_v2",
+			"account_id_v2",
+			"cookie_token",
+			"account_id"
+		]
 	});
 
-	const results = await Promise.all(fetchPromises);
+	try {
+		const res = await Promise.race([
+			redeemFunction(account, code, cookieData),
+			new Promise((_, reject) => setTimeout(TIMEOUT_DURATION).then(() => reject(new Error("Request timed out"))))
+		]);
 
-	const genshin = results.find(result => result.platform === "genshin")?.result ?? [];
-	const starrail = results.find(result => result.platform === "starrail")?.result ?? [];
-	const zenless = results.find(result => result.platform === "nap")?.result ?? [];
+		if (res.statusCode !== 200) {
+			throw new app.Error({
+				message: "API returned non-200 status code.",
+				args: {
+					statusCode: res.statusCode,
+					body: res.body
+				}
+			});
+		}
 
-	return {
-		genshin,
-		starrail,
-		zenless
-	};
+		const retcode = res.body.retcode;
+		if (retcode === -2001 || retcode === -2003) {
+			app.Logger.log(`CodeRedeem:${account.platform}`, {
+				message: "Expired or invalid code",
+				args: { code }
+			});
+			return null;
+		}
+
+		if (retcode !== 0) {
+			app.Logger.info(`CodeRedeem:${account.platform}`, `${code.code} ${res.body.message}`);
+			return { success: false, reason: res.body.message };
+		}
+
+		return { success: true };
+	}
+	catch (e) {
+		if (e.message === "Request timed out") {
+			app.Logger.warn(`CodeRedeem:${account.platform}`, `Code redemption timed out for ${code.code}`);
+			return { success: false, reason: "Redemption timed out" };
+		}
+		else {
+			app.Logger.error(`CodeRedeem:${account.platform}`, `Error redeeming code ${code.code}`);
+			return { success: false, reason: "Unexpected error occurred" };
+		}
+	}
 };
 
-const redeemGenshin = async (account, codeList) => {
+const redeemCodes = async (account, codeList, redeemFunction) => {
 	const success = [];
 	const failed = [];
 
 	for (const code of codeList) {
-		const cookieData = app.HoyoLab.parseCookie(account.cookie, {
-			whitelist: [
-				"cookie_token_v2",
-				"account_mid_v2",
-				"account_id_v2",
-				"cookie_token",
-				"account_id"
-			]
-		});
-
-		try {
-			const res = await Promise.race([
-				app.Got("HoYoLab", {
-					url: "https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey",
-					searchParams: {
-						uid: account.uid,
-						region: account.region,
-						lang: "en",
-						cdkey: code.code,
-						game_biz: "hk4e_global",
-						sLangKey: "en-us"
-					},
-					headers: {
-						Cookie: cookieData
-					}
-				}),
-				new Promise((_, reject) => setTimeout(30000).then(() => reject(new Error("Request timed out"))))
-			]);
-
-			if (res.statusCode !== 200) {
-				throw new app.Error({
-					message: "Genshin API returned non-200 status code.",
-					args: {
-						statusCode: res.statusCode,
-						body: res.body
-					}
-				});
-			}
-
-			const retcode = res.body.retcode;
-			if (retcode === -2001 || retcode === -2003) {
-				app.Logger.log("CodeRedeem:Genshin", {
-					message: "Expired or invalid code",
-					args: {
-						code
-					}
-				});
-
-				await setTimeout(7000);
-				continue;
-			}
-
-			if (retcode !== 0) {
-				app.Logger.info("CodeRedeem:Genshin", `${code.code} ${res.body.message}`);
-				app.Logger.debug("CodeRedeem:Genshin", {
-					message: `Genshin API returned non-zero status code`,
-					args: {
-						retcode,
-						message: res.body
-					}
-				});
-
-				failed.push({ ...code, reason: res.body.message });
-				await setTimeout(7000);
-				continue;
-			}
-
+		const result = await redeemCode(account, code, redeemFunction);
+		if (result === null) {
+			continue;
+		}
+		if (result.success) {
 			success.push(code);
-			await setTimeout(7000);
 		}
-		catch (e) {
-			if (e.message === "Request timed out") {
-				app.Logger.warn("CodeRedeem:Genshin", `Code redemption timed out for ${code.code}`);
-				failed.push({ ...code, reason: "Redemption timed out" });
-			}
-			else {
-				app.Logger.error("CodeRedeem:Genshin", `Error redeeming code ${code.code}`, e);
-				failed.push({ ...code, reason: "Unexpected error occurred" });
-			}
-			await setTimeout(7000);
+		else {
+			failed.push({ ...code, reason: result.reason });
 		}
+		await setTimeout(RETRY_DELAY);
 	}
 
-	return {
-		success,
-		failed
-	};
+	return { success, failed };
 };
 
-const redeemStarRail = async (account, codeList) => {
-	const success = [];
-	const failed = [];
-
-	for (const code of codeList) {
-		const cookieData = app.HoyoLab.parseCookie(account.cookie, {
-			whitelist: [
-				"cookie_token_v2",
-				"account_mid_v2",
-				"account_id_v2",
-				"cookie_token",
-				"account_id"
-			]
-		});
-
-		try {
-			const res = await Promise.race([
-				app.Got("HoYoLab", {
-					url: "https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkeyRisk",
-					method: "POST",
-					responseType: "json",
-					throwHttpErrors: false,
-					searchParams: {
-						cdkey: code.code,
-						game_biz: "hkrpg_global",
-						lang: "en",
-						region: account.region,
-						t: Date.now(),
-						uid: account.uid
-					},
-					headers: {
-						Cookie: cookieData
-					}
-				}),
-				new Promise((_, reject) => setTimeout(30000).then(() => reject(new Error("Request timed out"))))
-			]);
-
-			if (res.statusCode !== 200) {
-				throw new app.Error({
-					message: "Star Rail API returned non-200 status code.",
-					args: {
-						statusCode: res.statusCode,
-						body: res.body
-					}
-				});
-			}
-
-			const retcode = res.body.retcode;
-			if (retcode === -2001 || retcode === -2003) {
-				app.Logger.log("CodeRedeem:StarRail", {
-					message: "Expired or invalid code",
-					args: {
-						code: code.code
-					}
-				});
-
-				await setTimeout(7000);
-				continue;
-			}
-			if (retcode !== 0) {
-				app.Logger.info("CodeRedeem:StarRail", `${code.code} ${res.body.message}`);
-				app.Logger.debug("CodeRedeem:StarRail", {
-					message: `Star Rail API returned non-zero status code`,
-					args: {
-						retcode,
-						message: res.body
-					}
-				});
-
-				failed.push({ ...code, reason: res.body.message });
-				await setTimeout(7000);
-				continue;
-			}
-
-			success.push(code);
-			await setTimeout(7000);
-		}
-		catch (e) {
-			if (e.message === "Request timed out") {
-				app.Logger.warn("CodeRedeem:StarRail", `Code redemption timed out for ${code.code}`);
-				failed.push({ ...code, reason: "Redemption timed out" });
-			}
-			else {
-				app.Logger.error("CodeRedeem:StarRail", `Error redeeming code ${code.code}`, e);
-				failed.push({ ...code, reason: "Unexpected error occurred" });
-			}
-			await setTimeout(7000);
-		}
-	}
-
-	return {
-		success,
-		failed
-	};
-};
-
-const redeemZenless = async (account, codeList) => {
-	const success = [];
-	const failed = [];
-
-	for (const code of codeList) {
-		const cookieData = app.HoyoLab.parseCookie(account.cookie, {
-			whitelist: [
-				"cookie_token_v2",
-				"account_mid_v2",
-				"account_id_v2",
-				"cookie_token",
-				"account_id"
-			]
-		});
-
-		try {
-			const res = await Promise.race([
-				app.Got("HoYoLab", {
-					url: "https://public-operation-nap.hoyoverse.com/common/apicdkey/api/webExchangeCdkey",
-					searchParams: {
-						t: Date.now(),
-						lang: "en",
-						game_biz: "nap_global",
-						uid: account.uid,
-						region: account.region,
-						cdkey: code.code
-					},
-					headers: {
-						Cookie: cookieData
-					}
-				}),
-				new Promise((_, reject) => setTimeout(30000).then(() => reject(new Error("Request timed out"))))
-			]);
-
-			if (res.statusCode !== 200) {
-				throw new app.Error({
-					message: "Zenless API returned non-200 status code.",
-					args: {
-						statusCode: res.statusCode,
-						body: res.body
-					}
-				});
-			}
-
-			const retcode = res.body.retcode;
-			if (retcode === -2001 || retcode === -2003) {
-				app.Logger.log("CodeRedeem:Zenless", {
-					message: "Expired or invalid code",
-					args: {
-						code
-					}
-				});
-
-				await setTimeout(7000);
-				continue;
-			}
-
-			if (retcode !== 0) {
-				app.Logger.info("CodeRedeem:Zenless", `${code.code} ${res.body.message}`);
-				app.Logger.debug("CodeRedeem:Zenless", {
-					message: `Zenless API returned non-zero status code`,
-					args: {
-						retcode,
-						message: res.body
-					}
-				});
-
-				failed.push({ ...code, reason: res.body.message });
-				await setTimeout(7000);
-				continue;
-			}
-
-			success.push(code);
-			await setTimeout(7000);
-		}
-		catch (e) {
-			if (e.message === "Request timed out") {
-				app.Logger.warn("CodeRedeem:Zenless", `Code redemption timed out for ${code.code}`);
-				failed.push({ ...code, reason: "Redemption timed out" });
-			}
-			else {
-				app.Logger.error("CodeRedeem:Zenless", `Error redeeming code ${code.code}`, e);
-				failed.push({ ...code, reason: "Unexpected error occurred" });
-			}
-			await setTimeout(7000);
-		}
-	}
-
-	return {
-		success,
-		failed
-	};
-};
+const redeemGenshin = (account, codeList) => redeemCodes(account, codeList, Genshin.redeem);
+const redeemStarRail = (account, codeList) => redeemCodes(account, codeList, StarRail.redeem);
+const redeemZenless = (account, codeList) => redeemCodes(account, codeList, ZenlessZoneZero.redeem);
 
 module.exports = {
 	fetchAll,

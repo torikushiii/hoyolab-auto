@@ -56,6 +56,22 @@ const fetchAll = async () => {
 	}
 };
 
+const redeem = async (account, code, cookieData) => app.Got("HoYoLab", {
+	url: "https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey",
+	searchParams: {
+		uid: account.uid,
+		region: account.region,
+		lang: "en",
+		cdkey: code.code,
+		game_biz: "hk4e_global",
+		sLangKey: "en-us"
+	},
+	headers: {
+		Cookie: cookieData
+	}
+});
+
 module.exports = {
-	fetchAll
+	fetchAll,
+	redeem
 };

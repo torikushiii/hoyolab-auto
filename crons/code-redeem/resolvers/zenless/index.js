@@ -56,6 +56,22 @@ const fetchAll = async () => {
 	}
 };
 
+const redeem = async (account, code, cookieData) => app.Got("HoYoLab", {
+	url: "https://public-operation-nap.hoyoverse.com/common/apicdkey/api/webExchangeCdkey",
+	searchParams: {
+		t: Date.now(),
+		lang: "en",
+		game_biz: "nap_global",
+		uid: account.uid,
+		region: account.region,
+		cdkey: code.code
+	},
+	headers: {
+		Cookie: cookieData
+	}
+});
+
 module.exports = {
-	fetchAll
+	fetchAll,
+	redeem
 };
