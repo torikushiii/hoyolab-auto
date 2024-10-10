@@ -100,7 +100,8 @@ module.exports = class CheckIn {
 				act_id: this.#instance.config.ACT_ID
 			},
 			headers: {
-				Cookie: cookieData
+				Cookie: cookieData,
+				"x-rpc-signgame": "zzz"
 			}
 		});
 
@@ -144,7 +145,8 @@ module.exports = class CheckIn {
 				act_id: this.#instance.config.ACT_ID
 			},
 			headers: {
-				Cookie: cookieData
+				Cookie: cookieData,
+				"x-rpc-signgame": "zzz"
 			}
 		});
 
@@ -194,7 +196,8 @@ module.exports = class CheckIn {
 				act_id: this.#instance.config.ACT_ID
 			},
 			headers: {
-				Cookie: cookieData
+				Cookie: cookieData,
+				"x-rpc-signgame": "zzz"
 			}
 		});
 

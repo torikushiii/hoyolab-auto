@@ -13,9 +13,9 @@ const DEFAULT_CONSTANTS = {
 		game: "Zenless Zone Zero"
 	},
 	url: {
-		info: "https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/info",
-		home: "https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/home",
-		sign: "https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/sign",
+		info: "https://sg-public-api.hoyolab.com/event/luna/zzz/os/info",
+		home: "https://sg-public-api.hoyolab.com/event/luna/zzz/os/home",
+		sign: "https://sg-public-api.hoyolab.com/event/luna/zzz/os/sign",
 		notes: "https://sg-act-nap-api.hoyolab.com/event/game_record_zzz/api/zzz/note",
 		redemption: "https://public-operation-nap.hoyoverse.com/common/apicdkey/api/webExchangeCdkey"
 	}
