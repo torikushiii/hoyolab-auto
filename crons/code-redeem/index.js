@@ -43,6 +43,8 @@ module.exports = {
 				processCodesForGame("starrail", starrail, redeemStarRail, telegram, webhook),
 				processCodesForGame("nap", zenless, redeemZenless, telegram, webhook)
 			]);
+
+			app.Logger.info("CodeRedeem", "Code redemption process completed.");
 		}
 		catch (e) {
 			app.Logger.error("CodeRedeem", "An error occurred during code redemption process", e);
@@ -52,6 +54,7 @@ module.exports = {
 
 async function processCodesForGame (gameName, codes, redeemFunction, telegram, webhook) {
 	if (codes.length === 0) {
+		app.Logger.debug("CodeRedeem", `No new codes for ${gameName}.`);
 		return;
 	}
 
@@ -61,20 +64,29 @@ async function processCodesForGame (gameName, codes, redeemFunction, telegram, w
 		return;
 	}
 
+	app.Logger.info("CodeRedeem", `Processing ${codes.length} code(s) for ${gameName} (${accounts.length} account(s)).`);
+
 	for (const account of accounts) {
 		if (account.redeemCode === false) {
+			app.Logger.debug("CodeRedeem", `Code redemption disabled for account ${account.uid} (${gameName}).`);
 			continue;
 		}
 
 		try {
+			app.Logger.debug("CodeRedeem", `Redeeming codes for account ${account.uid} (${gameName}).`);
 			const { success, failed } = await redeemFunction(account, codes);
+
+			app.Logger.info("CodeRedeem", `Account ${account.uid} (${gameName}): ${success.length} code(s) redeemed, ${failed.length} failed.`);
 
 			for (const code of [...success, ...failed]) {
 				await sendNotification(success.includes(code), account, code, telegram, webhook);
 			}
 		}
 		catch (e) {
-			app.Logger.error("CodeRedeem", `Error processing codes for ${gameName}`, e);
+			console.error({
+				message: `Error processing codes for ${gameName} account ${account.uid}`,
+				error: e
+			});
 		}
 	}
 }

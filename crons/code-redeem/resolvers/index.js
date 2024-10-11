@@ -34,6 +34,7 @@ const fetchForPlatform = async (account) => {
 				fetchFunction = ZenlessZoneZero.fetchAll;
 				break;
 			default:
+				app.Logger.warn(`CodeRedeem:${account.platform}`, `Unsupported platform: ${account.platform}`);
 				return null;
 		}
 
@@ -42,6 +43,7 @@ const fetchForPlatform = async (account) => {
 			new Promise((_, reject) => setTimeout(TIMEOUT_DURATION).then(() => reject(new Error("Fetch operation timed out"))))
 		]);
 
+		app.Logger.debug(`CodeRedeem:${account.platform}`, `Fetched ${result.length} codes`);
 		return { platform: account.platform, result };
 	}
 	catch (e) {
@@ -81,7 +83,7 @@ const redeemCode = async (account, code, redeemFunction) => {
 		if (retcode === -2001 || retcode === -2003) {
 			app.Logger.log(`CodeRedeem:${account.platform}`, {
 				message: "Expired or invalid code",
-				args: { code }
+				args: { code: code.code }
 			});
 			return null;
 		}
@@ -91,6 +93,7 @@ const redeemCode = async (account, code, redeemFunction) => {
 			return { success: false, reason: res.body.message };
 		}
 
+		app.Logger.info(`CodeRedeem:${account.platform}`, `Successfully redeemed code: ${code.code}`);
 		return { success: true };
 	}
 	catch (e) {
@@ -99,7 +102,10 @@ const redeemCode = async (account, code, redeemFunction) => {
 			return { success: false, reason: "Redemption timed out" };
 		}
 		else {
-			app.Logger.error(`CodeRedeem:${account.platform}`, `Error redeeming code ${code.code}`);
+			console.error({
+				message: `Error redeeming code ${code.code}`,
+				error: e
+			});
 			return { success: false, reason: "Unexpected error occurred" };
 		}
 	}
@@ -123,6 +129,7 @@ const redeemCodes = async (account, codeList, redeemFunction) => {
 		await setTimeout(RETRY_DELAY);
 	}
 
+	app.Logger.info(`CodeRedeem:${account.platform}`, `Redeemed ${success.length} code(s), ${failed.length} failed`);
 	return { success, failed };
 };
 
