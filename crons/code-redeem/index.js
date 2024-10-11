@@ -12,9 +12,13 @@ module.exports = {
 	description: "Check and redeem codes for supported games from HoyoLab.",
 	code: async function codeRedeem () {
 		try {
+			app.Logger.info("CodeRedeem", "Starting code redemption process");
+			
 			const accountData = app.HoyoLab.getActiveAccounts({
 				blacklist: ["honkai", "tot"]
 			});
+
+			app.Logger.debug("CodeRedeem", `Found ${accountData.length} active accounts`);
 
 			if (accountData.length === 0) {
 				app.Logger.debug("CodeRedeem", "No active accounts found.");
@@ -27,16 +31,21 @@ module.exports = {
 				return;
 			}
 
+			app.Logger.debug("CodeRedeem", "Fetching new codes");
 			const codeData = await fetchCodes(accountData);
 			if (!codeData) {
 				app.Logger.debug("CodeRedeem", "No new codes found.");
 				return;
 			}
 
+			app.Logger.info("CodeRedeem", "New codes found, preparing to redeem");
+
 			const telegram = app.Platform.get(2);
 			const webhook = app.Platform.get(3);
 
 			const { genshin, starrail, zenless } = codeData;
+
+			app.Logger.debug("CodeRedeem", `Processing codes: Genshin (${genshin.length}), Star Rail (${starrail.length}), Zenless (${zenless.length})`);
 
 			await Promise.all([
 				processCodesForGame("genshin", genshin, redeemGenshin, telegram, webhook),
@@ -47,7 +56,10 @@ module.exports = {
 			app.Logger.info("CodeRedeem", "Code redemption process completed.");
 		}
 		catch (e) {
-			app.Logger.error("CodeRedeem", "An error occurred during code redemption process", e);
+			console.error({
+				message: "An error occurred during code redemption process",
+				error: e
+			});
 		}
 	}
 };
@@ -104,6 +116,9 @@ async function sendNotification (isSuccess, account, code, telegram, webhook) {
 		}
 	}
 	catch (e) {
-		app.Logger.error("CodeRedeem", "Error sending notification", e);
+		console.error({
+			message: "Error sending notification",
+			error: e
+		});
 	}
 }

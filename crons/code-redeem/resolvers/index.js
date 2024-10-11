@@ -5,6 +5,7 @@ const { setTimeout } = require("node:timers/promises");
 
 const TIMEOUT_DURATION = 30_000;
 const RETRY_DELAY = 7000;
+const MAX_RETRIES = 3;
 
 const fetchAll = async (accounts) => {
 	const filteredAccounts = accounts.filter(account => account.redeemCode);
@@ -63,50 +64,56 @@ const redeemCode = async (account, code, redeemFunction) => {
 		]
 	});
 
-	try {
-		const res = await Promise.race([
-			redeemFunction(account, code, cookieData),
-			new Promise((_, reject) => setTimeout(TIMEOUT_DURATION).then(() => reject(new Error("Request timed out"))))
-		]);
+	for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+		try {
+			const res = await Promise.race([
+				redeemFunction(account, code, cookieData),
+				new Promise((_, reject) => setTimeout(TIMEOUT_DURATION).then(() => reject(new Error("Request timed out"))))
+			]);
 
-		if (res.statusCode !== 200) {
-			throw new app.Error({
-				message: "API returned non-200 status code.",
-				args: {
-					statusCode: res.statusCode,
-					body: res.body
-				}
-			});
-		}
+			if (res.statusCode !== 200) {
+				throw new app.Error({
+					message: "API returned non-200 status code.",
+					args: {
+						statusCode: res.statusCode,
+						body: res.body
+					}
+				});
+			}
 
-		const retcode = res.body.retcode;
-		if (retcode === -2001 || retcode === -2003) {
-			app.Logger.log(`CodeRedeem:${account.platform}`, {
-				message: "Expired or invalid code",
-				args: { code: code.code }
-			});
-			return null;
-		}
+			const retcode = res.body.retcode;
+			if (retcode === -2001 || retcode === -2003) {
+				app.Logger.log(`CodeRedeem:${account.platform}`, {
+					message: "Expired or invalid code",
+					args: { code: code.code }
+				});
+				return null;
+			}
 
-		if (retcode !== 0) {
-			app.Logger.info(`CodeRedeem:${account.platform}`, `${code.code} ${res.body.message}`);
-			return { success: false, reason: res.body.message };
-		}
+			if (retcode !== 0) {
+				app.Logger.info(`CodeRedeem:${account.platform}`, `${code.code} ${res.body.message}`);
+				return { success: false, reason: res.body.message };
+			}
 
-		app.Logger.info(`CodeRedeem:${account.platform}`, `Successfully redeemed code: ${code.code}`);
-		return { success: true };
-	}
-	catch (e) {
-		if (e.message === "Request timed out") {
-			app.Logger.warn(`CodeRedeem:${account.platform}`, `Code redemption timed out for ${code.code}`);
-			return { success: false, reason: "Redemption timed out" };
+			app.Logger.info(`CodeRedeem:${account.platform}`, `Successfully redeemed code: ${code.code}`);
+			return { success: true };
 		}
-		else {
-			console.error({
-				message: `Error redeeming code ${code.code}`,
-				error: e
-			});
-			return { success: false, reason: "Unexpected error occurred" };
+		catch (e) {
+			if (attempt < MAX_RETRIES) {
+				app.Logger.warn(`CodeRedeem:${account.platform}`, `Attempt ${attempt} failed for code ${code.code}. Retrying...`);
+				await setTimeout(RETRY_DELAY);
+			}
+			else if (e.message === "Request timed out") {
+				app.Logger.warn(`CodeRedeem:${account.platform}`, `Code redemption timed out for ${code.code} after ${MAX_RETRIES} attempts`);
+				return { success: false, reason: "Redemption timed out" };
+			}
+			else {
+				console.error({
+					message: `Error redeeming code ${code.code} after ${MAX_RETRIES} attempts`,
+					error: e
+				});
+				return { success: false, reason: "Unexpected error occurred" };
+			}
 		}
 	}
 };
@@ -115,17 +122,24 @@ const redeemCodes = async (account, codeList, redeemFunction) => {
 	const success = [];
 	const failed = [];
 
+	app.Logger.debug(`CodeRedeem:${account.platform}`, `Starting to redeem ${codeList.length} codes for account ${account.uid}`);
+
 	for (const code of codeList) {
+		app.Logger.debug(`CodeRedeem:${account.platform}`, `Attempting to redeem code: ${code.code}`);
 		const result = await redeemCode(account, code, redeemFunction);
 		if (result === null) {
+			app.Logger.debug(`CodeRedeem:${account.platform}`, `Code ${code.code} skipped (likely expired or invalid)`);
 			continue;
 		}
 		if (result.success) {
 			success.push(code);
+			app.Logger.debug(`CodeRedeem:${account.platform}`, `Successfully redeemed code: ${code.code}`);
 		}
 		else {
 			failed.push({ ...code, reason: result.reason });
+			app.Logger.debug(`CodeRedeem:${account.platform}`, `Failed to redeem code: ${code.code}. Reason: ${result.reason}`);
 		}
+		app.Logger.debug(`CodeRedeem:${account.platform}`, `Waiting ${RETRY_DELAY}ms before next code`);
 		await setTimeout(RETRY_DELAY);
 	}
 
