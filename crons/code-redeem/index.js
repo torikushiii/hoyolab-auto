@@ -12,8 +12,8 @@ module.exports = {
 	description: "Check and redeem codes for supported games from HoyoLab.",
 	code: async function codeRedeem () {
 		try {
-			app.Logger.info("CodeRedeem", "Starting code redemption process");
-			
+			app.Logger.debug("CodeRedeem", "Starting code redemption process");
+
 			const accountData = app.HoyoLab.getActiveAccounts({
 				blacklist: ["honkai", "tot"]
 			});

@@ -7,7 +7,7 @@ exports.fetch = async () => {
 		});
 
 		if (res.statusCode !== 200) {
-			app.Logger.log("ZenlessZoneZero:ReadWrite", {
+			app.Logger.debug("ZenlessZoneZero:ReadWrite", {
 				message: "Failed to fetch data from ReadWrite.",
 				statusCode: res.statusCode
 			});
