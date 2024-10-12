@@ -20,13 +20,11 @@ let config;
 try {
 	config = JSON5.parse(file.readFileSync("./config.json5"));
 }
-catch {
-	try {
-		config = JSON5.parse(file.readFileSync("./default.config.json5"));
+catch (e) {
+	if (file.existsSync("./config.json5") === false) {
+		throw new Error({ message: "No config file (config.json5) was found. Please follow the setup instructions on https://github.com/torikushiii/hoyolab-auto?tab=readme-ov-file#installation \n" + e });
 	}
-	catch (e) {
-		throw new Error({ message: "No default or custom configuration found." });
-	}
+	throw new Error({ message: "An error occurred when reading your configuration file. Please check and fix the following error:\n" + e });
 }
 
 (async () => {
