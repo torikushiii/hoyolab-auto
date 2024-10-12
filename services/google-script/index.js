@@ -94,9 +94,9 @@ const DEFAULT_CONSTANTS = {
 			icon: "https://hyl-static-res-prod.hoyolab.com/communityweb/business/nap.png"
 		},
 		url: {
-			info: "https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/info",
-			home: "https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/home",
-			sign: "https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/sign"
+			info: "https://sg-public-api.hoyolab.com/event/luna/zzz/os/info",
+			home: "https://sg-public-api.hoyolab.com/event/luna/zzz/os/home",
+			sign: "https://sg-public-api.hoyolab.com/event/luna/zzz/os/sign",
 		}
 	}
 };
