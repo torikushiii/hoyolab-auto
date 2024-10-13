@@ -48,7 +48,10 @@ const fetchForPlatform = async (account) => {
 		return { platform: account.platform, result };
 	}
 	catch (e) {
-		app.Logger.error(`CodeRedeem:${account.platform}`, `Error fetching codes`, e);
+		app.Logger.log(`CodeRedeem:${account.platform}`, {
+			message: "Error fetching codes",
+			error: e
+		});
 		return null;
 	}
 };
