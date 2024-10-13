@@ -279,7 +279,10 @@ class Game {
 		try {
 			const url = `${this.config.url.info}?act_id=${this.config.ACT_ID}`;
 			const response = await UrlFetchApp.fetch(url, {
-				headers: { Cookie: cookieData }
+				headers: {
+					Cookie: cookieData,
+					"x-rpc-signgame": this.getSignGameHeader()
+				}
 			});
 			const data = JSON.parse(response.getContentText());
 
@@ -311,7 +314,10 @@ class Game {
 		try {
 			const url = `${this.config.url.home}?act_id=${this.config.ACT_ID}`;
 			const response = await UrlFetchApp.fetch(url, {
-				headers: { Cookie: cookieData }
+				headers: {
+					Cookie: cookieData,
+					"x-rpc-signgame": this.getSignGameHeader()
+				}
 			});
 			const data = JSON.parse(response.getContentText());
 
