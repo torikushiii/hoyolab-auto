@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    restart: unless-stopped
+    restart: on-failure:5
     container_name: hoyolab-auto
     network_mode: bridge
     volumes:

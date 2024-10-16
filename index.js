@@ -59,16 +59,6 @@ catch (e) {
 	Config.load(config);
 	app.Logger.info("Client", `Loaded ${Config.data.size} configuration entries`);
 
-	const platforms = new Set();
-	for (const definition of platformsConfig) {
-		if (!definition.active) {
-			app.Logger.warn("Client", `Skipping ${definition.type} platform (inactive)`);
-			continue;
-		}
-
-		platforms.add(Platform.create(definition.type, definition));
-	}
-
 	const { loadCommands } = require("./commands/index.js");
 	const commands = await loadCommands();
 	await Command.importData(commands.definitions);
@@ -101,18 +91,29 @@ catch (e) {
 		HoyoLab
 	};
 
-	const promises = [];
-	for (const platform of platforms) {
-		promises.push(platform.connect());
-	}
-
 	const hoyoPromises = [];
 	for (const account of accounts) {
 		hoyoPromises.push(account.login());
 	}
 
-	await Promise.all(promises);
 	await Promise.all(hoyoPromises);
+
+	const platforms = new Set();
+	for (const definition of platformsConfig) {
+		if (!definition.active) {
+			app.Logger.warn("Client", `Skipping ${definition.type} platform (inactive)`);
+			continue;
+		}
+
+		platforms.add(Platform.create(definition.type, definition));
+	}
+
+	const promises = [];
+	for (const platform of platforms) {
+		promises.push(platform.connect());
+	}
+
+	await Promise.all(promises);
 
 	const end = process.hrtime.bigint();
 	app.Logger.info("Client", `Initialize completed (${Number(end - start) / 1e6}ms)`);
