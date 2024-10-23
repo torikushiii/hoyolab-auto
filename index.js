@@ -118,14 +118,14 @@ catch (e) {
 	const end = process.hrtime.bigint();
 	app.Logger.info("Client", `Initialize completed (${Number(end - start) / 1e6}ms)`);
 
-	process.on("unhandledRejection", (reason) => {
-		if (!(reason instanceof Error)) {
-			return;
-		}
+	// process.on("unhandledRejection", (reason) => {
+	// 	if (!(reason instanceof Error)) {
+	// 		return;
+	// 	}
 
-		app.Logger.log("Client", {
-			message: "Unhandled promise rejection",
-			args: { reason }
-		});
-	});
+	// 	app.Logger.log("Client", {
+	// 		message: "Unhandled promise rejection",
+	// 		args: { reason }
+	// 	});
+	// });
 })();

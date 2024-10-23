@@ -131,19 +131,22 @@ const redeemCodes = async (account, codeList, redeemFunction) => {
 		app.Logger.debug(`CodeRedeem:${account.platform}`, `Attempting to redeem code: ${code.code}`);
 		const result = await redeemCode(account, code, redeemFunction);
 		if (result === null) {
+			await setTimeout(Math.max(7000, RETRY_DELAY));
 			app.Logger.debug(`CodeRedeem:${account.platform}`, `Code ${code.code} skipped (likely expired or invalid)`);
 			continue;
 		}
 		if (result.success) {
 			success.push(code);
 			app.Logger.debug(`CodeRedeem:${account.platform}`, `Successfully redeemed code: ${code.code}`);
+			app.Logger.debug(`CodeRedeem:${account.platform}`, `Waiting at least 7 seconds before next code`);
+			await setTimeout(Math.max(7000, RETRY_DELAY));
 		}
 		else {
 			failed.push({ ...code, reason: result.reason });
 			app.Logger.debug(`CodeRedeem:${account.platform}`, `Failed to redeem code: ${code.code}. Reason: ${result.reason}`);
+			app.Logger.debug(`CodeRedeem:${account.platform}`, `Waiting ${RETRY_DELAY}ms before next code`);
+			await setTimeout(RETRY_DELAY);
 		}
-		app.Logger.debug(`CodeRedeem:${account.platform}`, `Waiting ${RETRY_DELAY}ms before next code`);
-		await setTimeout(RETRY_DELAY);
 	}
 
 	app.Logger.info(`CodeRedeem:${account.platform}`, `Redeemed ${success.length} code(s), ${failed.length} failed`);
