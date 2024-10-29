@@ -18,33 +18,45 @@ exports.fetch = async () => {
 		const $ = app.Utils.cheerio(res.body);
 
 		const codes = [];
+		const title = $("h2:contains(\"Active Redeem Codes for\")").text().trim();
 
-		const table = $("body > div.l-content > div.l-3col > div.l-3colMain > div.l-3colMain__center.l-3colMain__center--shadow > div.archive-style-wrapper > ul");
-		const codeList = table.find(".a-listItem");
-		if (codeList.length === 0) {
-			app.Logger.debug("StarRail:Game8", {
-				message: "No codes found.",
-				args: {
-					body: res.body
+		if (title.includes("Active Redeem Codes for")) {
+			const codeList = $("body > div.l-content > div.l-3col > div.l-3colMain > div.l-3colMain__center.l-3colMain__center--shadow > div.archive-style-wrapper > ul.a-list");
+			codeList.find("li.a-listItem").each((index, element) => {
+				const $element = $(element);
+				const codeElement = $element.find("a.a-link").first();
+				const code = codeElement.text().trim();
+
+				const rewardsText = $element.text().replace(code, "").replace(/NEW/i, "")
+					.trim();
+				const rewardsRaw = rewardsText.replace(/^\(|\)$/g, "").split(",");
+
+				const rewards = [];
+				let currentReward = "";
+				for (const part of rewardsRaw) {
+					if (currentReward && /\d+$/.test(currentReward) && /^\d+/.test(part.trim())) {
+						// If the current reward ends with a number and the next part starts with a number,
+						// it's likely a thousands separator
+						currentReward += `,${part.trim()}`;
+					}
+					else {
+						if (currentReward) {
+							rewards.push(currentReward.trim());
+						}
+						currentReward = part.trim();
+					}
 				}
-			});
-		}
+				if (currentReward) {
+					rewards.push(currentReward.trim());
+				}
 
-		for (let i = 0; i < codeList.length; i++) {
-			const $code = $(codeList[i]);
-			const codeText = $code.text().trim();
-			const [code, ...rewardParts] = codeText.split(" ");
-			const rewardsText = rewardParts.join(" ").replace(code, "").trim();
-
-			const cleanedRewardsText = rewardsText.replace(/^-/, "").trim();
-			const rewards = cleanedRewardsText
-				.split(/,\s| and /)
-				.map((reward) => reward.replace(/\(|\)/g, "").trim());
-
-			codes.push({
-				code: code.trim(),
-				rewards,
-				source: "game8"
+				if (code && rewards.length > 0) {
+					codes.push({
+						code,
+						rewards,
+						source: "game8"
+					});
+				}
 			});
 		}
 
