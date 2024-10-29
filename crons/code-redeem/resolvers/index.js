@@ -3,7 +3,7 @@ const StarRail = require("./star-rail");
 const ZenlessZoneZero = require("./zenless");
 const { setTimeout } = require("node:timers/promises");
 
-const TIMEOUT_DURATION = 30_000;
+const TIMEOUT_DURATION = 10_000;
 const RETRY_DELAY = 7000;
 const MAX_RETRIES = 3;
 
@@ -130,11 +130,13 @@ const redeemCodes = async (account, codeList, redeemFunction) => {
 	for (const code of codeList) {
 		app.Logger.debug(`CodeRedeem:${account.platform}`, `Attempting to redeem code: ${code.code}`);
 		const result = await redeemCode(account, code, redeemFunction);
+
 		if (result === null) {
 			await setTimeout(Math.max(7000, RETRY_DELAY));
 			app.Logger.debug(`CodeRedeem:${account.platform}`, `Code ${code.code} skipped (likely expired or invalid)`);
 			continue;
 		}
+
 		if (result.success) {
 			success.push(code);
 			app.Logger.debug(`CodeRedeem:${account.platform}`, `Successfully redeemed code: ${code.code}`);
