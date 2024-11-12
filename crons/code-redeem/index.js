@@ -34,7 +34,12 @@ module.exports = {
 			return;
 		}
 
-		const { success, failed } = await checkAndRedeem(codes);
+		const result = await checkAndRedeem(codes);
+		if (typeof result === "undefined") {
+			return;
+		}
+
+		const { success, failed } = result;
 		if (success.length === 0 && failed.length === 0) {
 			return;
 		}
