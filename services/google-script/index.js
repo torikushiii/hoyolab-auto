@@ -374,7 +374,7 @@ class Game {
 	}
 
 	get userAgent () {
-		return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36";
+		return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36";
 	}
 
 	async redeemCodes (account) {
@@ -388,7 +388,7 @@ class Game {
 			}
 
 			await this.redeemCode(account, code.code);
-			await this.delay(10000);
+			await this.delay(6000);
 
 			this.saveRedeemedCode(code.code);
 		}
@@ -396,17 +396,17 @@ class Game {
 
 	async fetchCodes () {
 		const gameParam = this.getGameParam();
-		const url = `https://hoyo-codes.seria.moe/codes?game=${gameParam}`;
+		const url = `https://api.ennead.cc/mihoyo/${gameParam}/codes`;
 		const response = await UrlFetchApp.fetch(url);
 		const data = JSON.parse(response.getContentText());
-		return data.codes;
+		return data.active;
 	}
 
 	getGameParam () {
 		switch (this.name) {
 			case "genshin": return "genshin";
-			case "starrail": return "hkrpg";
-			case "zenless": return "nap";
+			case "starrail": return "starrail";
+			case "zenless": return "zenless";
 			default: throw new Error(`Unknown game: ${this.name}`);
 		}
 	}
