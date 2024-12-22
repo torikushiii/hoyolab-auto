@@ -20,8 +20,8 @@
 2. **Getting the Cookie:**
 
    **Method 1 (Check-in Only):**
-   > [!WARNING]
-   > This method will only work for daily check-ins. For both check-in and code redemption features, use Method 2 below.
+> [!WARNING]
+> This method will only work for daily check-ins. For both check-in and code redemption features, use Method 2 below.
 
    - When you are at the check-in page, open the developer console (F12) and go to the "Network" tab (refresh the page if needed).
    - Find the `home` request and click it.
@@ -33,22 +33,22 @@
      ![image](https://github.com/torikushiii/hoyolab-auto/assets/21153445/e4cb8259-aef4-4b2c-9d88-78e30a03b05c)
 
    **Method 2 (Check-in and Code Redemption):**
-   > [!NOTE]
-   > This method is recommended if you want to use both check-in and code redemption features.
+> [!NOTE]
+> This method is recommended if you want to use both check-in and code redemption features.
 
    1. Go to your [HoyoLab profile](https://www.hoyolab.com/accountCenter/postList) and log in with your Hoyoverse account.
    2. Open the browser console by pressing `F12`.
    3. Navigate to the **Network** tab.
 
-      ![Network Tab](https://gist.github.com/assets/21153445/f3c90ee3-e711-4aea-a1d2-94abd8824c01)
+      ![Network Tab](https://github.com/user-attachments/assets/d161d859-7575-4740-b0dd-72b3f637e7c7)
 
    4. Search for `getGameRecordCard` in the network requests and click on the result. (If you don't see anything, refresh the page while keeping the browser console open)
 
-      ![getGameRecordCard Request](https://gist.github.com/assets/21153445/4da91d07-59de-4af0-9471-d1f9e000f61f)
+      ![image](https://github.com/user-attachments/assets/45e6b302-3c33-4af1-b426-4fb6298fbe80)
 
    5. Go to the **Headers** tab and scroll down to find **Request Headers**. Copy all the cookie values.
 
-      ![Request Headers](https://gist.github.com/assets/21153445/0165a481-682e-411b-ba88-a8af17cd6f71)
+      ![image](https://github.com/user-attachments/assets/283c43eb-20bd-47e9-9751-1bc7cc852025)
 
 ### 2. Setup in Google Apps Script
 
