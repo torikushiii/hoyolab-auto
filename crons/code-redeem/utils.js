@@ -34,6 +34,10 @@ const checkAndRedeem = async (codes) => {
 		});
 
 		for (const account of accounts) {
+			if (account.redeemCode === false) {
+				continue;
+			}
+
 			for (const code of newCodes.genshin) {
 				const result = await require("./genshin").redeemCodes(account, code);
 				if (result.success) {
@@ -63,6 +67,10 @@ const checkAndRedeem = async (codes) => {
 		});
 
 		for (const account of accounts) {
+			if (account.redeemCode === false) {
+				continue;
+			}
+
 			for (const code of newCodes.starrail) {
 				const result = await require("./starrail").redeemCodes(account, code);
 				if (result.success) {
@@ -92,6 +100,10 @@ const checkAndRedeem = async (codes) => {
 		});
 
 		for (const account of accounts) {
+			if (account.redeemCode === false) {
+				continue;
+			}
+
 			for (const code of newCodes.zenless) {
 				const result = await require("./zenless").redeemCodes(account, code);
 				if (result.success) {
