@@ -57,7 +57,7 @@ const checkAndRedeem = async (codes) => {
 		const existingCodes = await app.Cache.get("genshin-code") || [];
 		await app.Cache.set({
 			key: "genshin-code",
-			value: [...existingCodes, ...newCodes.genshin.map(c => c.code)]
+			value: [...existingCodes, ...newCodes.genshin.map(c => c.code.toUpperCase())]
 		});
 	}
 
@@ -90,7 +90,7 @@ const checkAndRedeem = async (codes) => {
 		const existingCodes = await app.Cache.get("starrail-code") || [];
 		await app.Cache.set({
 			key: "starrail-code",
-			value: [...existingCodes, ...newCodes.starrail.map(c => c.code)]
+			value: [...existingCodes, ...newCodes.starrail.map(c => c.code.toUpperCase())]
 		});
 	}
 
@@ -123,7 +123,7 @@ const checkAndRedeem = async (codes) => {
 		const existingCodes = await app.Cache.get("zenless-code") || [];
 		await app.Cache.set({
 			key: "zenless-code",
-			value: [...existingCodes, ...newCodes.zenless.map(c => c.code)]
+			value: [...existingCodes, ...newCodes.zenless.map(c => c.code.toUpperCase())]
 		});
 	}
 
@@ -178,9 +178,9 @@ const buildMessage = (status, data) => {
 };
 
 const checkCachedCodes = async (codes) => {
-	const genshinCodes = await app.Cache.get("genshin-code") || [];
-	const starrailCodes = await app.Cache.get("starrail-code") || [];
-	const zenlessCodes = await app.Cache.get("zenless-code") || [];
+	const genshinCodes = (await app.Cache.get("genshin-code") || []).map(code => code.toUpperCase());
+	const starrailCodes = (await app.Cache.get("starrail-code") || []).map(code => code.toUpperCase());
+	const zenlessCodes = (await app.Cache.get("zenless-code") || []).map(code => code.toUpperCase());
 
 	const newCodes = {
 		genshin: [],
@@ -191,31 +191,31 @@ const checkCachedCodes = async (codes) => {
 	if (genshinCodes.length === 0 && codes.genshin.length > 0) {
 		await app.Cache.set({
 			key: "genshin-code",
-			value: codes.genshin.map(c => c.code)
+			value: codes.genshin.map(c => c.code.toUpperCase())
 		});
 	}
 	else if (codes.genshin.length > 0) {
-		newCodes.genshin = codes.genshin.filter(code => !genshinCodes.includes(code.code));
+		newCodes.genshin = codes.genshin.filter(code => !genshinCodes.includes(code.code.toUpperCase()));
 	}
 
 	if (starrailCodes.length === 0 && codes.starrail.length > 0) {
 		await app.Cache.set({
 			key: "starrail-code",
-			value: codes.starrail.map(c => c.code)
+			value: codes.starrail.map(c => c.code.toUpperCase())
 		});
 	}
 	else if (codes.starrail.length > 0) {
-		newCodes.starrail = codes.starrail.filter(code => !starrailCodes.includes(code.code));
+		newCodes.starrail = codes.starrail.filter(code => !starrailCodes.includes(code.code.toUpperCase()));
 	}
 
 	if (zenlessCodes.length === 0 && codes.zenless.length > 0) {
 		await app.Cache.set({
 			key: "zenless-code",
-			value: codes.zenless.map(c => c.code)
+			value: codes.zenless.map(c => c.code.toUpperCase())
 		});
 	}
 	else if (codes.zenless.length > 0) {
-		newCodes.zenless = codes.zenless.filter(code => !zenlessCodes.includes(code.code));
+		newCodes.zenless = codes.zenless.filter(code => !zenlessCodes.includes(code.code.toUpperCase()));
 	}
 
 	return newCodes;
