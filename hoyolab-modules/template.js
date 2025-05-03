@@ -60,7 +60,7 @@ module.exports = class HoyoLab {
 
 			if (this.#name === "honkai" || this.#name === "tot") {
 				const parsedCookie = this.#parseCookie(account.cookie);
-				const ltuid = account.cookie.match(/ltuid_v2=([^;]+)/)[1];
+				const ltuid = account.cookie.match(/ltuid(?:|_v2)=([^;]+)/)[1];
 				this.#data.push({
 					cookie: parsedCookie.cookie,
 					ltuid

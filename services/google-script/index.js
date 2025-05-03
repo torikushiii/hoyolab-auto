@@ -128,7 +128,7 @@ class Game {
 		const success = [];
 		for (const cookie of accounts) {
 			try {
-				const ltuid = cookie.match(/ltuid_v2=([^;]+)/)[1];
+				const ltuid = cookie.match(/ltuid(?:|_v2)=([^;]+)/)[1];
 				const accountDetails = await this.getAccountDetails(cookie, ltuid);
 				if (!accountDetails) {
 					continue;
