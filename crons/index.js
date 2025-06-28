@@ -15,13 +15,7 @@ const Stamina = require("./stamina/index.js");
 const UpdateCookie = require("./update-cookie/index.js");
 const WeekliesReminder = require("./weeklies-reminder/index.js");
 
-let config;
-try {
-	config = JSON5.parse(file.readFileSync("./config.json5"));
-}
-catch {
-	config = JSON5.parse(file.readFileSync("./default.config.json5"));
-}
+const config = require("../config.js");
 
 const definitions = [
 	CheckIn,
