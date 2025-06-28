@@ -147,6 +147,7 @@ You can configure your config using one of the following methods:
      cp default.config.json5 config.json5
      ```
    - Open `config.json5` and update it with your application's configuration settings.
+   - Set environment variable `CONFIG_PATH` to alter the configuration file path (default to `./config.json5`).
 
 **3. Building and Running with Docker Compose**
 
