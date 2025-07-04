@@ -8,14 +8,10 @@ try {
 }
 catch (e) {
 	if (file.existsSync(configPath) === false) {
-		throw new Error({
-			message: `No config file (${configPath}) was found. Please follow the setup instructions on https://github.com/torikushiii/hoyolab-auto?tab=readme-ov-file#installation \n${e}`
-		});
+		throw new Error(`No config file (${configPath}) was found. Please follow the setup instructions on https://github.com/torikushiii/hoyolab-auto?tab=readme-ov-file#installation \n${e}`);
 	}
 
-	throw new Error({
-		message: `An error occurred when reading your configuration file (${configPath}). Please check and fix the following error:\n${e}`
-	});
+	throw new Error(`An error occurred when reading your configuration file (${configPath}). Please check and fix the following error:\n${e}`);
 }
 
 module.exports = config;
