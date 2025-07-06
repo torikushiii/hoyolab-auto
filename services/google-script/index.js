@@ -669,3 +669,67 @@ function checkInAllGames () {
 			console.error("Error during check-in process:", e);
 		});
 }
+
+function manuallyRedeemCodes(gameName, forceRedeem = false) {
+	if (!["genshin", "honkai", "starrail", "zenless"].includes(gameName)) {
+		console.error(`Invalid game name: ${gameName}. Must be one of: genshin, honkai, starrail, zenless`);
+		return Promise.reject(new Error(`Invalid game name: ${gameName}`));
+	}
+
+	if (gameName === "honkai") {
+		console.warn("Code redemption is not supported for Honkai Impact 3rd");
+		return Promise.resolve({ success: false, message: "Code redemption is not supported for Honkai Impact 3rd" });
+	}
+
+	const game = new Game(gameName, config[gameName]);
+	const accounts = config[gameName].data;
+
+	if (accounts.length === 0) {
+		console.warn(`No ${gameName} accounts provided. Cannot redeem codes.`);
+		return Promise.resolve({ success: false, message: `No ${gameName} accounts provided` });
+	}
+
+	return Promise.all(accounts.map(async (cookieData) => {
+		try {
+			const ltuid = cookieData.match(/ltuid(?:|_v2)=([^;]+)/)[1];
+			const accountDetails = await game.getAccountDetails(cookieData, ltuid);
+
+			if (!accountDetails) {
+				return { success: false, message: `Failed to get account details for ${gameName}` };
+			}
+
+			const account = {
+				uid: accountDetails.uid,
+				nickname: accountDetails.nickname,
+				rank: accountDetails.rank,
+				region: accountDetails.region,
+				cookie: cookieData
+			};
+
+			console.log(`Redeeming codes for ${gameName} account: ${account.nickname} (${account.uid})`);
+
+			if (forceRedeem) {
+				await game.forceRedeemCodes(account);
+				return { success: true, account, message: `Force redeemed all codes for ${account.nickname} (${account.uid})` };
+			} else {
+				await game.redeemCodes(account);
+				return { success: true, account, message: `Redeemed new codes for ${account.nickname} (${account.uid})` };
+			}
+		} catch (e) {
+			console.error(`Error redeeming codes for ${gameName}:`, e);
+			return { success: false, message: e.message };
+		}
+	}));
+}
+
+function redeemGenshinCodes() {
+	return manuallyRedeemCodes("genshin", false);
+}
+
+function redeemStarRailCodes() {
+	return manuallyRedeemCodes("starrail", false);
+}
+
+function redeemZenlessCodes() {
+	return manuallyRedeemCodes("zenless", false);
+}
