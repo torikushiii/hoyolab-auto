@@ -29,6 +29,29 @@ const config = {
 	}
 };
 
+// Function to reset redeemed codes for all games
+function resetAllRedeemedCodes() {
+	const games = ["genshin", "honkai", "starrail", "zenless"];
+	games.forEach(game => {
+		PropertiesService.getScriptProperties().deleteProperty(`${game}_redeemed_codes`);
+	});
+	console.log("Redeemed codes for all games have been reset.");
+}
+
+// Function to view all stored redeemed codes
+function viewAllRedeemedCodes() {
+	const games = ["genshin", "honkai", "starrail", "zenless"];
+	const allCodes = {};
+
+	games.forEach(game => {
+		const redeemedCodes = PropertiesService.getScriptProperties().getProperty(`${game}_redeemed_codes`);
+		allCodes[game] = redeemedCodes ? JSON.parse(redeemedCodes) : [];
+	});
+
+	console.log("All redeemed codes:", allCodes);
+	return allCodes;
+}
+
 const DISCORD_WEBHOOK = null; // Replace with your Discord webhook URL (optional)
 const DEFAULT_CONSTANTS = {
 	genshin: {
@@ -392,6 +415,19 @@ class Game {
 
 			this.saveRedeemedCode(code.code);
 		}
+	}
+
+	// Force redemption of all codes regardless of previous redemption status
+	async forceRedeemCodes (account) {
+		const codes = await this.fetchCodes();
+
+		for (const code of codes) {
+			console.log(`Attempting to redeem code ${code.code} for ${this.fullName}`);
+			await this.redeemCode(account, code.code);
+			Utilities.sleep(6000);
+		}
+
+		console.log(`Completed forced code redemption for ${this.fullName}`);
 	}
 
 	async fetchCodes () {
