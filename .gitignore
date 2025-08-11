@@ -182,6 +182,11 @@ bun.lockb
 # Cache Path
 cache.json
 
+# Configuration files with sensitive data
+config/
+*.config.json5
+!default.config.json5
+
 # Cookie
 generated-cookie.txt
 diff.sh
