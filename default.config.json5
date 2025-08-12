@@ -1,6 +1,10 @@
 {
     loglevel: 'info',
     userAgent: 'Custom fork of HoyoLabAuto: github.com/torikushiii/hoyolab-auto',
+    // Test notification settings
+    testNotification: {
+        enabled: true, // Set to false if you don't want to receive test notifications on startup
+    },
     platforms: [
         {
             id: 1,

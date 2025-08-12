@@ -52,25 +52,33 @@ jobs:
         run: |
           VERSION="${{ steps.version.outputs.version }}"
           
-          # Generate changelog
-          CHANGELOG="## 🚀 HoyoLab Auto v$VERSION
+          # Generate changelog using cat with heredoc
+          CHANGELOG=$(cat << 'EOL'
+          ## 🚀 HoyoLab Auto v${VERSION}
 
-Automatically generated release from version file update.
+          Automatically generated release from version file update.
 
-### Changes
-- Updated to version $VERSION
-- See commit history for detailed changes
+          ### Changes
+          - Updated to version ${VERSION}
+          - See commit history for detailed changes
 
-**Full Changelog**: [View all changes](https://github.com/TheInfamousToTo/hoyolab-auto/commits/v$VERSION)"
+          **Full Changelog**: [View all changes](https://github.com/TheInfamousToTo/hoyolab-auto/commits/v${VERSION})
+          EOL
+          )
+          
+          # Substitute the VERSION variable
+          CHANGELOG=$(echo "$CHANGELOG" | sed "s/\${VERSION}/$VERSION/g")
 
           # Debug output
           echo "Generated changelog preview:"
           echo "$CHANGELOG" | head -10
           
           # Save changelog to output (GitHub Actions multiline string)
-          echo "changelog<<EOF" >> $GITHUB_OUTPUT
-          printf "%b\n" "$CHANGELOG" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          {
+            echo "changelog<<EOF"
+            echo "$CHANGELOG"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
           
       - name: Check if tag exists
         id: check-tag
