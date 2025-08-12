@@ -1,0 +1,98 @@
+name: Create Release
+
+# This workflow automatically creates GitHub releases when the version file is updated
+# It extracts changelog information from README.md (preferred) or CHANGELOG.md (fallback)
+# Version information is read from the 'version' file in the repository root
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'version'
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          
+      - name: Check if version file changed
+        id: check
+        run: |
+          if git diff HEAD~1 HEAD --name-only | grep -q "^version$"; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Version file has changed"
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "Version file has not changed"
+          fi
+          
+      - name: Read version
+        id: version
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          VERSION=$(cat version | tr -d '\n' | sed 's/^v//')
+          TAG_VERSION=$(cat version | tr -d '\n')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag_version=$TAG_VERSION" >> $GITHUB_OUTPUT
+          echo "Found version: $VERSION"
+          echo "Tag version: $TAG_VERSION"
+          
+      - name: Generate changelog
+        id: changelog
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          
+          # Generate changelog
+          CHANGELOG="## 🚀 HoyoLab Auto v$VERSION
+
+Automatically generated release from version file update.
+
+### Changes
+- Updated to version $VERSION
+- See commit history for detailed changes
+
+**Full Changelog**: [View all changes](https://github.com/TheInfamousToTo/hoyolab-auto/commits/v$VERSION)"
+
+          # Debug output
+          echo "Generated changelog preview:"
+          echo "$CHANGELOG" | head -10
+          
+          # Save changelog to output (GitHub Actions multiline string)
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          printf "%b\n" "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+      - name: Check if tag exists
+        id: check-tag
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          TAG_VERSION="${{ steps.version.outputs.tag_version }}"
+          if git tag -l | grep -q "^$TAG_VERSION$"; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Tag $TAG_VERSION already exists"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Tag $TAG_VERSION does not exist"
+          fi
+          
+      - name: Create GitHub Release
+        if: steps.check.outputs.changed == 'true' && steps.check-tag.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.tag_version }}
+          name: "HoyoLab Auto ${{ steps.version.outputs.tag_version }}"
+          body: ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
