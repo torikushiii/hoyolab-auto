@@ -2,47 +2,19 @@ const { SlashCommandBuilder } = require("discord.js");
 const TestNotification = require("../../singleton/test-notification.js");
 
 module.exports = {
-	definition: {
-		name: "test-notification",
-		description: "Send a test notification to verify platform functionality",
-		aliases: ["test", "ping"],
-		params: [
-			{
-				name: "message",
-				type: "string",
-				description: "Custom message for the test notification",
-				required: false
-			}
-		],
-		examples: [
-			{
-				usage: "$test-notification",
-				description: "Send a default test notification"
-			},
-			{
-				usage: "$test-notification Testing webhook functionality",
-				description: "Send a test notification with a custom message"
-			}
-		],
-		whitelist: {
-			response: "You do not have permission to use this command."
+	name: "test-notification",
+	description: "Send a test notification to verify platform functionality",
+	params: [
+		{
+			name: "message",
+			type: "string",
+			description: "Custom message for the test notification",
+			required: false
 		}
-	},
+	],
 	
-	getSlashCommandData () {
-		return new SlashCommandBuilder()
-			.setName("test-notification")
-			.setDescription("Send a test notification to verify platform functionality")
-			.addStringOption(option => 
-				option
-					.setName("message")
-					.setDescription("Custom message for the test notification")
-					.setRequired(false)
-			);
-	},
-
-	async execute (context, ...args) {
-		const { platform } = context;
+	run: async function (context, message) {
+		const { platform, interaction } = context;
 		
 		if (!platform) {
 			return {
@@ -51,17 +23,31 @@ module.exports = {
 			};
 		}
 
-		const customMessage = args.join(" ") || "Manual test notification triggered via command";
+		const customMessage = message || "Manual test notification triggered via command";
 		
 		try {
-			await TestNotification.sendManualTestNotification(platform, { 
-				message: customMessage 
-			});
-			
-			return {
-				success: true,
-				reply: "✅ Test notification sent successfully!"
-			};
+			// For Discord bot commands, the platform object is just metadata
+			// We handle the response differently based on the platform
+			if (platform.name === "Discord") {
+				// For Discord bot, we just return a reply - no need to call external send methods
+				const timestamp = new Date().toLocaleString();
+				app.Logger.info("TestCommand", `Manual test triggered via Discord bot: ${customMessage}`);
+				
+				return {
+					success: true,
+					reply: `🧪 **Manual Test Notification**\n\n${customMessage}\n\n🔧 **Test Type:** Manual\n🕒 **Triggered At:** ${timestamp}\n🤖 **Platform:** Discord Bot`
+				};
+			} else {
+				// For other platforms (webhook, telegram), use the test notification system
+				await TestNotification.sendManualTestNotification(platform, { 
+					message: customMessage 
+				});
+				
+				return {
+					success: true,
+					reply: "✅ Test notification sent successfully!"
+				};
+			}
 		} catch (error) {
 			app.Logger.error("TestCommand", `Failed to send test notification: ${error.message}`);
 			
