@@ -1,8 +1,6 @@
 services:
   instance:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/theinfamoustoto/hoyolab-auto:latest
     restart: on-failure:5
     container_name: hoyolab-auto
     network_mode: bridge
