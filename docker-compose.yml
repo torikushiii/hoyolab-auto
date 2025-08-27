@@ -1,19 +1,12 @@
-version: '3'
-
 services:
   instance:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/theinfamoustoto/hoyolab-auto:latest
     restart: on-failure:5
     container_name: hoyolab-auto
     network_mode: bridge
     volumes:
       - ./config.json5:/app/config.json5:ro
-      - data:/app/data
+      - ./data:/app/data
+      - ./logs:/app/logs
     environment:
-      TZ: Asia/Shanghai
-
-volumes:
-  config:
-  data:
+      TZ: Asia/Bahrain

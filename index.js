@@ -5,6 +5,7 @@ const Got = require("./classes/got.js");
 const Cache = require("./singleton/cache.js");
 const Logger = require("./singleton/logger.js");
 const Utils = require("./singleton/utils.js");
+const TestNotification = require("./singleton/test-notification.js");
 
 const HoyoLab = require("./hoyolab-modules/template.js");
 const Platform = require("./platforms/template.js");
@@ -35,7 +36,8 @@ const config = require("./config.js");
 		Got: await Got.initialize(),
 		Cache: new Cache(),
 		Logger: new Logger(config.loglevel),
-		Utils: new Utils()
+		Utils: new Utils(),
+		TestNotification
 	};
 
 	app.Logger.info("Client", "Loading configuration data");
@@ -97,6 +99,11 @@ const config = require("./config.js");
 	}
 
 	await Promise.all(promises);
+
+	// Send test notifications to confirm platform functionality
+	if (config.testNotification?.enabled !== false) {
+		await TestNotification.sendTestNotifications(platforms);
+	}
 
 	const end = process.hrtime.bigint();
 	app.Logger.info("Client", `Initialize completed (${Number(end - start) / 1e6}ms)`);
