@@ -169,6 +169,18 @@
 
     <h2>Platforms</h2>
 -->
+    <!-- Test Notification -->
+    <div class="platform-section">
+    <h3>Test Notification</h3>
+    <label for="testNotificationEnabled">Enable test notification on startup:</label>
+    <select id="testNotificationEnabled">
+        <option value="select">Select option</option>
+        <option value="true">true</option>
+        <option value="false" selected>false</option>
+    </select>
+    <div class="small-text">Set to false if you don't want to receive test notifications on startup</div>
+    </div>
+    
     <!-- Platform 1: Discord Bot -->
     <div class="platform-section">
         <h3>Discord Bot</h3>
@@ -738,9 +750,15 @@
         };
 
         function generateConfig() {
+            const tnEl = document.getElementById('testNotificationEnabled');
+            const testNotifyEnabled = tnEl ? (tnEl.value === 'true') : false;
             const config = {
                 loglevel: 'info',
                 userAgent: 'Custom fork of HoyoLabAuto: github.com/torikushiii/hoyolab-auto',
+                // Test notification settings
+                testNotification: {
+                enabled: testNotifyEnabled,
+                },
                 platforms: [
                     {
                         id: 1,
