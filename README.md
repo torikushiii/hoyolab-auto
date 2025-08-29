@@ -94,6 +94,35 @@ If you don't have a server to run this script and simply just want to use it for
       - Open `config.json5` and update it with your application's configuration settings.
 
 4. Follow the instructions in the `default.config.json5` or `config.json5` file.
+5. Run the application:
+   ```bash
+   npm start
+   ```
+
+### Cache File Location
+
+After running the application for the first time, a cache file will be automatically created at:
+```
+./data/cache.json
+```
+
+This file stores temporary data to improve performance and reduce API calls. The `data/` directory structure will look like this:
+```
+project-root/
+├── data/
+│   ├── cache.json    # Auto-generated cache file
+│   └── README.md     # Cache documentation
+├── logs/             # Application logs (if logging is enabled)
+├── config.json5      # Your configuration file
+└── ...
+```
+
+**Important Notes:**
+- The cache file is automatically managed by the application
+- Do not manually edit the cache file
+- The cache file will be recreated if deleted
+- You can safely delete the cache file to reset cached data
+- The `data/` directory must be writable by the application
 
 ## Migration
 
@@ -148,6 +177,9 @@ You can configure your config using one of the following methods:
      ```
    - Open `config.json5` and update it with your application's configuration settings.
    - Set environment variable `CONFIG_PATH` to alter the configuration file path (default to `./config.json5`).
+
+**Important for Docker Users:**
+When running with Docker, the cache file will be created inside the container at `/app/data/cache.json`. To persist cache data between container restarts, ensure the `data` directory is properly mounted as a volume (this is already configured in the provided `docker-compose.yml`).
 
 **3. Building and Running with Docker Compose**
 
