@@ -16,7 +16,7 @@ async function sendTestNotifications (platforms) {
 	app.Logger.info("TestNotification", "Sending test notifications to all configured platforms");
 
 	const testPromises = [];
-	for (const platform of platforms.values()) {
+	for (const platform of platforms) {
 		testPromises.push(sendPlatformTestNotification(platform));
 	}
 
@@ -25,18 +25,17 @@ async function sendTestNotifications (platforms) {
 	let successCount = 0;
 	let failureCount = 0;
 
+	const platformArray = Array.from(platforms);
 	for (const [index, result] of results.entries()) {
-		const platform = Array.from(platforms.values())[index];
-		const platformName = platform.name || "Unknown Platform";
-		const platformId = platform.id || "Unknown ID";
+		const platform = platformArray[index];
 
 		if (result.status === "fulfilled") {
 			successCount++;
-			app.Logger.info("TestNotification", `Successfully sent test notification to ${platformName} (ID: ${platformId})`);
+			app.Logger.info("TestNotification", `Successfully sent test notification to ${platform.name} (ID: ${platform.id})`);
 		}
 		else {
 			failureCount++;
-			app.Logger.error("TestNotification", `Failed to send test notification to ${platformName} (ID: ${platformId}): ${result.reason?.message || "No error message provided"}`);
+			app.Logger.error("TestNotification", `Failed to send test notification to ${platform.name} (ID: ${platform.id}): ${result.reason.message}`);
 		}
 	}
 
@@ -44,62 +43,20 @@ async function sendTestNotifications (platforms) {
 }
 
 /**
- * Get the server location and country code using a ipinfo.io API.
- * @returns {object} An object containing the location string and country code.
- */
-async function getServerLocation () {
-	try {
-		const response = await fetch("https://ipinfo.io/json");
-		const data = await response.json();
-		if (data.city && data.region && data.country) {
-			const location = `${data.city}, ${data.region}, ${data.country}`;
-			const countryCode = data.country;
-			return { location, countryCode };
-		}
-	}
-	catch (e) {
-		app.Logger.error("TestNotification", `Failed to fetch server location: ${e.message}`);
-	}
-	return { location: "Unknown Location", countryCode: null };
-}
-
-/**
- * Converts a two-letter country code to a flag emoji.
- * @param {string} countryCode - The two-letter country code (e.g., "US", "SG").
- * @returns {string} The corresponding flag emoji.
- */
-function getCountryFlag (countryCode) {
-	if (!countryCode) {
-		return "";
-	}
-
-	const codePoints = countryCode
-		.toUpperCase()
-		.split("")
-		.map(char => 127397 + char.charCodeAt());
-	return String.fromCodePoint(...codePoints);
-}
-
-/**
  * Send a test notification to a specific platform
  * @param {Platform} platform - Platform instance to send test notification to
  */
 async function sendPlatformTestNotification (platform) {
-	const { name, id } = platform;
-	const platformName = name.toLowerCase();
-
 	try {
 		const timestamp = new Date().toISOString();
 		const localTime = new Date().toLocaleString();
-		const { location, countryCode } = await getServerLocation();
-		const flag = getCountryFlag(countryCode);
-		const serverLocation = `${flag} ${location}`.trim();
 
+		const platformName = platform.name?.toLowerCase() || "unknown";
 		switch (platformName) {
 			case "discord":
 				// Send a simple message to Discord bot (if it has access to channels)
 				// Note: Discord bots need proper channel access to send messages
-				app.Logger.info("TestNotification", `Discord bot (ID: ${id}) is connected and ready`);
+				app.Logger.info("TestNotification", `Discord bot (ID: ${platform.id}) is connected and ready`);
 				break;
 
 			case "webhook": {
@@ -108,23 +65,23 @@ async function sendPlatformTestNotification (platform) {
 					title: "🔥 HoyoLab Auto - Test Notification",
 					description: "This is a test notification to confirm that the webhook is working properly.",
 					color: 3447003,
-					fields: [{
-						name: "Status",
-						value: "✅ Connected",
-						inline: true
-					}, {
-						name: "Local Time",
-						value: localTime,
-						inline: true
-					}, {
-						name: "Server Location",
-						value: serverLocation,
-						inline: true
-					}, {
-						name: "Platform",
-						value: "Discord Webhook",
-						inline: true
-					}],
+					fields: [
+						{
+							name: "Status",
+							value: "✅ Connected",
+							inline: true
+						},
+						{
+							name: "Local Time",
+							value: localTime,
+							inline: true
+						},
+						{
+							name: "Platform",
+							value: "Discord Webhook",
+							inline: true
+						}
+					],
 					footer: {
 						text: "HoyoLab Auto Test System",
 						icon_url: "https://i.ibb.co/nRqTkXv/image.png"
@@ -144,28 +101,25 @@ async function sendPlatformTestNotification (platform) {
 				// Send a test message to Telegram
 				const escapeMarkdown = (text) => text.replace(/[_*[\]()~`>#+=|{}.!-]/g, "\\$&");
 				const testMessage = `🔥 *HoyoLab Auto \\- Test Notification*\n\n`
-          + `This is a test notification to confirm that the Telegram bot is working properly\\.\n\n`
-          + `✅ *Status:* Connected\n`
-          + `🕒 *Local Time:* ${escapeMarkdown(localTime)}\n`
-          + `📍 *Server Location:* ${escapeMarkdown(serverLocation)}\n`
-          + `🤖 *Platform:* Telegram Bot\n\n`
-          + `🚀 *HoyoLab Auto Started Successfully\\!*`;
+					+ `This is a test notification to confirm that the Telegram bot is working properly\\.\n\n`
+					+ `✅ *Status:* Connected\n`
+					+ `🕒 *Local Time:* ${escapeMarkdown(localTime)}\n`
+					+ `🤖 *Platform:* Telegram Bot\n\n`
+					+ `🚀 *HoyoLab Auto Started Successfully\\!*`;
 
 				await platform.send(testMessage);
 				break;
 			}
 
 			default:
-				app.Logger.warn("TestNotification", `Unknown platform type: ${name}`);
+				app.Logger.warn("TestNotification", `Unknown platform type: ${platform.name || "undefined"}`);
 				break;
 		}
 	}
 	catch (e) {
 		throw new app.Error({
-			message: `Failed to send test notification to ${name}`,
-			args: {
-				error: e.message
-			}
+			message: `Failed to send test notification to ${platform.name || "undefined platform"}`,
+			args: { error: e.message }
 		});
 	}
 }
@@ -176,40 +130,36 @@ async function sendPlatformTestNotification (platform) {
  * @param {Object} options - Additional options for the test message
  */
 async function sendManualTestNotification (platform, options = {}) {
-	const { name, id } = platform;
 	const customMessage = options.message || "Manual test notification triggered";
 
 	try {
 		const timestamp = new Date().toISOString();
 		const localTime = new Date().toLocaleString();
-		const { location, countryCode } = await getServerLocation();
-		const flag = getCountryFlag(countryCode);
-		const serverLocation = `${flag} ${location}`.trim();
-		const platformName = name.toLowerCase();
 
+		const platformName = platform.name?.toLowerCase() || "unknown";
 		switch (platformName) {
 			case "webhook": {
 				const testEmbed = {
 					title: "🧪 HoyoLab Auto - Manual Test",
 					description: customMessage,
-					color: 16776960,
-					fields: [{
-						name: "Test Type",
-						value: "Manual",
-						inline: true
-					}, {
-						name: "Triggered At",
-						value: localTime,
-						inline: true
-					}, {
-						name: "Server Location",
-						value: serverLocation,
-						inline: true
-					}, {
-						name: "Platform",
-						value: "Discord Webhook",
-						inline: true
-					}],
+					color: 16776960, // Yellow color for manual tests
+					fields: [
+						{
+							name: "Test Type",
+							value: "Manual",
+							inline: true
+						},
+						{
+							name: "Triggered At",
+							value: localTime,
+							inline: true
+						},
+						{
+							name: "Platform",
+							value: "Discord Webhook",
+							inline: true
+						}
+					],
 					footer: {
 						text: "HoyoLab Auto Manual Test",
 						icon_url: "https://i.ibb.co/nRqTkXv/image.png"
@@ -228,22 +178,24 @@ async function sendManualTestNotification (platform, options = {}) {
 			case "telegram": {
 				const escapeMarkdown = (text) => text.replace(/[_*[\]()~`>#+=|{}.!-]/g, "\\$&");
 				const testMessage = `🧪 *HoyoLab Auto \\- Manual Test*\n\n`
-          + `${escapeMarkdown(customMessage)}\n\n`
-          + `🔧 *Test Type:* Manual\n`
-          + `🕒 *Triggered At:* ${escapeMarkdown(localTime)}\n`
-          + `📍 *Server Location:* ${escapeMarkdown(serverLocation)}\n`
-          + `🤖 *Platform:* Telegram Bot`;
+					+ `${escapeMarkdown(customMessage)}\n\n`
+					+ `🔧 *Test Type:* Manual\n`
+					+ `🕒 *Triggered At:* ${escapeMarkdown(localTime)}\n`
+					+ `🤖 *Platform:* Telegram Bot`;
 
 				await platform.send(testMessage);
 				break;
 			}
 
 			case "discord":
-				app.Logger.info("TestNotification", `Manual test triggered for Discord bot (ID: ${id}): ${customMessage}`);
+				// For Discord bots, we can't use the simple send method directly from the command
+				// The Discord platform context doesn't have the same send method as webhooks
+				// Instead, we'll return a reply that will be handled by the Discord platform
+				app.Logger.info("TestNotification", `Manual test triggered for Discord bot (ID: ${platform.id}): ${customMessage}`);
 				return true;
 
 			default:
-				app.Logger.warn("TestNotification", `Manual test not supported for platform type: ${name}`);
+				app.Logger.warn("TestNotification", `Manual test not supported for platform type: ${platform.name || "undefined"}`);
 				break;
 		}
 
@@ -251,10 +203,8 @@ async function sendManualTestNotification (platform, options = {}) {
 	}
 	catch (e) {
 		throw new app.Error({
-			message: `Failed to send manual test notification to ${name}`,
-			args: {
-				error: e.message
-			}
+			message: `Failed to send manual test notification to ${platform.name || "undefined platform"}`,
+			args: { error: e.message }
 		});
 	}
 }
