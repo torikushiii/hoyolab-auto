@@ -14,15 +14,20 @@
 A multi-purpose tool for any supported Hoyoverse games. This tool is designed to assist with daily check-ins, stamina checks, expedition checks, automatic code-redemption, and more.
 
 ## Table of Contents
-- [Google App Script](#google-app-script)
-- [Supported Games](#supported-games)
-- [Features](#features)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Migration](#migration)
-- [Usage](#usage)
-- [Notifications Setup](#notifications-setup)
-- [Running with Docker](#running-with-docker)
+- [HoyoLab Auto](#hoyolab-auto)
+  - [Table of Contents](#table-of-contents)
+  - [Google App Script](#google-app-script)
+  - [Supported Games](#supported-games)
+  - [Features](#features)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+    - [Cache File Location](#cache-file-location)
+  - [Migration](#migration)
+  - [Usage](#usage)
+  - [Notifications Setup](#notifications-setup)
+  - [Running with Docker](#running-with-docker)
+  - [Contributing](#contributing)
+  - [Buy Me a Coffee](#buy-me-a-coffee)
 
 ## Google App Script
 If you don't have a server to run this script and simply just want to use it for checking in, you can use Google App Script.
@@ -179,8 +184,11 @@ You can configure your config using one of the following methods:
    - Set environment variable `CONFIG_PATH` to alter the configuration file path (default to `./config.json5`).
 
 **Important for Docker Users:**
-When running with Docker, the cache file will be created inside the container at `/app/data/cache.json`. To persist cache data between container restarts, ensure the `data` directory is properly mounted as a volume (this is already configured in the provided `docker-compose.yml`).
-
+> [!NOTE]
+> When running with Docker, the cache file will be created inside the container at `/app/data/cache.json`. To persist cache data between container restarts, ensure the `data` directory is properly mounted as a volume (this is already configured in the provided `docker-compose.yml`).
+> If this is your first time running docker:
+> - Make sure your user is listed in the docker group, you can do so by running `sudo usermod -aG docker $USER`, logging out and back in
+> - From the project root, grant yourself perms to not have errors while accessing certain folders such as `data`, we can fix this by running `sudo chown -R $USER:$USER data logs && chmod -R 777 data logs`
 **3. Building and Running with Docker Compose**
 
 **Using the Makefile (Recommended):**
