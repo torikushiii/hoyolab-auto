@@ -188,7 +188,8 @@ You can configure your config using one of the following methods:
 > When running with Docker, the cache file will be created inside the container at `/app/data/cache.json`. To persist cache data between container restarts, ensure the `data` directory is properly mounted as a volume (this is already configured in the provided `docker-compose.yml`).
 > If this is your first time running docker:
 > - Make sure your user is listed in the docker group, you can do so by running `sudo usermod -aG docker $USER`, logging out and back in
-> - From the project root, grant yourself perms to not have errors while accessing certain folders such as `data`, we can fix this by running `sudo chown -R $USER:$USER data logs && chmod -R 777 data logs`
+> - From the project root, grant yourself perms to not have errors while accessing certain folders such as `data`. We can fix this by running `sudo chown -R $USER:$USER data logs && chmod -R 777 data logs`
+
 **3. Building and Running with Docker Compose**
 
 **Using the Makefile (Recommended):**
