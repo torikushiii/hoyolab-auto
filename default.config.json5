@@ -8,22 +8,22 @@
     platforms: [
         {
             id: 1,
-            active: true,
+            active: false, // Set to true if you want to receive notifications and issue commands through a bot
             type: 'discord', // This platform is optional, only use this if you have want to access commands via Discord bot
             botId: '123', // Your Discord bot ID
             token: '(YOUR_DISCORD_BOT_TOKEN)',
         },
         {
             id: 2,
-            active: false, // Set to true if you want to enable Telegram bot
+            active: false, // Set to true if you want to enable a Telegram bot to receive notifications and issue commands
             type: 'telegram',
             chatId: 123, // You can follow this guide to create a bot: https://github.com/torikushiii/hoyolab-auto/blob/main/setup/TELEGRAM.md
-            token: '123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11',
+            token: '(YOUR_TELEGRAM_BOT_TOKEN)',
             disableNotification: false, // Set to true if you want to disable notification for Telegram bot (sounds, vibration, etc.)
         },
         {
             id: 3,
-            active: true, // Set to true if you want to send notification to Discord webhook
+            active: false, // Set to true if you want to receive notifications from a Discord webhook
             type: 'webhook',
             url: '(YOUR_WEBHOOK_URL)', // You can follow this guide to create a webhook: https://github.com/torikushiii/hoyolab-auto/blob/main/setup/DISCORD_WEBHOOK.md
         },
@@ -63,7 +63,7 @@
         },
         {
             id: 3,
-            active: true, // Set to true if you want to enable Genshin Impact
+            active: false, // Set to true if you want to enable Genshin Impact
             type: 'genshin',
             data: [
                 {
@@ -81,7 +81,7 @@
                     },
                     stamina: {
                         check: false, // Enable this if you want to get notified when your stamina is above the threshold
-                        threshold: 150, // Your stamina threshold, only fires notification when your stamina is above this value
+                        threshold: 0, // Your stamina threshold, only fires notification when your stamina is above this value
                         persistent: false, // Set to true if you want to get notified every time your stamina is above the threshold
                     },
                     expedition: {
@@ -89,9 +89,10 @@
                         persistent: false, // Set to true if you want to get notified every time your expedition is done
                     },
                     discord: {
-                        // Your Discord user ID to ping you when to do your dailies/weeklies
+                        // Your Discord user ID to ping you when to do your dailies/weeklies (will only work if discord bot / webhook is configured)
                         // or when your stamina is above the threshold and your expedition is done
                         // this is optional, you can leave it as null if you don't want to get pinged
+                        // Make sure your Discord user ID is between single quotes such as ''
                         // e.g userId: '123456789'
                         userId: null,
                     }
@@ -100,7 +101,7 @@
         },
         {
             id: 4,
-            active: true, // Set to true if you want to enable Honkai: Star Rail
+            active: false, // Set to true if you want to enable Honkai: Star Rail
             type: 'starrail',
             data: [
                 // If you have same account for both genshin and starrail
@@ -112,21 +113,22 @@
                 {
                     cookie: '',
                     redeemCode: false,
-                    dailiesCheck: true,
-                    weekliesCheck: true,
+                    dailiesCheck: false,
+                    weekliesCheck: false,
                     stamina: {
-                        check: true,
-                        threshold: 230,
-                        persistent: true,
+                        check: false,
+                        threshold: 0,
+                        persistent: false,
                     },
                     expedition: {
-                        check: true,
+                        check: false,
                         persistent: false,
                     },
                     discord: {
-                        // Your Discord user ID to ping you when to do your dailies/weeklies
+                        // Your Discord user ID to ping you when to do your dailies/weeklies (will only work if discord bot / webhook is configured)
                         // or when your stamina is above the threshold and your expedition is done
                         // this is optional, you can leave it as null if you don't want to get pinged
+                        // Make sure your Discord user ID is between single quotes such as ''
                         // e.g userId: '123456789'
                         userId: null,
                     }
@@ -139,7 +141,7 @@
                     weekliesCheck: false,
                     stamina: {
                         check: false,
-                        threshold: 150,
+                        threshold: 0,
                         persistent: false,
                     },
                     expedition: {
@@ -147,9 +149,10 @@
                         persistent: false,
                     },
                     discord: {
-                        // Your Discord user ID to ping you when to do your dailies/weeklies
+                        // Your Discord user ID to ping you when to do your dailies/weeklies (will only work if discord bot / webhook is configured)
                         // or when your stamina is above the threshold and your expedition is done
                         // this is optional, you can leave it as null if you don't want to get pinged
+                        // Make sure your Discord user ID is between single quotes such as ''
                         // e.g userId: '123456789'
                         userId: null,
                     }
@@ -165,16 +168,17 @@
                     cookie: '',
                     redeemCode: false,
                     shopStatus: false, // This will check if your shop has finished selling videos
-                    dailiesCheck: true,
+                    dailiesCheck: false,
                     stamina: {
-                        check: true,
-                        threshold: 200,
+                        check: false,
+                        threshold: 0,
                         persistent: false,
                     },
                     discord: {
-                        // Your Discord user ID to ping you when to do your dailies/weeklies
+                        // Your Discord user ID to ping you when to do your dailies/weeklies (will only work if discord bot / webhook is configured)
                         // or when your stamina is above the threshold and your expedition is done
                         // this is optional, you can leave it as null if you don't want to get pinged
+                        // Make sure your Discord user ID is between single quotes such as ''
                         // e.g userId: '123456789'
                         userId: null,
                     }
