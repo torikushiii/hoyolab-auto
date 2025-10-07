@@ -1,21 +1,123 @@
 const { setTimeout } = require("node:timers/promises");
 
+const GAME_CONFIG = [
+	{
+		key: "genshin",
+		modulePath: "./genshin",
+		cacheKey: "genshin-code",
+		accountFilter: "genshin",
+		platform: "genshin",
+		redeemable: true,
+		redemptionLink: "https://genshin.hoyoverse.com/en/gift"
+	},
+	{
+		key: "starrail",
+		modulePath: "./starrail",
+		cacheKey: "starrail-code",
+		accountFilter: "starrail",
+		platform: "starrail",
+		redeemable: true,
+		redemptionLink: "https://hsr.hoyoverse.com/gift"
+	},
+	{
+		key: "zenless",
+		modulePath: "./zenless",
+		cacheKey: "zenless-code",
+		accountFilter: "nap",
+		platform: "nap",
+		redeemable: true,
+		redemptionLink: "https://zenless.hoyoverse.com/redemption"
+	},
+	{
+		key: "honkai",
+		modulePath: "./honkai",
+		cacheKey: "honkai-code",
+		accountFilter: "honkai",
+		platform: "honkai",
+		redeemable: false,
+		manualReason: "Redeem this code via the in-game exchange center."
+	},
+	{
+		key: "tot",
+		modulePath: "./tot",
+		cacheKey: "tot-code",
+		accountFilter: "tot",
+		platform: "tot",
+		redeemable: false,
+		manualReason: "Redeem this code from the in-game Exchange menu."
+	}
+];
+
+const REDEMPTION_LINKS = GAME_CONFIG.reduce((acc, game) => {
+	if (game.redemptionLink) {
+		acc[game.platform] = game.redemptionLink;
+	}
+	return acc;
+}, {});
+
+const DEFAULT_MANUAL_REASON = "Redeem this code from within the game client.";
+
+const toUpperCase = (value) => String(value).toUpperCase();
+const formatCodeValue = (code) => String(code?.code ?? "").toUpperCase();
+
+const getCachedCodes = async (cacheKey) => {
+	const cachedCodes = await app.Cache.get(cacheKey);
+	return Array.isArray(cachedCodes) ? cachedCodes.map(toUpperCase) : [];
+};
+
+const appendCodesToCache = async (game, codes) => {
+	if (!Array.isArray(codes) || codes.length === 0) {
+		return;
+	}
+
+	const existingCodes = await getCachedCodes(game.cacheKey);
+	const codeSet = new Set(existingCodes);
+
+	let hasUpdates = false;
+	for (const code of codes) {
+		const normalized = formatCodeValue(code);
+		if (!normalized) {
+			continue;
+		}
+
+		if (codeSet.has(normalized)) {
+			continue;
+		}
+
+		codeSet.add(normalized);
+		hasUpdates = true;
+	}
+
+	if (!hasUpdates) {
+		return;
+	}
+
+	await app.Cache.set({
+		key: game.cacheKey,
+		value: Array.from(codeSet)
+	});
+};
+
 const fetchCodes = async () => {
-	const [genshinRes, starrailRes, zenlessRes] = await Promise.allSettled([
-		require("./genshin").fetchData(),
-		require("./starrail").fetchData(),
-		require("./zenless").fetchData()
-	]);
+	const settled = await Promise.allSettled(
+		GAME_CONFIG.map(async (game) => {
+			const module = require(game.modulePath);
+			return await module.fetchData();
+		})
+	);
 
-	const genshin = genshinRes.status === "fulfilled" ? genshinRes.value : [];
-	const starrail = starrailRes.status === "fulfilled" ? starrailRes.value : [];
-	const zenless = zenlessRes.status === "fulfilled" ? zenlessRes.value : [];
+	return settled.reduce((acc, result, index) => {
+		const game = GAME_CONFIG[index];
 
-	return {
-		genshin,
-		starrail,
-		zenless
-	};
+		if (result.status === "fulfilled" && Array.isArray(result.value)) {
+			acc[game.key] = result.value;
+		}
+		else {
+			acc[game.key] = [];
+		}
+
+		return acc;
+	}, {});
 };
 
 const checkAndRedeem = async (codes) => {
@@ -27,19 +129,55 @@ const checkAndRedeem = async (codes) => {
 
 	const success = [];
 	const failed = [];
+	const manual = [];
 
-	if (newCodes.genshin.length > 0) {
+	for (const game of GAME_CONFIG) {
+		const pendingCodes = newCodes[game.key] ?? [];
+		if (pendingCodes.length === 0) {
+			continue;
+		}
+
 		const accounts = app.HoyoLab.getActiveAccounts({
-			whitelist: ["genshin"]
+			whitelist: game.accountFilter
 		});
+
+		if (game.redeemable === false) {
+			const manualEligibleAccounts = accounts.filter(acc => acc.redeemCode !== false);
+			if (manualEligibleAccounts.length > 0) {
+				const sampleAccount = manualEligibleAccounts[0];
+				const platform = app.HoyoLab.get(sampleAccount.platform ?? game.accountFilter);
+				const platformAssets = platform?.config?.assets ?? {};
+				const accountAssets = sampleAccount.assets ?? {};
+
+				for (const code of pendingCodes) {
+					manual.push({
+						gameKey: game.key,
+						gameName: sampleAccount.game?.name ?? platformAssets.game ?? game.key.toUpperCase(),
+						platform: game.platform,
+						assets: {
+							color: accountAssets.color ?? platform?.color ?? platformAssets.color ?? 0x5865F2,
+							author: accountAssets.author ?? platformAssets.author ?? "HoyoLab Auto",
+							logo: accountAssets.logo ?? platform?.logo ?? platformAssets.logo ?? null
+						},
+						reason: game.manualReason ?? DEFAULT_MANUAL_REASON,
+						code
+					});
+				}
+			}
+
+			await appendCodesToCache(game, pendingCodes);
+			continue;
+		}
+
+		const { redeemCodes } = require(game.modulePath);
 
 		for (const account of accounts) {
 			if (account.redeemCode === false) {
 				continue;
 			}
 
-			for (const code of newCodes.genshin) {
-				const result = await require("./genshin").redeemCodes(account, code);
+			for (const code of pendingCodes) {
+				const result = await redeemCodes(account, code);
 				if (result.success) {
 					success.push({ account, code });
 				}
@@ -50,172 +188,150 @@ const checkAndRedeem = async (codes) => {
 						reason: result.reason
 					});
 				}
+
 				await setTimeout(6000);
 			}
 		}
 
-		const existingCodes = await app.Cache.get("genshin-code") || [];
-		await app.Cache.set({
-			key: "genshin-code",
-			value: [...existingCodes, ...newCodes.genshin.map(c => c.code.toUpperCase())]
-		});
-	}
-
-	if (newCodes.starrail.length > 0) {
-		const accounts = app.HoyoLab.getActiveAccounts({
-			whitelist: ["starrail"]
-		});
-
-		for (const account of accounts) {
-			if (account.redeemCode === false) {
-				continue;
-			}
-
-			for (const code of newCodes.starrail) {
-				const result = await require("./starrail").redeemCodes(account, code);
-				if (result.success) {
-					success.push({ account, code });
-				}
-				else {
-					failed.push({
-						account,
-						code,
-						reason: result.reason
-					});
-				}
-				await setTimeout(6000);
-			}
-		}
-
-		const existingCodes = await app.Cache.get("starrail-code") || [];
-		await app.Cache.set({
-			key: "starrail-code",
-			value: [...existingCodes, ...newCodes.starrail.map(c => c.code.toUpperCase())]
-		});
-	}
-
-	if (newCodes.zenless.length > 0) {
-		const accounts = app.HoyoLab.getActiveAccounts({
-			whitelist: ["nap"]
-		});
-
-		for (const account of accounts) {
-			if (account.redeemCode === false) {
-				continue;
-			}
-
-			for (const code of newCodes.zenless) {
-				const result = await require("./zenless").redeemCodes(account, code);
-				if (result.success) {
-					success.push({ account, code });
-				}
-				else {
-					failed.push({
-						account,
-						code,
-						reason: result.reason
-					});
-				}
-				await setTimeout(6000);
-			}
-		}
-
-		const existingCodes = await app.Cache.get("zenless-code") || [];
-		await app.Cache.set({
-			key: "zenless-code",
-			value: [...existingCodes, ...newCodes.zenless.map(c => c.code.toUpperCase())]
-		});
+		await appendCodesToCache(game, pendingCodes);
 	}
 
 	return {
 		success,
-		failed
+		failed,
+		manual
 	};
 };
 
-const REDEMPTION_LINKS = {
-	genshin: "https://genshin.hoyoverse.com/en/gift",
-	starrail: "https://hsr.hoyoverse.com/gift",
-	nap: "https://zenless.hoyoverse.com/redemption"
-};
-
 const buildMessage = (status, data) => {
-	const gameName = data.account.game.name;
-	const messageTitle = status ? "Code Successfully Redeemed!" : `Code Redeem Failed! (${data.reason})`;
-	const redeemLink = `${REDEMPTION_LINKS[data.account.platform]}?code=${data.code.code}`;
+	const isManual = status === "manual";
+	const account = data.account ?? {};
+	const assets = account.assets ?? data.assets ?? {};
 
-	const message = [
-		`[${gameName}] (${data.account.uid}) ${data.account.nickname}`,
+	const gameName = account.game?.name
+		?? data.gameName
+		?? (data.gameKey ? data.gameKey.toUpperCase() : (account.platform ? account.platform.toUpperCase() : "Unknown Game"));
+
+	const redeemLinkBase = REDEMPTION_LINKS[data.gameKey ?? data.platform ?? account.platform];
+	const redeemLink = redeemLinkBase ? `${redeemLinkBase}?code=${data.code.code}` : null;
+
+	let messageTitle;
+	const detailLines = [];
+	let includeRewards = false;
+	let includeManualLink = false;
+	let manualLinkLabel = "Manually Redeem Here";
+
+	switch (status) {
+		case "success":
+			messageTitle = "Code Successfully Redeemed!";
+			includeRewards = true;
+			break;
+		case "failed":
+			messageTitle = `Code Redeem Failed! (${data.reason})`;
+			includeManualLink = Boolean(redeemLink);
+			break;
+		case "manual":
+			messageTitle = "Code Found - Manual Redemption Required";
+			detailLines.push(data.reason ?? DEFAULT_MANUAL_REASON);
+			includeRewards = true;
+			includeManualLink = Boolean(redeemLink);
+			manualLinkLabel = "Redeem Online";
+			break;
+		default:
+			throw new app.Error({
+				message: "Unknown code redeem status received.",
+				args: { status }
+			});
+	}
+
+	const headerLine = isManual
+		? `[${gameName}]`
+		: `[${gameName}] (${account.uid ?? "Unknown UID"}) ${account.nickname ?? "Unknown"}`;
+
+	const messageParts = [
+		headerLine,
+		`\n${messageTitle}`
+	];
+
+	for (const line of detailLines) {
+		messageParts.push(`\n${line}`);
+	}
+
+	messageParts.push(`\nCode: ${data.code.code}`);
+
+	if (includeManualLink && redeemLink) {
+		messageParts.push(`\n${manualLinkLabel}: ${redeemLink}`);
+	}
+
+	if (includeRewards && Array.isArray(data.code.rewards) && data.code.rewards.length > 0) {
+		messageParts.push(`\nRewards: ${data.code.rewards.join(", ")}`);
+	}
+
+	const embedDescriptionParts = [
+		isManual ? null : `(${account.uid ?? "Unknown UID"}) ${account.nickname ?? "Unknown"}`,
 		`\n${messageTitle}`,
-		`\nCode: ${data.code.code}`,
-		...(status === false ? [`Manually Redeem Here: ${redeemLink}`] : []),
-		...(status === true ? [`Rewards: ${data.code.rewards.join(", ")}`] : [])
-	].join("\n");
+		...detailLines.map(line => `\n${line}`),
+		`\nCode: ${data.code.code}`
+	].filter(Boolean);
+
+	if (includeManualLink && redeemLink) {
+		embedDescriptionParts.push(`\n${manualLinkLabel}: ${redeemLink}`);
+	}
+
+	if (includeRewards && Array.isArray(data.code.rewards) && data.code.rewards.length > 0) {
+		embedDescriptionParts.push(`\nRewards: ${data.code.rewards.join(", ")}`);
+	}
 
 	const embed = {
-		color: data.account.assets.color,
+		color: assets.color ?? 0x5865F2,
 		title: `${gameName} Code Redeem`,
 		author: {
-			name: data.account.assets.author,
-			icon_url: data.account.assets.logo
+			name: assets.author ?? "HoyoLab Auto",
+			icon_url: assets.logo ?? null
 		},
-		description: `(${data.account.uid}) ${data.account.nickname}`
-		+ `\n${messageTitle}`
-		+ `\nCode: ${data.code.code}`
-		+ `${status === false ? `\nManually Redeem Here: ${redeemLink}` : ""}`
-		+ `${status === true ? `\nRewards: ${data.code.rewards.join(", ")}` : ""}`,
+		description: embedDescriptionParts.join(""),
 		timestamp: new Date(),
 		footer: {
 			text: `${data.code.code}`,
-			icon_url: data.account.assets.logo
+			icon_url: assets.logo ?? null
 		}
 	};
 
 	return {
-		telegram: message,
+		telegram: messageParts.join(""),
 		embed
 	};
 };
 
 const checkCachedCodes = async (codes) => {
-	const genshinCodes = (await app.Cache.get("genshin-code") || []).map(code => code.toUpperCase());
-	const starrailCodes = (await app.Cache.get("starrail-code") || []).map(code => code.toUpperCase());
-	const zenlessCodes = (await app.Cache.get("zenless-code") || []).map(code => code.toUpperCase());
+	const newCodes = {};
 
-	const newCodes = {
-		genshin: [],
-		starrail: [],
-		zenless: []
-	};
+	for (const game of GAME_CONFIG) {
+		const incomingCodes = Array.isArray(codes[game.key]) ? codes[game.key] : [];
 
-	if (genshinCodes.length === 0 && codes.genshin.length > 0) {
-		await app.Cache.set({
-			key: "genshin-code",
-			value: codes.genshin.map(c => c.code.toUpperCase())
+		if (incomingCodes.length === 0) {
+			newCodes[game.key] = [];
+			continue;
+		}
+
+		const cachedCodes = await getCachedCodes(game.cacheKey);
+		if (cachedCodes.length === 0) {
+			const cachedValues = incomingCodes
+				.map(formatCodeValue)
+				.filter(Boolean);
+
+			await app.Cache.set({
+				key: game.cacheKey,
+				value: cachedValues
+			});
+			newCodes[game.key] = [];
+			continue;
+		}
+
+		newCodes[game.key] = incomingCodes.filter((code) => {
+			const normalized = formatCodeValue(code);
+			return normalized && !cachedCodes.includes(normalized);
 		});
-	}
-	else if (codes.genshin.length > 0) {
-		newCodes.genshin = codes.genshin.filter(code => !genshinCodes.includes(code.code.toUpperCase()));
-	}
-
-	if (starrailCodes.length === 0 && codes.starrail.length > 0) {
-		await app.Cache.set({
-			key: "starrail-code",
-			value: codes.starrail.map(c => c.code.toUpperCase())
-		});
-	}
-	else if (codes.starrail.length > 0) {
-		newCodes.starrail = codes.starrail.filter(code => !starrailCodes.includes(code.code.toUpperCase()));
-	}
-
-	if (zenlessCodes.length === 0 && codes.zenless.length > 0) {
-		await app.Cache.set({
-			key: "zenless-code",
-			value: codes.zenless.map(c => c.code.toUpperCase())
-		});
-	}
-	else if (codes.zenless.length > 0) {
-		newCodes.zenless = codes.zenless.filter(code => !zenlessCodes.includes(code.code.toUpperCase()));
 	}
 
 	return newCodes;

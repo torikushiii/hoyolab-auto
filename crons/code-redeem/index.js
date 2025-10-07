@@ -9,9 +9,7 @@ module.exports = {
 	expression: "* * * * *",
 	description: "Check and redeem codes for supported games from HoyoLab.",
 	code: async function codeRedeem () {
-		const accountData = app.HoyoLab.getActiveAccounts({
-			blacklist: ["honkai", "tot"]
-		});
+		const accountData = app.HoyoLab.getActiveAccounts();
 
 		if (accountData.length === 0) {
 			app.Logger.info("No active accounts found");
@@ -39,8 +37,8 @@ module.exports = {
 			return;
 		}
 
-		const { success, failed } = result;
-		if (success.length === 0 && failed.length === 0) {
+		const { success, failed, manual } = result;
+		if (success.length === 0 && failed.length === 0 && manual.length === 0) {
 			return;
 		}
 
@@ -49,14 +47,21 @@ module.exports = {
 
 		if (telegram) {
 			for (const data of success) {
-				const message = buildMessage(true, data);
+				const message = buildMessage("success", data);
 				const escapedMessage = app.Utils.escapeCharacters(message.telegram);
 
 				await telegram.send(escapedMessage);
 			}
 
 			for (const data of failed) {
-				const message = buildMessage(false, data);
+				const message = buildMessage("failed", data);
+				const escapedMessage = app.Utils.escapeCharacters(message.telegram);
+
+				await telegram.send(escapedMessage);
+			}
+
+			for (const data of manual) {
+				const message = buildMessage("manual", data);
 				const escapedMessage = app.Utils.escapeCharacters(message.telegram);
 
 				await telegram.send(escapedMessage);
@@ -65,12 +70,17 @@ module.exports = {
 
 		if (webhook) {
 			for (const data of success) {
-				const message = buildMessage(true, data);
+				const message = buildMessage("success", data);
 				await webhook.send(message.embed);
 			}
 
 			for (const data of failed) {
-				const message = buildMessage(false, data);
+				const message = buildMessage("failed", data);
+				await webhook.send(message.embed);
+			}
+
+			for (const data of manual) {
+				const message = buildMessage("manual", data);
 				await webhook.send(message.embed);
 			}
 		}
