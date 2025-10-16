@@ -80,7 +80,7 @@ RegionalTaskManager.registerTask("WeekliesReminder", 21, 0, async (account) => {
 			}
 		}
 		if (platform.type === "nap") {
-			const bountiesCompleted = (weeklies.bounties === weeklies.bountyTotal);
+			const bountiesCompleted = (weeklies.bounty === weeklies.bountyTotal);
 			const surveyCompleted = (weeklies.surveyPoints === weeklies.surveyPointsTotal);
 			if (bountiesCompleted && surveyCompleted) {
 				return;
@@ -88,8 +88,8 @@ RegionalTaskManager.registerTask("WeekliesReminder", 21, 0, async (account) => {
 
 			if (!bountiesCompleted) {
 				embed.fields.push({
-					name: "Bounty Comission",
-					value: `${weeklies.bounties}/${weeklies.bountyTotal}`,
+					name: "Bounty Commission",
+					value: `${weeklies.bounty}/${weeklies.bountyTotal}`,
 					inline: true
 				});
 			}
@@ -150,14 +150,14 @@ RegionalTaskManager.registerTask("WeekliesReminder", 21, 0, async (account) => {
 			}
 		}
 		if (platform.type === "nap") {
-			const bountiesCompleted = (weeklies.bounties === weeklies.bountyTotal);
+			const bountiesCompleted = (weeklies.bounty === weeklies.bountyTotal);
 			const surveyCompleted = (weeklies.surveyPoints === weeklies.surveyPointsTotal);
 			if (bountiesCompleted && surveyCompleted) {
 				return;
 			}
 
 			if (!bountiesCompleted) {
-				message.push(`- **Bounty Comission**: ${weeklies.bounties}/${weeklies.bountyTotal}`);
+				message.push(`- **Bounty Commission**: ${weeklies.bounty}/${weeklies.bountyTotal}`);
 			}
 			if (!surveyCompleted) {
 				message.push(`- **Survey Points**: ${weeklies.surveyPoints}/${weeklies.surveyPointsTotal}`);
@@ -175,6 +175,6 @@ module.exports = {
 	description: "Reminds you to complete your weeklies.",
 	code: (async function weekliesReminder () {
 		// eslint-disable-next-line object-curly-spacing
-		await RegionalTaskManager.executeTasks({ blacklist: ["honkai", "nap", "tot"] });
+		await RegionalTaskManager.executeTasks();
 	})
 };
