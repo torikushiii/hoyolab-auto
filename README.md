@@ -7,6 +7,7 @@
    <img src="https://img.shields.io/badge/NodeJS-20.2.0-green" alt="NodeJS version badge">
    <img src="https://img.shields.io/github/license/torikushiii/hoyolab-auto" alt="License badge">
    <img src="https://img.shields.io/github/stars/torikushiii/hoyolab-auto" alt="GitHub stars badge">
+   <a href="https://github.com/TheInfamousToTo/hoyolab-auto/pulse"><img src="https://img.shields.io/badge/📈_Pulse-Activity-blue?logo=github" alt="GitHub Pulse"></a>
 </p>
 
 # HoyoLab Auto
