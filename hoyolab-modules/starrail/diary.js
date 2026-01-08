@@ -1,3 +1,5 @@
+const { setTimeout: sleep } = require("node:timers/promises");
+
 module.exports = class Diary {
 	/** @type {import("../template")} */
 	#instance;
@@ -141,7 +143,10 @@ module.exports = class Diary {
 
 		const getMonthString = (month) => month.toString().padStart(6, "0");
 
-		const fetchMonthData = async (month) => {
+		const fetchMonthData = async (month, retryCount = 0) => {
+			const maxRetries = 3;
+			const retryDelay = 5000;
+
 			const searchParams = {
 				lang: "en-us",
 				uid: accountData.uid,
@@ -171,6 +176,12 @@ module.exports = class Diary {
 				});
 
 				if (res.body.retcode !== 0) {
+					if (res.body.retcode === -500001 && retryCount < maxRetries) {
+						app.Logger.debug(`${this.#instance.fullName}:Diary`, `Rate limited, retrying in ${retryDelay / 1000}s... (attempt ${retryCount + 1}/${maxRetries})`);
+						await sleep(retryDelay);
+						return fetchMonthData(month, retryCount + 1);
+					}
+
 					app.Logger.log(`${this.#instance.fullName}:Diary`, {
 						message: "Failed to fetch diary data",
 						args: {
@@ -189,13 +200,17 @@ module.exports = class Diary {
 				allResults = allResults.concat(data.list);
 				totalResults = data.total;
 				currentPage++;
+
+				if (allResults.length < totalResults) {
+					await sleep(500);
+				}
 			} while (allResults.length < totalResults);
 
 			return allResults;
 		};
 
-		// Fetch data for current and last months
 		const currentMonthResults = await fetchMonthData(currentMonth);
+		await sleep(1000);
 		const lastMonthResults = await fetchMonthData(lastMonth);
 
 		return { currentMonthResults, lastMonthResults };

@@ -218,16 +218,38 @@ module.exports = class DiscordController extends require("./template.js") {
 		const rest = new REST({ version: "10" }).setToken(this.token);
 
 		try {
-			app.Logger.info("Discord", "Registering application commands.");
+			const existingCommands = await rest.get(
+				Routes.applicationCommands(this.botId)
+			);
+
+			const localCommandNames = commands.map(c => c.name);
+			const existingCommandNames = existingCommands.map(c => c.name);
+
+			const commandsToRemove = existingCommandNames.filter(name => !localCommandNames.includes(name));
+			const commandsToAdd = localCommandNames.filter(name => !existingCommandNames.includes(name));
+
+			if (commandsToRemove.length > 0) {
+				app.Logger.info("Discord", `Cleaning up ${commandsToRemove.length} stale command(s): ${commandsToRemove.join(", ")}`);
+			}
+
+			if (commandsToAdd.length > 0) {
+				app.Logger.info("Discord", `Adding ${commandsToAdd.length} new command(s): ${commandsToAdd.join(", ")}`);
+			}
+
+			app.Logger.info("Discord", `Syncing ${commands.length} application command(s)...`);
 
 			await rest.put(
 				Routes.applicationCommands(this.botId),
 				{ body: commands }
 			);
 
-			app.Logger.info("Discord", `Successfully registered ${commands.length} application commands.`);
+			app.Logger.info("Discord", `Successfully registered ${commands.length} application command(s).`);
 		}
 		catch (e) {
+			app.Logger.error("Discord", {
+				message: "Failed to register application commands",
+				error: e.message
+			});
 			console.error(e);
 		}
 	}

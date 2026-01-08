@@ -1,4 +1,4 @@
-const { setTimeout } = require("node:timers/promises");
+const { setTimeout, setTimeout: sleep } = require("node:timers/promises");
 
 module.exports = class Diary {
 	/** @type {import("../template")} */
@@ -139,7 +139,10 @@ module.exports = class Diary {
 	}
 
 	async fetchResultsForType (accountData, type, options = {}) {
-		const fetchPage = async (type, month, currentPage) => {
+		const maxRetries = 3;
+		const retryDelay = 5000;
+
+		const fetchPage = async (type, month, currentPage, retryCount = 0) => {
 			const response = await app.Got("HoyoClient", {
 				url: this.#instance.config.url.diary,
 				responseType: "json",
@@ -169,6 +172,12 @@ module.exports = class Diary {
 			}
 
 			if (response.body.retcode !== 0) {
+				if (response.body.retcode === -500001 && retryCount < maxRetries) {
+					app.Logger.debug(`${this.#instance.fullName}:Diary`, `Rate limited, retrying in ${retryDelay / 1000}s... (attempt ${retryCount + 1}/${maxRetries})`);
+					await sleep(retryDelay);
+					return fetchPage(type, month, currentPage, retryCount + 1);
+				}
+
 				app.Logger.log(`${this.#instance.fullName}:Diary`, {
 					message: "Hoyolab API returned non-zero retcode",
 					args: {

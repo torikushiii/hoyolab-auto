@@ -64,6 +64,19 @@
             background-color: #0056b3;
         }
 
+        .status-message {
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        .status-error {
+            color: #c0392b;
+        }
+
+        .status-success {
+            color: #2e7d32;
+        }
+
         .platform-section {
             border: 1px solid #ddd;
             padding: 20px;
@@ -154,6 +167,14 @@
     <button class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</button>
 
     <h1>Config.json5 Generator</h1>
+
+    <div class="platform-section">
+        <h3>Import Existing Config</h3>
+        <label for="configFile">Select config.json5 file:</label>
+        <input type="file" id="configFile" accept=".json5,.json">
+        <button id="importConfigButton">Import Config</button>
+        <p id="importStatus" class="small-text status-message"></p>
+    </div>
 
     <!-- Form Fields 
     <label for="loglevel">Log Level:</label>
@@ -644,6 +665,335 @@
         let honkaiAccountCount = 1;
         let tearsAccountCount = 1;
         let zenlessAccountCount = 1;
+
+        const importButton = document.getElementById('importConfigButton');
+        if (importButton) {
+            importButton.addEventListener('click', handleConfigImport);
+        }
+
+        function handleConfigImport() {
+            setImportStatus('');
+            const fileInput = document.getElementById('configFile');
+
+            if (!fileInput || fileInput.files.length === 0) {
+                setImportStatus('Please select a config.json5 file.', true);
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                try {
+                    importConfigFromText(event.target.result);
+                }
+                catch (error) {
+                    setImportStatus(error.message || 'Failed to import configuration.', true);
+                }
+            };
+            reader.onerror = function () {
+                setImportStatus('Unable to read the selected file.', true);
+            };
+            reader.readAsText(fileInput.files[0]);
+        }
+
+        function importConfigFromText(text) {
+            if (!text) {
+                throw new Error('The selected file is empty.');
+            }
+
+            let parsedConfig;
+            try {
+                parsedConfig = JSON5.parse(text);
+            }
+            catch (error) {
+                throw new Error('Failed to parse configuration: ' + error.message);
+            }
+
+            populateFormFromConfig(parsedConfig);
+            setImportStatus('Config imported successfully.', false);
+        }
+
+        function setImportStatus(message, isError) {
+            const statusElement = document.getElementById('importStatus');
+            if (!statusElement) {
+                return;
+            }
+
+            statusElement.textContent = message || '';
+            statusElement.classList.remove('status-error', 'status-success');
+
+            if (!message) {
+                return;
+            }
+
+            statusElement.classList.add(isError ? 'status-error' : 'status-success');
+        }
+
+        function populateFormFromConfig(config) {
+            if (!config || typeof config !== 'object') {
+                throw new Error('Invalid configuration file.');
+            }
+
+            applyTestNotificationConfig(config.testNotification);
+            applyPlatformConfig(config.platforms);
+            applyCronConfig(config.crons);
+            applyAccountConfig(config.accounts);
+            recalculateAccountNumbers();
+        }
+
+        function applyTestNotificationConfig(testNotification) {
+            const select = document.getElementById('testNotificationEnabled');
+            const enabled = testNotification && typeof testNotification.enabled === 'boolean' ? testNotification.enabled : undefined;
+            setBooleanSelectValue(select, enabled);
+        }
+
+        function applyPlatformConfig(platforms) {
+            const platformByType = {};
+            if (Array.isArray(platforms)) {
+                platforms.forEach(function (platform) {
+                    if (platform && platform.type) {
+                        platformByType[platform.type] = platform;
+                    }
+                });
+            }
+
+            const discord = platformByType.discord || {};
+            setBooleanSelectValue(document.getElementById('discordActive'), discord.active);
+            setInputValue(document.getElementById('discordBotId'), discord.botId);
+            setInputValue(document.getElementById('discordToken'), discord.token);
+
+            const telegram = platformByType.telegram || {};
+            setBooleanSelectValue(document.getElementById('telegramActive'), telegram.active);
+            setInputValue(document.getElementById('telegramChatId'), telegram.chatId);
+            setInputValue(document.getElementById('telegramToken'), telegram.token);
+            setBooleanSelectValue(document.getElementById('disableNotification'), telegram.disableNotification);
+
+            const webhook = platformByType.webhook || {};
+            setBooleanSelectValue(document.getElementById('webhookActive'), webhook.active);
+            setInputValue(document.getElementById('webhookUrl'), webhook.url);
+        }
+
+        function applyCronConfig(crons) {
+            crons = crons || {};
+
+            setInputValue(
+                document.getElementById('whitelist'),
+                Array.isArray(crons.whitelist) ? crons.whitelist.join(',') : ''
+            );
+            setInputValue(
+                document.getElementById('blacklist'),
+                Array.isArray(crons.blacklist) ? crons.blacklist.join(',') : ''
+            );
+            setInputValue(document.getElementById('checkInCron'), crons.checkIn);
+            setInputValue(document.getElementById('codeRedeemCron'), crons.codeRedeem);
+            setInputValue(document.getElementById('expeditionCron'), crons.expedition);
+            setInputValue(document.getElementById('missedCheckInCron'), crons.missedCheckIn);
+            setInputValue(document.getElementById('realmCurrencyCron'), crons.realmCurrency);
+            setInputValue(document.getElementById('shopStatusCron'), crons.shopStatus);
+            setInputValue(document.getElementById('staminaCron'), crons.stamina);
+        }
+
+        function applyAccountConfig(accounts) {
+            const accountByType = {};
+            if (Array.isArray(accounts)) {
+                accounts.forEach(function (entry) {
+                    if (entry && entry.type) {
+                        accountByType[entry.type] = entry;
+                    }
+                });
+            }
+
+            configureAccountSection({
+                entry: accountByType.honkai,
+                activeSelectId: 'honkaiActive',
+                containerSelector: '#honkaiaccounts',
+                addButtonId: 'copy-settings-honkai',
+                filler: fillHonkaiAccount
+            });
+
+            configureAccountSection({
+                entry: accountByType.termis,
+                activeSelectId: 'tearsActive',
+                containerSelector: '#tearsaccounts',
+                addButtonId: 'copy-settings-tears',
+                filler: fillTearsAccount
+            });
+
+            configureAccountSection({
+                entry: accountByType.genshin,
+                activeSelectId: 'genshinActive',
+                containerSelector: '#genshinaccounts',
+                addButtonId: 'copy-settings',
+                filler: fillGenshinAccount
+            });
+
+            configureAccountSection({
+                entry: accountByType.starrail,
+                activeSelectId: 'starrailActive',
+                containerSelector: '#starrailaccounts',
+                addButtonId: 'copy-settings-starrail',
+                filler: fillStarRailAccount
+            });
+
+            configureAccountSection({
+                entry: accountByType.zenless,
+                activeSelectId: 'zenlessActive',
+                containerSelector: '#zenlessaccounts',
+                addButtonId: 'copy-settings-zenless',
+                filler: fillZenlessAccount
+            });
+        }
+
+        function configureAccountSection(options) {
+            const entry = options.entry || null;
+            setBooleanSelectValue(document.getElementById(options.activeSelectId), entry ? entry.active : undefined);
+
+            const dataEntries = entry && Array.isArray(entry.data) ? entry.data : [];
+            fillAccountForms(options.containerSelector, options.addButtonId, dataEntries, options.filler);
+        }
+
+        function fillAccountForms(containerSelector, addButtonId, dataEntries, filler) {
+            const container = document.querySelector(containerSelector);
+            if (!container || typeof filler !== 'function') {
+                return;
+            }
+
+            const entries = Array.isArray(dataEntries) ? dataEntries : [];
+            const desiredCount = Math.max(entries.length, 1);
+            ensureAccountCount(containerSelector, addButtonId, desiredCount);
+
+            const accountNodes = container.querySelectorAll('.account');
+            accountNodes.forEach(function (accountNode, index) {
+                const entry = entries[index] || null;
+                filler(accountNode, entry);
+            });
+        }
+
+        function ensureAccountCount(containerSelector, addButtonId, desiredCount) {
+            const container = document.querySelector(containerSelector);
+            if (!container) {
+                return;
+            }
+
+            let accounts = container.querySelectorAll('.account');
+            while (accounts.length < desiredCount) {
+                const addButton = document.getElementById(addButtonId);
+                if (!addButton) {
+                    break;
+                }
+                addButton.click();
+                accounts = container.querySelectorAll('.account');
+            }
+
+            while (accounts.length > desiredCount && accounts.length > 1) {
+                const accountToRemove = accounts[accounts.length - 1];
+                const deleteButton = accountToRemove.querySelector('.delete-account');
+                if (deleteButton) {
+                    deleteButton.click();
+                } else {
+                    break;
+                }
+                accounts = container.querySelectorAll('.account');
+            }
+        }
+
+        function setInputValue(element, value) {
+            if (!element) {
+                return;
+            }
+
+            if (value === undefined || value === null) {
+                element.value = '';
+                return;
+            }
+
+            element.value = String(value);
+        }
+
+        function setBooleanSelectValue(selectElement, value, fallback) {
+            if (!selectElement) {
+                return;
+            }
+
+            if (typeof value === 'boolean') {
+                selectElement.value = String(value);
+            }
+            else if (fallback !== undefined) {
+                selectElement.value = fallback;
+            }
+            else {
+                selectElement.value = 'false';
+            }
+        }
+
+        function fillHonkaiAccount(accountElement, data) {
+            const entry = data || {};
+            setInputValue(accountElement.querySelector('input[id*="honkaiCookie"]'), entry.cookie);
+        }
+
+        function fillTearsAccount(accountElement, data) {
+            const entry = data || {};
+            setInputValue(accountElement.querySelector('input[id*="tearsCookie"]'), entry.cookie);
+        }
+
+        function fillGenshinAccount(accountElement, data) {
+            const entry = data || {};
+            setInputValue(accountElement.querySelector('input[id*="genshinCookie"]'), entry.cookie);
+            setBooleanSelectValue(accountElement.querySelector('select[id*="genshinredeemCode"]'), entry.redeemCode);
+            setBooleanSelectValue(accountElement.querySelector('select[id*="genshindailiesCheck"]'), entry.dailiesCheck);
+            setBooleanSelectValue(accountElement.querySelector('select[id*="genshinweekliesCheck"]'), entry.weekliesCheck);
+
+            const realm = entry.realm || {};
+            setBooleanSelectValue(accountElement.querySelector('select[id*="genshinrealmCheck"]'), realm.check);
+            setBooleanSelectValue(accountElement.querySelector('select[id*="genshinrealmpersistent"]'), realm.persistent);
+
+            const stamina = entry.stamina || {};
+            setBooleanSelectValue(accountElement.querySelector('select[id*="genshinstaminaCheck"]'), stamina.check);
+            setInputValue(accountElement.querySelector('input[id*="genshinthreshold"]'), stamina.threshold);
+            setBooleanSelectValue(accountElement.querySelector('select[id*="genshinstaminapersistent"]'), stamina.persistent);
+
+            const expedition = entry.expedition || {};
+            setBooleanSelectValue(accountElement.querySelector('select[id*="genshinexpeditionCheck"]'), expedition.check);
+            setBooleanSelectValue(accountElement.querySelector('select[id*="genshinexpeditionpersistent"]'), expedition.persistent);
+
+            const discord = entry.discord || {};
+            setInputValue(accountElement.querySelector('input[id*="genshinuserId"]'), discord.userId);
+        }
+
+        function fillStarRailAccount(accountElement, data) {
+            const entry = data || {};
+            setInputValue(accountElement.querySelector('input[id*="starrailCookie"]'), entry.cookie);
+            setBooleanSelectValue(accountElement.querySelector('select[id*="starrailredeemCode"]'), entry.redeemCode);
+            setBooleanSelectValue(accountElement.querySelector('select[id*="starraildailiesCheck"]'), entry.dailiesCheck);
+            setBooleanSelectValue(accountElement.querySelector('select[id*="starrailweekliesCheck"]'), entry.weekliesCheck);
+
+            const stamina = entry.stamina || {};
+            setBooleanSelectValue(accountElement.querySelector('select[id*="starrailstaminaCheck"]'), stamina.check);
+            setInputValue(accountElement.querySelector('input[id*="starrailthreshold"]'), stamina.threshold);
+            setBooleanSelectValue(accountElement.querySelector('select[id*="starrailstaminapersistent"]'), stamina.persistent);
+
+            const expedition = entry.expedition || {};
+            setBooleanSelectValue(accountElement.querySelector('select[id*="starrailexpeditionCheck"]'), expedition.check);
+            setBooleanSelectValue(accountElement.querySelector('select[id*="starrailexpeditionpersistent"]'), expedition.persistent);
+
+            const discord = entry.discord || {};
+            setInputValue(accountElement.querySelector('input[id*="starrailuserId"]'), discord.userId);
+        }
+
+        function fillZenlessAccount(accountElement, data) {
+            const entry = data || {};
+            setInputValue(accountElement.querySelector('input[id*="zenlessCookie"]'), entry.cookie);
+            setBooleanSelectValue(accountElement.querySelector('select[id*="zenlessredeemCode"]'), entry.redeemCode);
+            setBooleanSelectValue(accountElement.querySelector('select[id*="zenlessshopStatus"]'), entry.shopStatus);
+            setBooleanSelectValue(accountElement.querySelector('select[id*="zenlessdailiesCheck"]'), entry.dailiesCheck);
+
+            const stamina = entry.stamina || {};
+            setBooleanSelectValue(accountElement.querySelector('select[id*="zenlessstaminaCheck"]'), stamina.check);
+            setInputValue(accountElement.querySelector('input[id*="zenlessthreshold"]'), stamina.threshold);
+            setBooleanSelectValue(accountElement.querySelector('select[id*="zenlessstaminapersistent"]'), stamina.persistent);
+
+            const discord = entry.discord || {};
+            setInputValue(accountElement.querySelector('input[id*="zenlessuserId"]'), discord.userId);
+        }
 
         document.getElementById('copy-settings-zenless').onclick = function () {
             const originalAccount = document.querySelector('#zenlessaccounts .account');

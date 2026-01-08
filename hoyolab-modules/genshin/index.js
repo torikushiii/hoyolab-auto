@@ -2,6 +2,7 @@ const CheckIn = require("./check-in.js");
 const Diary = require("./diary.js");
 const Notes = require("./notes.js");
 const RedeemCode = require("./redeem-code.js");
+const TravelingMimo = require("./mimo.js");
 
 const DEFAULT_CONSTANTS = {
 	ACT_ID: "e202102251931481",
@@ -145,6 +146,10 @@ module.exports = class Genshin extends require("../template.js") {
 					check: account.realm.check ?? false,
 					persistent: account.realm.persistent ?? false,
 					fired: false
+				},
+				mimo: {
+					check: account.mimo?.check ?? false,
+					lastRun: null
 				}
 			});
 
@@ -186,5 +191,23 @@ module.exports = class Genshin extends require("../template.js") {
 		});
 
 		return await d.diary(accountData);
+	}
+
+	async mimo (accountData) {
+		const tm = new TravelingMimo(this, {
+			logo: this.#logo,
+			color: this.#color
+		});
+
+		return await tm.run(accountData);
+	}
+
+	async mimoGetRestockTime (accountData) {
+		const tm = new TravelingMimo(this, {
+			logo: this.#logo,
+			color: this.#color
+		});
+
+		return await tm.getNextRestockTime(accountData);
 	}
 };

@@ -35,6 +35,7 @@
         checkIn: '0 0 0 * * *',
         codeRedeem: '*/15 * * * *',
         expedition: '0 */30 * * * *',
+        mimo: '0 0 */6 * * *',
         missedCheckIn: '0 0 23 * * *',
         realmCurrency: '0 */1 * * *',
         shopStatus: '0 */1 * * *',
@@ -88,6 +89,9 @@
                         check: false, // Enable this if you want to get notified when your expedition is done
                         persistent: false, // Set to true if you want to get notified every time your expedition is done
                     },
+                    mimo: {
+                        check: false, // NOT CURRENTLY SUPPORTED - Genshin uses a different API structure
+                    },
                     discord: {
                         // Your Discord user ID to ping you when to do your dailies/weeklies (will only work if discord bot / webhook is configured)
                         // or when your stamina is above the threshold and your expedition is done
@@ -124,6 +128,9 @@
                         check: false,
                         persistent: false,
                     },
+                    mimo: {
+                        check: false, // Enable Traveling Mimo automation (claim tasks, exchange for Stellar Jade)
+                    },
                     discord: {
                         // Your Discord user ID to ping you when to do your dailies/weeklies (will only work if discord bot / webhook is configured)
                         // or when your stamina is above the threshold and your expedition is done
@@ -148,6 +155,9 @@
                         check: false,
                         persistent: false,
                     },
+                    mimo: {
+                        check: false, // Enable Traveling Mimo automation (claim tasks, exchange for Stellar Jade)
+                    },
                     discord: {
                         // Your Discord user ID to ping you when to do your dailies/weeklies (will only work if discord bot / webhook is configured)
                         // or when your stamina is above the threshold and your expedition is done
@@ -169,6 +179,9 @@
                     redeemCode: false,
                     shopStatus: false, // This will check if your shop has finished selling videos
                     dailiesCheck: false,
+                    mimo: {
+                        check: false, // Enable Traveling Mimo automation (claim tasks, exchange for Polychromes)
+                    },
                     stamina: {
                         check: false,
                         threshold: 0,

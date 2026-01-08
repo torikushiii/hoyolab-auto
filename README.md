@@ -63,6 +63,7 @@ If you don't have a server to run this script and simply just want to use it for
   - **Expedition check**: Check your expeditions and sends a notification if they're done.
   - **Code Redeems**: Search for codes and redeem them automatically.
   - **Trailblazer Monthly Calendar**: Check your monthly currency income.
+  - **Traveling Mimo**: Automatically complete Mimo tasks, claim points, and exchange for Stellar Jade.
 - **Zenless Zone Zero**:
   - **Daily check-in**: Runs every midnight local time.
   - **Dailies**: Reminds you to do your dailies, such as commissions if you haven't done them at 09:00 (local time).
@@ -70,6 +71,7 @@ If you don't have a server to run this script and simply just want to use it for
   - **Howl Scracth Card**: Notifies you if you haven't scratched the card for the day at 09:00 (local time).
   - **Shop Status**: Notifies you if the shop has finished selling videos.
   - **Code Redeems**: Search for codes and redeem them automatically.
+  - **Traveling Mimo**: Automatically complete Mimo tasks, claim points, and exchange for Polychrome.
 
 ## Prerequisites
 - [Git](https://git-scm.com/downloads)
@@ -152,7 +154,7 @@ For setting up Discord or Telegram notifications, refer to the [setup folder](ht
 
 ## Running with Docker
 
-This application can be easily managed and run using Docker. We provide a Makefile 
+This application can be easily managed and run using Docker. We provide a Makefile
 for convenience, but you can also use Docker commands directly.
 
 **1. Prerequisites**
@@ -194,12 +196,12 @@ You can configure your config using one of the following methods:
 
 **Using the Makefile (Recommended):**
 
-The provided Makefile simplifies common Docker tasks. 
+The provided Makefile simplifies common Docker tasks.
 
 - **Build the image:**
   ```bash
-  make build 
-  ``` 
+  make build
+  ```
 - **Start the application:**
   ```bash
   make up
@@ -210,13 +212,13 @@ The provided Makefile simplifies common Docker tasks.
   ```
 - **View logs:**
   ```bash
-  make logs 
+  make logs
   ```
 - **Rebuild and restart:**
   ```bash
-  make update 
+  make update
   ```
-  
+
   For a complete list of available Makefile targets, run:
 
   ```bash
