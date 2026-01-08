@@ -177,6 +177,7 @@ module.exports = class HoyoLab {
 				weekliesCheck,
 				stamina,
 				expedition,
+				mimo: account.mimo,
 				discord: account.discord ?? null
 			});
 		}
