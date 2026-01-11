@@ -140,6 +140,7 @@ module.exports = class ZenlessZoneZero extends require("../template.js") {
 				},
 				mimo: {
 					check: account.mimo?.check ?? false,
+					redeem: account.mimo?.redeem ?? true,
 					lastRun: null
 				},
 				cookie: cookieData

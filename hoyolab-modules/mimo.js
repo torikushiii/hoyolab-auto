@@ -291,6 +291,7 @@ module.exports = class TravelingMimo {
 			tasksClaimed: [],
 			itemsExchanged: [],
 			codesRedeemed: [],
+			codesObtained: [], // Codes that were not auto-redeemed (for notification)
 			errors: [],
 			points: 0,
 			shopStatus: []
@@ -368,7 +369,10 @@ module.exports = class TravelingMimo {
 
 					app.Logger.info(`${this.#instance.fullName}:Mimo`, `(${accountData.uid}) Exchanged ${item.name} for code: ${code}`);
 
-					if (accountData.redeemCode) {
+					// Check if auto-redeem is enabled (mimo.redeem defaults to true for backward compatibility)
+					const shouldRedeem = accountData.redeemCode && (accountData.mimo?.redeem !== false);
+
+					if (shouldRedeem) {
 						await sleep(2000);
 						const redeemResult = await this.#instance.redeemCode(accountData, code);
 						if (redeemResult.success) {
@@ -378,6 +382,11 @@ module.exports = class TravelingMimo {
 						else {
 							results.errors.push(`Failed to redeem code ${code}: ${redeemResult.message}`);
 						}
+					}
+					else {
+						// Code obtained but not auto-redeemed
+						results.codesObtained.push(code);
+						app.Logger.info(`${this.#instance.fullName}:Mimo`, `(${accountData.uid}) Code obtained (not auto-redeemed): ${code}`);
 					}
 				}
 

@@ -130,6 +130,7 @@
                     },
                     mimo: {
                         check: false, // Enable Traveling Mimo automation (claim tasks, exchange for Stellar Jade)
+                        redeem: true, // Set to false to receive codes as notifications instead of auto-redeeming (useful for redeeming on a different account)
                     },
                     discord: {
                         // Your Discord user ID to ping you when to do your dailies/weeklies (will only work if discord bot / webhook is configured)
@@ -157,6 +158,7 @@
                     },
                     mimo: {
                         check: false, // Enable Traveling Mimo automation (claim tasks, exchange for Stellar Jade)
+                        redeem: true, // Set to false to receive codes as notifications instead of auto-redeeming (useful for redeeming on a different account)
                     },
                     discord: {
                         // Your Discord user ID to ping you when to do your dailies/weeklies (will only work if discord bot / webhook is configured)
@@ -181,6 +183,7 @@
                     dailiesCheck: false,
                     mimo: {
                         check: false, // Enable Traveling Mimo automation (claim tasks, exchange for Polychromes)
+                        redeem: true, // Set to false to receive codes as notifications instead of auto-redeeming (useful for redeeming on a different account)
                     },
                     stamina: {
                         check: false,

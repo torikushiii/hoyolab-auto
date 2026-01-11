@@ -38,7 +38,8 @@ module.exports = {
 
 					const hasActivity = data.tasksClaimed.length > 0
 						|| data.itemsExchanged.length > 0
-						|| data.codesRedeemed.length > 0;
+						|| data.codesRedeemed.length > 0
+						|| data.codesObtained?.length > 0;
 
 					if (!hasActivity) {
 						app.Logger.debug("Cron:Mimo", `(${account.uid}) ${account.game.short}: No new Mimo activity.`);
@@ -75,6 +76,14 @@ module.exports = {
 							fields.push({
 								name: "✅ Codes Redeemed",
 								value: data.codesRedeemed.join(", ").slice(0, 1024),
+								inline: false
+							});
+						}
+
+						if (data.codesObtained?.length > 0) {
+							fields.push({
+								name: "🎫 Codes Obtained (Not Auto-Redeemed)",
+								value: data.codesObtained.map(c => `\`${c}\``).join("\n").slice(0, 1024),
 								inline: false
 							});
 						}
@@ -147,6 +156,13 @@ module.exports = {
 
 						if (data.codesRedeemed.length > 0) {
 							lines.push(`✅ Codes Redeemed: ${data.codesRedeemed.join(", ")}`);
+						}
+
+						if (data.codesObtained?.length > 0) {
+							lines.push(`🎫 Codes Obtained (Not Auto-Redeemed):`);
+							for (const c of data.codesObtained) {
+								lines.push(`  \`${c}\``);
+							}
 						}
 
 						lines.push(`💎 Current Points: ${data.points}`);
