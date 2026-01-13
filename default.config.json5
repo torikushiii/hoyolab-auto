@@ -134,6 +134,7 @@
                         redeem: true,
                         lottery: false,
                         reservePoints: 0,
+                        redeemDraw: true,
                     },
                     discord: {
                         // Your Discord user ID to ping you when to do your dailies/weeklies (will only work if discord bot / webhook is configured)
@@ -164,6 +165,7 @@
                         redeem: true,
                         lottery: false,
                         reservePoints: 0,
+                        redeemDraw: true,
                     },
                     discord: {
                         // Your Discord user ID to ping you when to do your dailies/weeklies (will only work if discord bot / webhook is configured)
@@ -191,6 +193,7 @@
                         redeem: true,
                         lottery: false,
                         reservePoints: 0,
+                        redeemDraw: true,
                     },
                     stamina: {
                         check: false,

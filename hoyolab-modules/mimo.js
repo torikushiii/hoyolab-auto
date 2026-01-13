@@ -510,8 +510,8 @@ module.exports = class TravelingMimo {
 					app.Logger.info(`${this.#instance.fullName}:Mimo`, `(${accountData.uid}) Lottery draw: ${drawResult.data.name}`);
 
 					if (drawResult.data.code) {
-						const shouldRedeem = accountData.redeemCode && (accountData.mimo?.redeem !== false);
-						if (shouldRedeem) {
+						const shouldRedeemDraw = accountData.redeemCode && (accountData.mimo?.redeemDraw !== false);
+						if (shouldRedeemDraw) {
 							await sleep(5000);
 							const redeemResult = await this.#instance.redeemCode(accountData, drawResult.data.code);
 							if (redeemResult.success) {
