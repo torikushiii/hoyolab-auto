@@ -307,6 +307,65 @@ module.exports = class TravelingMimo {
 		};
 	}
 
+	async getLotteryInfo (accountData, versionId) {
+		const cookieData = this.#getCookieData(accountData);
+
+		const res = await this.#request("lottery-info", {
+			params: {
+				lang: "en-us",
+				game_id: this.#gameId,
+				version_id: versionId
+			},
+			cookie: cookieData
+		});
+
+		if (res.statusCode !== 200 || res.body.retcode !== 0) {
+			return { success: false };
+		}
+
+		return {
+			success: true,
+			data: {
+				currentPoints: res.body.data.point,
+				cost: res.body.data.cost,
+				currentCount: res.body.data.count,
+				limitCount: res.body.data.limit_count,
+				rewards: res.body.data.award_list
+			}
+		};
+	}
+
+	async drawLottery (accountData, versionId) {
+		const cookieData = this.#getCookieData(accountData);
+
+		const res = await this.#request("lottery", {
+			method: "POST",
+			data: {
+				game_id: this.#gameId,
+				lang: "en-us",
+				version_id: versionId
+			},
+			cookie: cookieData
+		});
+
+		if (res.statusCode !== 200 || res.body.retcode !== 0) {
+			app.Logger.log(`${this.#instance.fullName}:Mimo`, {
+				message: "Failed to draw lottery",
+				args: { body: res.body }
+			});
+			return { success: false, message: res.body?.message };
+		}
+
+		return {
+			success: true,
+			data: {
+				name: res.body.data.name,
+				code: res.body.data.exchange_code,
+				rewardId: res.body.data.award_id
+			}
+		};
+	}
+
 	#getPremiumCurrencyName () {
 		switch (this.#gameId) {
 			case 2: return "primogem";
@@ -322,7 +381,8 @@ module.exports = class TravelingMimo {
 			tasksClaimed: [],
 			itemsExchanged: [],
 			codesRedeemed: [],
-			codesObtained: [], // Codes that were not auto-redeemed (for notification)
+			codesObtained: [],
+			lotteryDraws: [],
 			errors: [],
 			points: 0,
 			shopStatus: []
@@ -422,6 +482,50 @@ module.exports = class TravelingMimo {
 				}
 
 				await sleep(1500);
+			}
+		}
+
+		const lotteryEnabled = accountData.mimo?.lottery === true;
+		const reservePoints = accountData.mimo?.reservePoints ?? 0;
+
+		if (lotteryEnabled) {
+			const lotteryInfo = await this.getLotteryInfo(accountData, versionId);
+			if (lotteryInfo.success) {
+				const { cost, currentCount, limitCount } = lotteryInfo.data;
+				let drawsRemaining = limitCount - currentCount;
+
+				while (drawsRemaining > 0 && (results.points - reservePoints) >= cost) {
+					const drawResult = await this.drawLottery(accountData, versionId);
+					if (!drawResult.success) {
+						break;
+					}
+
+					results.lotteryDraws.push({
+						name: drawResult.data.name,
+						code: drawResult.data.code
+					});
+					results.points -= cost;
+					drawsRemaining--;
+
+					app.Logger.info(`${this.#instance.fullName}:Mimo`, `(${accountData.uid}) Lottery draw: ${drawResult.data.name}`);
+
+					if (drawResult.data.code) {
+						const shouldRedeem = accountData.redeemCode && (accountData.mimo?.redeem !== false);
+						if (shouldRedeem) {
+							await sleep(5000);
+							const redeemResult = await this.#instance.redeemCode(accountData, drawResult.data.code);
+							if (redeemResult.success) {
+								results.codesRedeemed.push(drawResult.data.code);
+								app.Logger.info(`${this.#instance.fullName}:Mimo`, `(${accountData.uid}) Redeemed lottery code: ${drawResult.data.code}`);
+							}
+						}
+						else {
+							results.codesObtained.push(drawResult.data.code);
+						}
+					}
+
+					await sleep(1500);
+				}
 			}
 		}
 

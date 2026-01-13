@@ -1,3 +1,95 @@
+const createEmbed = (result) => {
+	const gameColors = {
+		starrail: 0xBB0BB5,
+		nap: 0xFF8300
+	};
+
+	const gameNames = {
+		starrail: "Honkai: Star Rail",
+		nap: "Zenless Zone Zero"
+	};
+
+	const fields = [];
+
+	if (result.tasksClaimed.length > 0) {
+		const totalPoints = result.tasksClaimed.reduce((sum, t) => sum + t.points, 0);
+		fields.push({
+			name: "🎯 Tasks Claimed",
+			value: result.tasksClaimed.map(t => `• ${t.name} (+${t.points})`).join("\n").slice(0, 1024) || "None",
+			inline: false
+		});
+		fields.push({
+			name: "💰 Points Earned",
+			value: `+${totalPoints} pts`,
+			inline: true
+		});
+	}
+
+	if (result.itemsExchanged.length > 0) {
+		fields.push({
+			name: "🎁 Items Exchanged",
+			value: result.itemsExchanged.map(i => `• ${i.name} (-${i.cost} pts)`).join("\n").slice(0, 1024),
+			inline: false
+		});
+	}
+
+	if (result.codesRedeemed.length > 0) {
+		fields.push({
+			name: "✅ Codes Redeemed",
+			value: result.codesRedeemed.map(c => `\`${c}\``).join(", ").slice(0, 1024),
+			inline: false
+		});
+	}
+
+	if (result.codesObtained?.length > 0) {
+		fields.push({
+			name: "🎫 Codes Obtained",
+			value: result.codesObtained.map(c => `\`${c}\``).join("\n").slice(0, 1024),
+			inline: false
+		});
+	}
+
+	if (result.lotteryDraws?.length > 0) {
+		fields.push({
+			name: "🎰 Lottery Draws",
+			value: result.lotteryDraws.map(d => `• ${d.name}`).join("\n").slice(0, 1024),
+			inline: false
+		});
+	}
+
+	fields.push({
+		name: "💎 Current Points",
+		value: `${result.points} pts`,
+		inline: true
+	});
+
+	const hasActivity = result.tasksClaimed.length > 0
+		|| result.itemsExchanged.length > 0
+		|| result.codesRedeemed.length > 0
+		|| result.lotteryDraws?.length > 0;
+
+	return {
+		color: gameColors[result.game] || 0x5865F2,
+		title: `🐾 Traveling Mimo`,
+		author: {
+			name: `${result.nickname} (${result.uid})`,
+			icon_url: result.assets?.logo
+		},
+		description: hasActivity
+			? `Successfully ran Mimo automation for ${gameNames[result.game] || result.game}!`
+			: `No new activity for ${gameNames[result.game] || result.game}.`,
+		fields,
+		thumbnail: {
+			url: result.assets?.logo
+		},
+		timestamp: new Date().toISOString(),
+		footer: {
+			text: gameNames[result.game] || result.game,
+			icon_url: result.assets?.logo
+		}
+	};
+};
+
 module.exports = {
 	name: "mimo",
 	description: "Manually run Traveling Mimo automation for all games or a specific game.",
@@ -102,47 +194,26 @@ module.exports = {
 				: { success: false, reply: message };
 		}
 
-		// Build response
-		const summaryLines = ["🐾 **Traveling Mimo Results**\n"];
-
-		for (const r of results) {
-			const gameShort = { genshin: "GI", starrail: "HSR", nap: "ZZZ" }[r.game] || r.game;
-			summaryLines.push(`**${gameShort}** - ${r.nickname} (${r.uid})`);
-
-			if (r.tasksClaimed.length > 0) {
-				const totalPoints = r.tasksClaimed.reduce((sum, t) => sum + t.points, 0);
-				summaryLines.push(`  🎯 Tasks Claimed: ${r.tasksClaimed.length} (+${totalPoints} pts)`);
-			}
-
-			if (r.tasksFinished.length > 0) {
-				summaryLines.push(`  ✅ Tasks Finished: ${r.tasksFinished.length}`);
-			}
-
-			if (r.itemsExchanged.length > 0) {
-				summaryLines.push(`  🎁 Items Exchanged: ${r.itemsExchanged.map(i => i.name).join(", ")}`);
-			}
-
-			if (r.codesRedeemed.length > 0) {
-				summaryLines.push(`  🔑 Codes Redeemed: ${r.codesRedeemed.join(", ")}`);
-			}
-
-			summaryLines.push(`  💎 Current Points: ${r.points}`, "");
-		}
+		const embeds = results.map(r => createEmbed(r));
 
 		if (errors.length > 0) {
-			summaryLines.push("**❌ Errors:**");
-			for (const e of errors) {
-				summaryLines.push(`  • ${e.game} ${e.uid ? `(${e.uid})` : ""}: ${e.error}`);
-			}
+			embeds.push({
+				color: 0xFF0000,
+				title: "❌ Errors",
+				description: errors.map(e => `• **${e.game}** ${e.uid ? `(${e.uid})` : ""}: ${e.error}`).join("\n").slice(0, 4096)
+			});
 		}
 
-		const summary = summaryLines.join("\n").slice(0, 2000);
-
 		if (interaction) {
-			await interaction.editReply({ content: summary });
+			await interaction.editReply({ embeds: embeds.slice(0, 10) });
 			return;
 		}
 
-		return { success: true, reply: summary };
+		const summaryLines = results.map(r => {
+			const gameShort = { starrail: "HSR", nap: "ZZZ" }[r.game] || r.game;
+			return `${gameShort} - ${r.nickname}: ${r.points} pts`;
+		});
+
+		return { success: true, reply: summaryLines.join("\n") };
 	})
 };

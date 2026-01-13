@@ -1,8 +1,18 @@
+const { setTimeout: sleep } = require("node:timers/promises");
+const config = require("../../config.js");
+
 module.exports = {
 	name: "mimo",
 	expression: "0 0 */6 * * *",
 	description: "This will run the Traveling Mimo automation for supported games (Star Rail, ZZZ) - completing tasks, claiming rewards, and exchanging for premium currency.",
 	code: (async function mimo () {
+		const jitterSeconds = config.crons?.mimoJitter ?? 0;
+		if (jitterSeconds > 0) {
+			const jitterMs = Math.floor(Math.random() * jitterSeconds * 1000);
+			app.Logger.info("Cron:Mimo", `Applying ${(jitterMs / 1000).toFixed(1)}s jitter before starting...`);
+			await sleep(jitterMs);
+		}
+
 		// Note: Genshin uses a different API structure (/qiuqiu/) and is not supported yet
 		const supportedGames = ["starrail", "nap"];
 
@@ -39,7 +49,8 @@ module.exports = {
 					const hasActivity = data.tasksClaimed.length > 0
 						|| data.itemsExchanged.length > 0
 						|| data.codesRedeemed.length > 0
-						|| data.codesObtained?.length > 0;
+						|| data.codesObtained?.length > 0
+						|| data.lotteryDraws?.length > 0;
 
 					if (!hasActivity) {
 						app.Logger.debug("Cron:Mimo", `(${account.uid}) ${account.game.short}: No new Mimo activity.`);
@@ -84,6 +95,14 @@ module.exports = {
 							fields.push({
 								name: "🎫 Codes Obtained (Not Auto-Redeemed)",
 								value: data.codesObtained.map(c => `\`${c}\``).join("\n").slice(0, 1024),
+								inline: false
+							});
+						}
+
+						if (data.lotteryDraws?.length > 0) {
+							fields.push({
+								name: "🎰 Lottery Draws",
+								value: data.lotteryDraws.map(d => `• ${d.name}`).join("\n").slice(0, 1024),
 								inline: false
 							});
 						}
@@ -165,6 +184,7 @@ module.exports = {
 							}
 						}
 
+						if (data.lotteryDraws?.length > 0) { lines.push(`🎰 Lottery Draws: ${data.lotteryDraws.map(d => d.name).join(", ")}`); }
 						lines.push(`💎 Current Points: ${data.points}`);
 
 						const escapedMessage = app.Utils.escapeCharacters(lines.join("\n"));

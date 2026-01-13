@@ -36,6 +36,7 @@
         codeRedeem: '*/15 * * * *',
         expedition: '0 */30 * * * *',
         mimo: '0 0 */6 * * *',
+        mimoJitter: 0, // Random delay in seconds before running Mimo (0-N). Helps avoid rate limits at reset time.
         missedCheckIn: '0 0 23 * * *',
         realmCurrency: '0 */1 * * *',
         shopStatus: '0 */1 * * *',
@@ -129,8 +130,10 @@
                         persistent: false,
                     },
                     mimo: {
-                        check: false, // Enable Traveling Mimo automation (claim tasks, exchange for Stellar Jade)
-                        redeem: true, // Set to false to receive codes as notifications instead of auto-redeeming (useful for redeeming on a different account)
+                        check: false,
+                        redeem: true,
+                        lottery: false,
+                        reservePoints: 0,
                     },
                     discord: {
                         // Your Discord user ID to ping you when to do your dailies/weeklies (will only work if discord bot / webhook is configured)
@@ -157,8 +160,10 @@
                         persistent: false,
                     },
                     mimo: {
-                        check: false, // Enable Traveling Mimo automation (claim tasks, exchange for Stellar Jade)
-                        redeem: true, // Set to false to receive codes as notifications instead of auto-redeeming (useful for redeeming on a different account)
+                        check: false,
+                        redeem: true,
+                        lottery: false,
+                        reservePoints: 0,
                     },
                     discord: {
                         // Your Discord user ID to ping you when to do your dailies/weeklies (will only work if discord bot / webhook is configured)
@@ -182,8 +187,10 @@
                     shopStatus: false, // This will check if your shop has finished selling videos
                     dailiesCheck: false,
                     mimo: {
-                        check: false, // Enable Traveling Mimo automation (claim tasks, exchange for Polychromes)
-                        redeem: true, // Set to false to receive codes as notifications instead of auto-redeeming (useful for redeeming on a different account)
+                        check: false,
+                        redeem: true,
+                        lottery: false,
+                        reservePoints: 0,
                     },
                     stamina: {
                         check: false,

@@ -145,6 +145,8 @@ module.exports = class StarRail extends require("../template.js") {
 				mimo: {
 					check: account.mimo?.check ?? false,
 					redeem: account.mimo?.redeem ?? true,
+					lottery: account.mimo?.lottery ?? false,
+					reservePoints: account.mimo?.reservePoints ?? 0,
 					lastRun: null
 				}
 			});
