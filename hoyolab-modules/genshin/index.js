@@ -3,6 +3,7 @@ const Diary = require("./diary.js");
 const Notes = require("./notes.js");
 const RedeemCode = require("./redeem-code.js");
 const TravelingMimo = require("./mimo.js");
+const HilichurlWorkshop = require("./hilichurl.js");
 
 const DEFAULT_CONSTANTS = {
 	ACT_ID: "e202102251931481",
@@ -150,6 +151,11 @@ module.exports = class Genshin extends require("../template.js") {
 				mimo: {
 					check: account.mimo?.check ?? false,
 					lastRun: null
+				},
+				hilichurl: {
+					check: account.hilichurl?.check ?? false,
+					redeem: account.hilichurl?.redeem ?? true,
+					lastRun: null
 				}
 			});
 
@@ -209,5 +215,23 @@ module.exports = class Genshin extends require("../template.js") {
 		});
 
 		return await tm.getNextRestockTime(accountData);
+	}
+
+	async hilichurl (accountData) {
+		const hw = new HilichurlWorkshop(this, {
+			logo: this.#logo,
+			color: this.#color
+		});
+
+		return await hw.run(accountData);
+	}
+
+	async hilichurlGetRestockTime (accountData) {
+		const hw = new HilichurlWorkshop(this, {
+			logo: this.#logo,
+			color: this.#color
+		});
+
+		return await hw.getNextRestockTime(accountData);
 	}
 };

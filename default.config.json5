@@ -37,6 +37,8 @@
         expedition: '0 */30 * * * *',
         mimo: '0 0 */6 * * *',
         mimoJitter: 0, // Random delay in seconds before running Mimo (0-N). Helps avoid rate limits at reset time.
+        hilichurl: '0 0 11 * * *', // 11:00 AM local time (adjust for your timezone if event resets at a different time)
+        hilichurlJitter: 0, // Random delay in seconds before running Hilichurl Workshop (0-N).
         missedCheckIn: '0 0 23 * * *',
         realmCurrency: '0 */1 * * *',
         shopStatus: '0 */1 * * *',
@@ -92,6 +94,10 @@
                     },
                     mimo: {
                         check: false, // NOT CURRENTLY SUPPORTED - Genshin uses a different API structure
+                    },
+                    hilichurl: {
+                        check: false, // Enable to auto-complete Hilichurl Machine Workshop tasks and exchange for Primogems
+                        redeem: true, // Auto-redeem primogem codes obtained from exchange
                     },
                     discord: {
                         // Your Discord user ID to ping you when to do your dailies/weeklies (will only work if discord bot / webhook is configured)
