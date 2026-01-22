@@ -178,6 +178,7 @@ module.exports = class HoyoLab {
 				stamina,
 				expedition,
 				mimo: account.mimo,
+				hilichurl: account.hilichurl,
 				discord: account.discord ?? null
 			});
 		}

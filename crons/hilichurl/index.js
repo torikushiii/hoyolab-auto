@@ -15,6 +15,7 @@ module.exports = {
 
 		const accounts = app.HoyoLab.getActiveAccounts({ whitelist: "genshin" });
 		if (accounts.length === 0) {
+			app.Logger.debug("Cron:Hilichurl", "No active Genshin accounts found");
 			return;
 		}
 
@@ -26,8 +27,11 @@ module.exports = {
 
 		for (const account of accounts) {
 			if (account.hilichurl?.check === false) {
+				app.Logger.debug("Cron:Hilichurl", `(${account.uid}) Hilichurl check disabled, skipping`);
 				continue;
 			}
+
+			app.Logger.info("Cron:Hilichurl", `(${account.uid}) Running Hilichurl automation...`);
 
 			try {
 				const result = await platform.hilichurl(account);
