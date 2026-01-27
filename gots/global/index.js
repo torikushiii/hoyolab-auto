@@ -30,24 +30,22 @@ const definition = {
 						}
 
 						const method = err.options?.method?.toUpperCase?.() ?? "UNKNOWN";
-						const endpoint = err.options?.url?.toString?.() ?? "UNKNOWN";
-						const status = err.response?.statusCode ?? "N/A";
+						const endpoint = err.options?.url?.toString?.() ?? null;
+						const code = err.code ?? null;
 						const responseType = err.options?.responseType ?? null;
 						const timeout = err.options?.timeout ?? null;
 
 						app.Logger.debug("GotRequest", {
 							error: err,
 							context: {
-								code: err.code ?? null,
-								method,
+								code,
 								responseType,
 								timeout,
-								url: endpoint,
-								status
+								url: endpoint
 							}
 						});
 
-						app.Logger.error("GotRequest", `Request failed (${method} ${endpoint}) status=${status} after ${retryAttempts} retries`);
+						app.Logger.error("GotRequest", `Request failed (${method} ${endpoint ?? "UNKNOWN"}) code=${code ?? "N/A"} after ${retryAttempts} retries`);
 
 						return err;
 					}
