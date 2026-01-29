@@ -1,6 +1,11 @@
 {
     loglevel: 'info',
     userAgent: 'Custom fork of HoyoLabAuto: github.com/torikushiii/hoyolab-auto',
+    retry: {
+        attempts: 0, // Number of retries for API calls (0 disables retries)
+        delayMs: 1000, // Time between retries in milliseconds
+        timeoutMs: 30000, // API timeout in milliseconds
+    },
     // Test notification settings
     testNotification: {
         enabled: false, // Set to false if you don't want to receive test notifications on startup
