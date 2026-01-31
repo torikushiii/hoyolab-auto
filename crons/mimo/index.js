@@ -147,9 +147,17 @@ module.exports = {
 							}
 						};
 
-						const userId = webhook.createUserMention(account.discord);
+						const hasSignificantActivity = data.itemsExchanged.length > 0
+							|| data.codesRedeemed.length > 0
+							|| data.codesObtained?.length > 0
+							|| data.lotteryDraws?.length > 0;
+
+						const userId = hasSignificantActivity
+							? webhook.createUserMention(account.discord)
+							: null;
+
 						await webhook.send(embed, {
-							content: userId,
+							...(userId && { content: userId }),
 							author: data.assets.author,
 							icon: data.assets.logo
 						});
