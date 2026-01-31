@@ -149,8 +149,7 @@ module.exports = {
 
 						const hasSignificantActivity = data.itemsExchanged.length > 0
 							|| data.codesRedeemed.length > 0
-							|| data.codesObtained?.length > 0
-							|| data.lotteryDraws?.length > 0;
+							|| data.codesObtained?.length > 0;
 
 						const userId = hasSignificantActivity
 							? webhook.createUserMention(account.discord)
