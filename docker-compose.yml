@@ -1,6 +1,6 @@
 services:
   instance:
-    image: ghcr.io/theinfamoustoto/hoyolab-auto:latest
+    image: ghcr.io/torikushiii/hoyolab-auto:latest
     restart: on-failure:5
     container_name: hoyolab-auto
     network_mode: bridge

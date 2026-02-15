@@ -14,15 +14,20 @@
 A multi-purpose tool for any supported Hoyoverse games. This tool is designed to assist with daily check-ins, stamina checks, expedition checks, automatic code-redemption, and more.
 
 ## Table of Contents
-- [Google App Script](#google-app-script)
-- [Supported Games](#supported-games)
-- [Features](#features)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Migration](#migration)
-- [Usage](#usage)
-- [Notifications Setup](#notifications-setup)
-- [Running with Docker](#running-with-docker)
+- [HoyoLab Auto](#hoyolab-auto)
+  - [Table of Contents](#table-of-contents)
+  - [Google App Script](#google-app-script)
+  - [Supported Games](#supported-games)
+  - [Features](#features)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+    - [Cache File Location](#cache-file-location)
+  - [Migration](#migration)
+  - [Usage](#usage)
+  - [Notifications Setup](#notifications-setup)
+  - [Running with Docker](#running-with-docker)
+  - [Contributing](#contributing)
+  - [Buy Me a Coffee](#buy-me-a-coffee)
 
 ## Google App Script
 If you don't have a server to run this script and simply just want to use it for checking in, you can use Google App Script.
@@ -58,6 +63,7 @@ If you don't have a server to run this script and simply just want to use it for
   - **Expedition check**: Check your expeditions and sends a notification if they're done.
   - **Code Redeems**: Search for codes and redeem them automatically.
   - **Trailblazer Monthly Calendar**: Check your monthly currency income.
+  - **Traveling Mimo**: Automatically complete Mimo tasks, claim points, and exchange for Stellar Jade.
 - **Zenless Zone Zero**:
   - **Daily check-in**: Runs every midnight local time.
   - **Dailies**: Reminds you to do your dailies, such as commissions if you haven't done them at 09:00 (local time).
@@ -65,6 +71,7 @@ If you don't have a server to run this script and simply just want to use it for
   - **Howl Scracth Card**: Notifies you if you haven't scratched the card for the day at 09:00 (local time).
   - **Shop Status**: Notifies you if the shop has finished selling videos.
   - **Code Redeems**: Search for codes and redeem them automatically.
+  - **Traveling Mimo**: Automatically complete Mimo tasks, claim points, and exchange for Polychrome.
 
 ## Prerequisites
 - [Git](https://git-scm.com/downloads)
@@ -94,6 +101,35 @@ If you don't have a server to run this script and simply just want to use it for
       - Open `config.json5` and update it with your application's configuration settings.
 
 4. Follow the instructions in the `default.config.json5` or `config.json5` file.
+5. Run the application:
+   ```bash
+   npm start
+   ```
+
+### Cache File Location
+
+After running the application for the first time, a cache file will be automatically created at:
+```
+./data/cache.json
+```
+
+This file stores temporary data to improve performance and reduce API calls. The `data/` directory structure will look like this:
+```
+project-root/
+├── data/
+│   ├── cache.json    # Auto-generated cache file
+│   └── README.md     # Cache documentation
+├── logs/             # Application logs (if logging is enabled)
+├── config.json5      # Your configuration file
+└── ...
+```
+
+**Important Notes:**
+- The cache file is automatically managed by the application
+- Do not manually edit the cache file
+- The cache file will be recreated if deleted
+- You can safely delete the cache file to reset cached data
+- The `data/` directory must be writable by the application
 
 ## Migration
 
@@ -118,7 +154,7 @@ For setting up Discord or Telegram notifications, refer to the [setup folder](ht
 
 ## Running with Docker
 
-This application can be easily managed and run using Docker. We provide a Makefile 
+This application can be easily managed and run using Docker. We provide a Makefile
 for convenience, but you can also use Docker commands directly.
 
 **1. Prerequisites**
@@ -149,16 +185,23 @@ You can configure your config using one of the following methods:
    - Open `config.json5` and update it with your application's configuration settings.
    - Set environment variable `CONFIG_PATH` to alter the configuration file path (default to `./config.json5`).
 
+**Important for Docker Users:**
+> [!NOTE]
+> When running with Docker, the cache file will be created inside the container at `/app/data/cache.json`. To persist cache data between container restarts, ensure the `data` directory is properly mounted as a volume (this is already configured in the provided `docker-compose.yml`).
+> If this is your first time running docker:
+> - Make sure your user is listed in the docker group, you can do so by running `sudo usermod -aG docker $USER`, logging out and back in
+> - From the project root, grant yourself perms to not have errors while accessing certain folders such as `data`. We can fix this by running `sudo chown -R $USER:$USER data logs && chmod -R 777 data logs`
+
 **3. Building and Running with Docker Compose**
 
 **Using the Makefile (Recommended):**
 
-The provided Makefile simplifies common Docker tasks. 
+The provided Makefile simplifies common Docker tasks.
 
 - **Build the image:**
   ```bash
-  make build 
-  ``` 
+  make build
+  ```
 - **Start the application:**
   ```bash
   make up
@@ -169,13 +212,13 @@ The provided Makefile simplifies common Docker tasks.
   ```
 - **View logs:**
   ```bash
-  make logs 
+  make logs
   ```
 - **Rebuild and restart:**
   ```bash
-  make update 
+  make update
   ```
-  
+
   For a complete list of available Makefile targets, run:
 
   ```bash

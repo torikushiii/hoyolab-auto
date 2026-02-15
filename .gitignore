@@ -160,6 +160,14 @@ dist
 
 .vscode-test
 
+# VS Code settings
+
+.vscode/
+
+# Codex Agent settings
+
+AGENTS.md
+
 # yarn v2
 
 .yarn/cache

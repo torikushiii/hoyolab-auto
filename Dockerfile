@@ -12,7 +12,7 @@ COPY . .
 
 RUN addgroup -S hoyolab && adduser -S -G hoyolab hoyolab && \
     mkdir -p /app/data /app/logs && \
-    chown -R hoyolab:hoyolab /app 
+    chown -R hoyolab:hoyolab /app
 
 USER hoyolab
 

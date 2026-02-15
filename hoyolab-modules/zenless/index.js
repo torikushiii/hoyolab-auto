@@ -1,6 +1,7 @@
 const CheckIn = require("./check-in.js");
 const Notes = require("./notes.js");
 const RedeemCode = require("./redeem-code.js");
+const TravelingMimo = require("./mimo.js");
 
 const DEFAULT_CONSTANTS = {
 	ACT_ID: "e202406031448091",
@@ -137,6 +138,14 @@ module.exports = class ZenlessZoneZero extends require("../template.js") {
 					check: account.shopStatus,
 					fired: false
 				},
+				mimo: {
+					check: account.mimo?.check ?? false,
+					redeem: account.mimo?.redeem ?? true,
+					redeemDraw: account.mimo?.redeemDraw ?? true,
+					lottery: account.mimo?.lottery ?? false,
+					reservePoints: account.mimo?.reservePoints ?? 0,
+					lastRun: null
+				},
 				cookie: cookieData
 			});
 
@@ -169,5 +178,23 @@ module.exports = class ZenlessZoneZero extends require("../template.js") {
 	async redeemCode (accountData, code) {
 		const rc = new RedeemCode(this);
 		return await rc.redeemCode(accountData, code);
+	}
+
+	async mimo (accountData) {
+		const tm = new TravelingMimo(this, {
+			logo: this.#logo,
+			color: this.#color
+		});
+
+		return await tm.run(accountData);
+	}
+
+	async mimoGetRestockTime (accountData) {
+		const tm = new TravelingMimo(this, {
+			logo: this.#logo,
+			color: this.#color
+		});
+
+		return await tm.getNextRestockTime(accountData);
 	}
 };

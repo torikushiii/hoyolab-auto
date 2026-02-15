@@ -1,29 +1,34 @@
 {
     loglevel: 'info',
     userAgent: 'Custom fork of HoyoLabAuto: github.com/torikushiii/hoyolab-auto',
+    retry: {
+        attempts: 0, // Number of retries for API calls (0 disables retries)
+        delayMs: 1000, // Time between retries in milliseconds
+        timeoutMs: 30000, // API timeout in milliseconds
+    },
     // Test notification settings
     testNotification: {
-        enabled: true, // Set to false if you don't want to receive test notifications on startup
+        enabled: false, // Set to false if you don't want to receive test notifications on startup
     },
     platforms: [
         {
             id: 1,
-            active: true,
+            active: false, // Set to true if you want to receive notifications and issue commands through a bot
             type: 'discord', // This platform is optional, only use this if you have want to access commands via Discord bot
             botId: '123', // Your Discord bot ID
             token: '(YOUR_DISCORD_BOT_TOKEN)',
         },
         {
             id: 2,
-            active: false, // Set to true if you want to enable Telegram bot
+            active: false, // Set to true if you want to enable a Telegram bot to receive notifications and issue commands
             type: 'telegram',
             chatId: 123, // You can follow this guide to create a bot: https://github.com/torikushiii/hoyolab-auto/blob/main/setup/TELEGRAM.md
-            token: '123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11',
+            token: '(YOUR_TELEGRAM_BOT_TOKEN)',
             disableNotification: false, // Set to true if you want to disable notification for Telegram bot (sounds, vibration, etc.)
         },
         {
             id: 3,
-            active: true, // Set to true if you want to send notification to Discord webhook
+            active: false, // Set to true if you want to receive notifications from a Discord webhook
             type: 'webhook',
             url: '(YOUR_WEBHOOK_URL)', // You can follow this guide to create a webhook: https://github.com/torikushiii/hoyolab-auto/blob/main/setup/DISCORD_WEBHOOK.md
         },
@@ -35,6 +40,10 @@
         checkIn: '0 0 0 * * *',
         codeRedeem: '*/15 * * * *',
         expedition: '0 */30 * * * *',
+        mimo: '0 0 */6 * * *',
+        mimoJitter: 0, // Random delay in seconds before running Mimo (0-N). Helps avoid rate limits at reset time.
+        hilichurl: '0 0 11 * * *', // 11:00 AM local time (adjust for your timezone if event resets at a different time)
+        hilichurlJitter: 0, // Random delay in seconds before running Hilichurl Workshop (0-N).
         missedCheckIn: '0 0 23 * * *',
         realmCurrency: '0 */1 * * *',
         shopStatus: '0 */1 * * *',
@@ -63,7 +72,7 @@
         },
         {
             id: 3,
-            active: true, // Set to true if you want to enable Genshin Impact
+            active: false, // Set to true if you want to enable Genshin Impact
             type: 'genshin',
             data: [
                 {
@@ -81,17 +90,25 @@
                     },
                     stamina: {
                         check: false, // Enable this if you want to get notified when your stamina is above the threshold
-                        threshold: 150, // Your stamina threshold, only fires notification when your stamina is above this value
+                        threshold: 0, // Your stamina threshold, only fires notification when your stamina is above this value
                         persistent: false, // Set to true if you want to get notified every time your stamina is above the threshold
                     },
                     expedition: {
                         check: false, // Enable this if you want to get notified when your expedition is done
                         persistent: false, // Set to true if you want to get notified every time your expedition is done
                     },
+                    mimo: {
+                        check: false, // NOT CURRENTLY SUPPORTED - Genshin uses a different API structure
+                    },
+                    hilichurl: {
+                        check: false, // Enable to auto-complete Hilichurl Machine Workshop tasks and exchange for Primogems
+                        redeem: true, // Auto-redeem primogem codes obtained from exchange
+                    },
                     discord: {
-                        // Your Discord user ID to ping you when to do your dailies/weeklies
+                        // Your Discord user ID to ping you when to do your dailies/weeklies (will only work if discord bot / webhook is configured)
                         // or when your stamina is above the threshold and your expedition is done
                         // this is optional, you can leave it as null if you don't want to get pinged
+                        // Make sure your Discord user ID is between single quotes such as ''
                         // e.g userId: '123456789'
                         userId: null,
                     }
@@ -100,7 +117,7 @@
         },
         {
             id: 4,
-            active: true, // Set to true if you want to enable Honkai: Star Rail
+            active: false, // Set to true if you want to enable Honkai: Star Rail
             type: 'starrail',
             data: [
                 // If you have same account for both genshin and starrail
@@ -112,21 +129,29 @@
                 {
                     cookie: '',
                     redeemCode: false,
-                    dailiesCheck: true,
-                    weekliesCheck: true,
+                    dailiesCheck: false,
+                    weekliesCheck: false,
                     stamina: {
-                        check: true,
-                        threshold: 230,
-                        persistent: true,
-                    },
-                    expedition: {
-                        check: true,
+                        check: false,
+                        threshold: 0,
                         persistent: false,
                     },
+                    expedition: {
+                        check: false,
+                        persistent: false,
+                    },
+                    mimo: {
+                        check: false,
+                        redeem: true,
+                        lottery: false,
+                        reservePoints: 0,
+                        redeemDraw: true,
+                    },
                     discord: {
-                        // Your Discord user ID to ping you when to do your dailies/weeklies
+                        // Your Discord user ID to ping you when to do your dailies/weeklies (will only work if discord bot / webhook is configured)
                         // or when your stamina is above the threshold and your expedition is done
                         // this is optional, you can leave it as null if you don't want to get pinged
+                        // Make sure your Discord user ID is between single quotes such as ''
                         // e.g userId: '123456789'
                         userId: null,
                     }
@@ -139,17 +164,25 @@
                     weekliesCheck: false,
                     stamina: {
                         check: false,
-                        threshold: 150,
+                        threshold: 0,
                         persistent: false,
                     },
                     expedition: {
                         check: false,
                         persistent: false,
                     },
+                    mimo: {
+                        check: false,
+                        redeem: true,
+                        lottery: false,
+                        reservePoints: 0,
+                        redeemDraw: true,
+                    },
                     discord: {
-                        // Your Discord user ID to ping you when to do your dailies/weeklies
+                        // Your Discord user ID to ping you when to do your dailies/weeklies (will only work if discord bot / webhook is configured)
                         // or when your stamina is above the threshold and your expedition is done
                         // this is optional, you can leave it as null if you don't want to get pinged
+                        // Make sure your Discord user ID is between single quotes such as ''
                         // e.g userId: '123456789'
                         userId: null,
                     }
@@ -165,16 +198,24 @@
                     cookie: '',
                     redeemCode: false,
                     shopStatus: false, // This will check if your shop has finished selling videos
-                    dailiesCheck: true,
+                    dailiesCheck: false,
+                    mimo: {
+                        check: false,
+                        redeem: true,
+                        lottery: false,
+                        reservePoints: 0,
+                        redeemDraw: true,
+                    },
                     stamina: {
-                        check: true,
-                        threshold: 200,
+                        check: false,
+                        threshold: 0,
                         persistent: false,
                     },
                     discord: {
-                        // Your Discord user ID to ping you when to do your dailies/weeklies
+                        // Your Discord user ID to ping you when to do your dailies/weeklies (will only work if discord bot / webhook is configured)
                         // or when your stamina is above the threshold and your expedition is done
                         // this is optional, you can leave it as null if you don't want to get pinged
+                        // Make sure your Discord user ID is between single quotes such as ''
                         // e.g userId: '123456789'
                         userId: null,
                     }

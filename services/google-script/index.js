@@ -1,4 +1,5 @@
 const config = {
+	enableCodeRedemption: false, // Set to true to enable automatic code redemption
 	genshin: {
 		data: [
 			// "account_cookie_1",
@@ -30,23 +31,23 @@ const config = {
 };
 
 // Function to reset redeemed codes for all games
-function resetAllRedeemedCodes() {
+function resetAllRedeemedCodes () {
 	const games = ["genshin", "honkai", "starrail", "zenless"];
-	games.forEach(game => {
+	for (const game of games) {
 		PropertiesService.getScriptProperties().deleteProperty(`${game}_redeemed_codes`);
-	});
+	}
 	console.log("Redeemed codes for all games have been reset.");
 }
 
 // Function to view all stored redeemed codes
-function viewAllRedeemedCodes() {
+function viewAllRedeemedCodes () {
 	const games = ["genshin", "honkai", "starrail", "zenless"];
 	const allCodes = {};
 
-	games.forEach(game => {
+	for (const game of games) {
 		const redeemedCodes = PropertiesService.getScriptProperties().getProperty(`${game}_redeemed_codes`);
 		allCodes[game] = redeemedCodes ? JSON.parse(redeemedCodes) : [];
-	});
+	}
 
 	console.log("All redeemed codes:", allCodes);
 	return allCodes;
@@ -460,7 +461,19 @@ class Game {
 		try {
 			const response = await UrlFetchApp.fetch(url, options);
 			const data = JSON.parse(response.getContentText());
-			console.log(`Code ${code} redemption result for ${this.fullName}:`, data);
+
+			// Check for authentication errors and other failures
+			if (data.retcode !== 0) {
+				if (data.retcode === -1071) {
+					console.error(`Authentication error for code ${code} in ${this.fullName}: ${data.message}. Try logging in via incognito mode and get a fresh cookie from there.`);
+				}
+				else {
+					console.error(`Code ${code} redemption failed for ${this.fullName}:`, data);
+				}
+			}
+			else {
+				console.log(`Code ${code} successfully redeemed for ${this.fullName}:`, data);
+			}
 		}
 		catch (e) {
 			console.error(`Error redeeming code ${code} for ${this.fullName}:`, e);
@@ -573,12 +586,18 @@ function checkInGame (gameName) {
 		.then(async (successes) => {
 			console.log(`Successful check-ins for ${gameName}:`, successes);
 
-			for (const success of successes) {
-				if (gameName === "honkai") {
-					continue;
-				}
+			// Only attempt code redemption if enabled in config
+			if (config.enableCodeRedemption) {
+				for (const success of successes) {
+					if (gameName === "honkai") {
+						continue;
+					}
 
-				await game.redeemCodes(success.account);
+					await game.redeemCodes(success.account);
+				}
+			}
+			else {
+				console.log(`Code redemption is disabled in config for ${gameName}`);
 			}
 
 			if (DISCORD_WEBHOOK) {
@@ -670,8 +689,10 @@ function checkInAllGames () {
 		});
 }
 
-function manuallyRedeemCodes(gameName, forceRedeem = false) {
-	if (!["genshin", "honkai", "starrail", "zenless"].includes(gameName)) {
+function manuallyRedeemCodes (gameName, forceRedeem = false) {
+	if (![
+		"genshin", "honkai", "starrail", "zenless"
+	].includes(gameName)) {
 		console.error(`Invalid game name: ${gameName}. Must be one of: genshin, honkai, starrail, zenless`);
 		return Promise.reject(new Error(`Invalid game name: ${gameName}`));
 	}
@@ -679,6 +700,12 @@ function manuallyRedeemCodes(gameName, forceRedeem = false) {
 	if (gameName === "honkai") {
 		console.warn("Code redemption is not supported for Honkai Impact 3rd");
 		return Promise.resolve({ success: false, message: "Code redemption is not supported for Honkai Impact 3rd" });
+	}
+
+	// Check if code redemption is enabled (can be bypassed with forceRedeem)
+	if (!config.enableCodeRedemption && !forceRedeem) {
+		console.warn(`Code redemption is disabled in config for ${gameName}. Use forceRedeem=true to bypass.`);
+		return Promise.resolve({ success: false, message: "Code redemption is disabled in config" });
 	}
 
 	const game = new Game(gameName, config[gameName]);
@@ -711,25 +738,27 @@ function manuallyRedeemCodes(gameName, forceRedeem = false) {
 			if (forceRedeem) {
 				await game.forceRedeemCodes(account);
 				return { success: true, account, message: `Force redeemed all codes for ${account.nickname} (${account.uid})` };
-			} else {
+			}
+			else {
 				await game.redeemCodes(account);
 				return { success: true, account, message: `Redeemed new codes for ${account.nickname} (${account.uid})` };
 			}
-		} catch (e) {
+		}
+		catch (e) {
 			console.error(`Error redeeming codes for ${gameName}:`, e);
 			return { success: false, message: e.message };
 		}
 	}));
 }
 
-function redeemGenshinCodes() {
+function redeemGenshinCodes () {
 	return manuallyRedeemCodes("genshin", false);
 }
 
-function redeemStarRailCodes() {
+function redeemStarRailCodes () {
 	return manuallyRedeemCodes("starrail", false);
 }
 
-function redeemZenlessCodes() {
+function redeemZenlessCodes () {
 	return manuallyRedeemCodes("zenless", false);
 }

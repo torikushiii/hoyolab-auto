@@ -65,9 +65,6 @@ module.exports = class Telegram extends require("./template.js") {
 			await this.processMessageUpdates(result);
 			this.lastUpdatedId = result[result.length - 1].update_id;
 		}
-		else {
-			this.lastUpdatedId = 0;
-		}
 	}
 
 	async send (message, options = {}) {
@@ -176,42 +173,46 @@ module.exports = class Telegram extends require("./template.js") {
 		if (messageData.callback_query) {
 			this.handlingCallbackQuery = true;
 
-			const data = messageData.callback_query.data;
-			if (data.startsWith("redeem:")) {
-				const parts = data.split(":");
+			try {
+				const data = messageData.callback_query.data;
+				if (typeof data === "string" && data.startsWith("redeem:")) {
+					const parts = data.split(":");
 
-				let game = parts[1];
-				const uid = parts[2];
+					let game = parts[1];
+					const uid = parts[2];
 
-				await this.send("Please enter the code you want to redeem:");
+					await this.send("Please enter the code you want to redeem:");
 
-				const code = await this.waitForUserInput(
-					messageData.callback_query.from.id,
-					messageData.callback_query
-				);
+					const code = await this.waitForUserInput(
+						messageData.callback_query.from.id,
+						messageData.callback_query
+					);
 
-				if (code) {
-					if (game === "zzz") {
-						game = "nap";
-					}
-					else if (game === "hsr") {
-						game = "starrail";
-					}
-					else if (game === "gi") {
-						game = "genshin";
-					}
+					if (code) {
+						if (game === "zzz") {
+							game = "nap";
+						}
+						else if (game === "hsr") {
+							game = "starrail";
+						}
+						else if (game === "gi") {
+							game = "genshin";
+						}
 
-					const res = await app.HoyoLab.redeemCode(game, uid, code);
-					if (!res.success) {
-						const reason = this.prepareMessage(res.data.reason);
-						await this.send(`Failed to redeem code: ${reason}`);
+						const res = await app.HoyoLab.redeemCode(game, uid, code);
+						if (!res.success) {
+							const reason = this.prepareMessage(res.data.reason);
+							await this.send(`Failed to redeem code: ${reason}`);
+						}
+						else {
+							await this.send(`Successfully redeemed code: ${code}`);
+						}
 					}
-					else {
-						await this.send(`Successfully redeemed code: ${code}`);
-					}
+					return;
 				}
+			}
+			finally {
 				this.handlingCallbackQuery = false;
-				return;
 			}
 		}
 
@@ -255,25 +256,31 @@ module.exports = class Telegram extends require("./template.js") {
 			}
 			else if (update.message) {
 				const { message } = update;
-				const command = message.text.split(" ")[0];
-				if (Telegram.possibleCommands.includes(command)) {
-					const args = message.text.split(" ").slice(1);
-					const channelData = {
-						id: message.chat.id,
-						name: message.chat.title ?? null
-					};
-					const userData = {
-						id: message.from.id,
-						username: message.from.first_name ?? null
-					};
-					await this.handleCommand({
-						command: command.slice(1),
-						args,
-						channelData,
-						userData
-					});
+				let handled = false;
+
+				if (typeof message.text === "string") {
+					const command = message.text.split(" ")[0];
+					if (Telegram.possibleCommands.includes(command)) {
+						const args = message.text.split(" ").slice(1);
+						const channelData = {
+							id: message.chat.id,
+							name: message.chat.title ?? null
+						};
+						const userData = {
+							id: message.from.id,
+							username: message.from.first_name ?? null
+						};
+						await this.handleCommand({
+							command: command.slice(1),
+							args,
+							channelData,
+							userData
+						});
+						handled = true;
+					}
 				}
-				else {
+
+				if (!handled) {
 					for (const listener of this.messageListeners) {
 						await listener(update);
 					}
