@@ -33,31 +33,30 @@ module.exports = {
 			}
 
 			if (shop.state === "Finished") {
-				const webhook = app.Platform.get(3);
-
 				account.shop.fired = true;
 				platform.update(account);
 
+				const platforms = app.Platform.getForAccount(account);
 				const region = app.HoyoLab.getRegion(account.region);
-				if (webhook) {
-					const embed = {
-						color: data.assets.color,
-						title: "Shop Status",
-						author: {
-							name: `${region} Server - ${account.nickname}`,
-							icon_url: data.assets.logo
-						},
-						description: "Your shop has finished selling videos!",
-						thumbnail: {
-							url: data.assets.logo
-						},
-						timestamp: new Date(),
-						footer: {
-							text: "Shop Status",
-							icon_url: data.assets.logo
-						}
-					};
+				const embed = {
+					color: data.assets.color,
+					title: "Shop Status",
+					author: {
+						name: `${region} Server - ${account.nickname}`,
+						icon_url: data.assets.logo
+					},
+					description: "Your shop has finished selling videos!",
+					thumbnail: {
+						url: data.assets.logo
+					},
+					timestamp: new Date(),
+					footer: {
+						text: "Shop Status",
+						icon_url: data.assets.logo
+					}
+				};
 
+				for (const webhook of platforms.filter(p => p.name === "webhook")) {
 					const userId = webhook.createUserMention(account.discord);
 					await webhook.send(embed, {
 						content: userId,
@@ -66,15 +65,14 @@ module.exports = {
 					});
 				}
 
-				const telegram = app.Platform.get(2);
-				if (telegram) {
-					const messageText = [
-						`🛒 Shop Status`,
-						`UID: ${account.uid} ${account.nickname}`,
-						`Your shop has finished selling videos!`
-					].join("\n");
+				const messageText = [
+					`🛒 Shop Status`,
+					`UID: ${account.uid} ${account.nickname}`,
+					`Your shop has finished selling videos!`
+				].join("\n");
 
-					const escapedMessage = app.Utils.escapeCharacters(messageText);
+				const escapedMessage = app.Utils.escapeCharacters(messageText);
+				for (const telegram of platforms.filter(p => p.name === "telegram")) {
 					await telegram.send(escapedMessage);
 				}
 			}

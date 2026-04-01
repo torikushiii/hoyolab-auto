@@ -146,7 +146,8 @@ module.exports = class ZenlessZoneZero extends require("../template.js") {
 					reservePoints: account.mimo?.reservePoints ?? 0,
 					lastRun: null
 				},
-				cookie: cookieData
+				cookie: cookieData,
+				allowedPlatforms: account.allowedPlatforms ?? null
 			});
 
 			const region = app.HoyoLab.getRegion(data.region);

@@ -65,7 +65,8 @@ module.exports = class TearsOfThemis extends require("../template.js") {
 					...this.config.url,
 					logo: this.#logo,
 					color: this.#color
-				}
+				},
+				allowedPlatforms: account.allowedPlatforms ?? null
 			});
 
 			accountList++;

@@ -13,27 +13,27 @@ RegionalTaskManager.registerTask("HowlScratchCard", 21, 0, async (account) => {
 		return;
 	}
 
-	const webhook = app.Platform.get(3);
+	const platforms = app.Platform.getForAccount(account);
 	const region = app.HoyoLab.getRegion(account.region);
-	if (webhook) {
-		const embed = {
-			color: data.assets.color,
-			title: "Howl's News Stand",
-			author: {
-				name: `${region} Server - ${account.nickname}`,
-				icon_url: data.assets.logo
-			},
-			description: "You haven't scratched the card at Howl's News Stand yet!",
-			thumbnail: {
-				url: data.assets.logo
-			},
-			timestamp: new Date(),
-			footer: {
-				text: "Howl's News Stand",
-				icon_url: data.assets.logo
-			}
-		};
+	const embed = {
+		color: data.assets.color,
+		title: "Howl's News Stand",
+		author: {
+			name: `${region} Server - ${account.nickname}`,
+			icon_url: data.assets.logo
+		},
+		description: "You haven't scratched the card at Howl's News Stand yet!",
+		thumbnail: {
+			url: data.assets.logo
+		},
+		timestamp: new Date(),
+		footer: {
+			text: "Howl's News Stand",
+			icon_url: data.assets.logo
+		}
+	};
 
+	for (const webhook of platforms.filter(p => p.name === "webhook")) {
 		const userId = webhook.createUserMention(account.discord);
 		await webhook.send(embed, {
 			content: userId,
@@ -42,15 +42,14 @@ RegionalTaskManager.registerTask("HowlScratchCard", 21, 0, async (account) => {
 		});
 	}
 
-	const telegram = app.Platform.get(2);
-	if (telegram) {
-		const messageText = [
-			`${region} Server - ${account.nickname}`,
-			`📰 Howl's News Stand`,
-			`You haven't scratched the card at Howl's News Stand yet!`
-		].join("\n");
+	const messageText = [
+		`${region} Server - ${account.nickname}`,
+		`📰 Howl's News Stand`,
+		`You haven't scratched the card at Howl's News Stand yet!`
+	].join("\n");
 
-		const escapedMessage = app.Utils.escapeCharacters(messageText);
+	const escapedMessage = app.Utils.escapeCharacters(messageText);
+	for (const telegram of platforms.filter(p => p.name === "telegram")) {
 		await telegram.send(escapedMessage);
 	}
 });

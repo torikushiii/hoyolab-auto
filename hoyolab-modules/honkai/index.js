@@ -110,7 +110,8 @@ module.exports = class HonkaiImpact extends require("../template.js") {
 				region: data.region,
 				timezone: offset,
 				level: data.level,
-				cookie: cookieData
+				cookie: cookieData,
+				allowedPlatforms: account.allowedPlatforms ?? null
 			});
 
 			const region = app.HoyoLab.getRegion(data.region);

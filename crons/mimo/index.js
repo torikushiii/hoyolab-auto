@@ -48,22 +48,23 @@ module.exports = {
 
 						if (isCriticalError) {
 							const region = app.HoyoLab.getRegion(account.region);
-							const webhook = app.Platform.get(3);
-							if (webhook) {
-								const embed = {
-									color: 0xFF0000,
-									title: `🐾 Traveling Mimo Failure - ${account.game.name}`,
-									author: {
-										name: `${region} Server - ${account.nickname}`,
-										icon_url: account.assets?.logo
-									},
-									description: `**Automation Failed:** ${result.message}`,
-									timestamp: new Date(),
-									footer: {
-										text: "Traveling Mimo Automation",
-										icon_url: account.assets?.logo
-									}
-								};
+							const platforms = app.Platform.getForAccount(account);
+							const embed = {
+								color: 0xFF0000,
+								title: `🐾 Traveling Mimo Failure - ${account.game.name}`,
+								author: {
+									name: `${region} Server - ${account.nickname}`,
+									icon_url: account.assets?.logo
+								},
+								description: `**Automation Failed:** ${result.message}`,
+								timestamp: new Date(),
+								footer: {
+									text: "Traveling Mimo Automation",
+									icon_url: account.assets?.logo
+								}
+							};
+
+							for (const webhook of platforms.filter(p => p.name === "webhook")) {
 								await webhook.send(embed, {
 									content: webhook.createUserMention(account.discord),
 									author: account.assets?.author,
@@ -71,17 +72,16 @@ module.exports = {
 								});
 							}
 
-							const telegram = app.Platform.get(2);
-							if (telegram) {
-								const messageText = [
-									`🐾 *Traveling Mimo Failure* - ${account.game.name}`,
-									`Region: ${region} | UID: ${account.uid}`,
-									`Player: ${account.nickname}`,
-									"",
-									`❌ *Error:* ${result.message}`
-								].join("\n");
-								const escapedMessage = app.Utils.escapeCharacters(messageText);
-								await telegram.send(escapedMessage);
+							const failureText = [
+								`🐾 *Traveling Mimo Failure* - ${account.game.name}`,
+								`Region: ${region} | UID: ${account.uid}`,
+								`Player: ${account.nickname}`,
+								"",
+								`❌ *Error:* ${result.message}`
+							].join("\n");
+							const escapedFailureText = app.Utils.escapeCharacters(failureText);
+							for (const telegram of platforms.filter(p => p.name === "telegram")) {
+								await telegram.send(escapedFailureText);
 							}
 						}
 						continue;
@@ -102,8 +102,10 @@ module.exports = {
 					}
 
 					const region = app.HoyoLab.getRegion(account.region);
-					const webhook = app.Platform.get(3);
-					if (webhook) {
+					const platforms = app.Platform.getForAccount(account);
+					const webhooks = platforms.filter(p => p.name === "webhook");
+					const telegrams = platforms.filter(p => p.name === "telegram");
+					if (webhooks.length > 0) {
 						const fields = [];
 
 						if (data.tasksClaimed.length > 0) {
@@ -203,19 +205,20 @@ module.exports = {
 							|| data.codesRedeemed.length > 0
 							|| data.codesObtained?.length > 0;
 
-						const userId = hasSignificantActivity
-							? webhook.createUserMention(account.discord)
-							: null;
+						for (const webhook of webhooks) {
+							const userId = hasSignificantActivity
+								? webhook.createUserMention(account.discord)
+								: null;
 
-						await webhook.send(embed, {
-							...(userId && { content: userId }),
-							author: data.assets.author,
-							icon: data.assets.logo
-						});
+							await webhook.send(embed, {
+								...(userId && { content: userId }),
+								author: data.assets.author,
+								icon: data.assets.logo
+							});
+						}
 					}
 
-					const telegram = app.Platform.get(2);
-					if (telegram) {
+					if (telegrams.length > 0) {
 						const lines = [
 							`🐾 *Traveling Mimo* - ${account.game.name}`,
 							`Region: ${region} | UID: ${account.uid}`,
@@ -254,7 +257,9 @@ module.exports = {
 						lines.push(`💎 Current Points: ${data.points}`);
 
 						const escapedMessage = app.Utils.escapeCharacters(lines.join("\n"));
-						await telegram.send(escapedMessage);
+						for (const telegram of telegrams) {
+							await telegram.send(escapedMessage);
+						}
 					}
 
 					app.Logger.info("Cron:Mimo", `(${account.uid}) ${account.game.short}: Mimo automation completed.`);

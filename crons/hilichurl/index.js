@@ -58,8 +58,10 @@ module.exports = {
 				}
 
 				const region = app.HoyoLab.getRegion(account.region);
-				const webhook = app.Platform.get(3);
-				if (webhook) {
+				const platforms = app.Platform.getForAccount(account);
+				const webhooks = platforms.filter(p => p.name === "webhook");
+				const telegrams = platforms.filter(p => p.name === "telegram");
+				if (webhooks.length > 0) {
 					const fields = [];
 
 					if (data.tasksClaimed.length > 0) {
@@ -146,19 +148,20 @@ module.exports = {
 						|| data.codesRedeemed.length > 0
 						|| data.codesObtained?.length > 0;
 
-					const userId = hasSignificantActivity
-						? webhook.createUserMention(account.discord)
-						: null;
+					for (const webhook of webhooks) {
+						const userId = hasSignificantActivity
+							? webhook.createUserMention(account.discord)
+							: null;
 
-					await webhook.send(embed, {
-						...(userId && { content: userId }),
-						author: data.assets.author,
-						icon: data.assets.logo
-					});
+						await webhook.send(embed, {
+							...(userId && { content: userId }),
+							author: data.assets.author,
+							icon: data.assets.logo
+						});
+					}
 				}
 
-				const telegram = app.Platform.get(2);
-				if (telegram) {
+				if (telegrams.length > 0) {
 					const lines = [
 						"🔧 *Hilichurl Machine Workshop* - Genshin Impact",
 						`Region: ${region} | UID: ${account.uid}`,
@@ -193,7 +196,9 @@ module.exports = {
 					lines.push(`💎 Current Points: ${data.points}`);
 
 					const escapedMessage = app.Utils.escapeCharacters(lines.join("\n"));
-					await telegram.send(escapedMessage);
+					for (const telegram of telegrams) {
+						await telegram.send(escapedMessage);
+					}
 				}
 
 				app.Logger.info("Cron:Hilichurl", `(${account.uid}) Genshin Impact: Hilichurl automation completed.`);

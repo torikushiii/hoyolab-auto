@@ -149,7 +149,8 @@ module.exports = class StarRail extends require("../template.js") {
 					lottery: account.mimo?.lottery ?? false,
 					reservePoints: account.mimo?.reservePoints ?? 0,
 					lastRun: null
-				}
+				},
+				allowedPlatforms: account.allowedPlatforms ?? null
 			});
 
 			const region = app.HoyoLab.getRegion(data.region);

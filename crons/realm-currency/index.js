@@ -37,34 +37,34 @@ module.exports = {
 				realm.fired = true;
 				platform.update(account);
 
-				const webhook = app.Platform.get(3);
-				if (webhook) {
-					const region = app.HoyoLab.getRegion(account.region);
-					const embed = {
-						color: data.assets.color,
-						title: "Realm Currency",
-						author: {
-							name: `${region} Server - ${account.nickname}`,
-							icon_url: data.assets.logo
-						},
-						description: "Your realm currency is full!",
-						fields: [
-							{
-								name: "Current Realm Currency",
-								value: `${coins.currentCoin}/${coins.maxCoin}`,
-								inline: true
-							}
-						],
-						thumbnail: {
-							url: data.assets.logo
-						},
-						timestamp: new Date(),
-						footer: {
-							text: "Realm Currency",
-							icon_url: data.assets.logo
+				const platforms = app.Platform.getForAccount(account);
+				const region = app.HoyoLab.getRegion(account.region);
+				const embed = {
+					color: data.assets.color,
+					title: "Realm Currency",
+					author: {
+						name: `${region} Server - ${account.nickname}`,
+						icon_url: data.assets.logo
+					},
+					description: "Your realm currency is full!",
+					fields: [
+						{
+							name: "Current Realm Currency",
+							value: `${coins.currentCoin}/${coins.maxCoin}`,
+							inline: true
 						}
-					};
+					],
+					thumbnail: {
+						url: data.assets.logo
+					},
+					timestamp: new Date(),
+					footer: {
+						text: "Realm Currency",
+						icon_url: data.assets.logo
+					}
+				};
 
+				for (const webhook of platforms.filter(p => p.name === "webhook")) {
 					const userId = webhook.createUserMention(account.discord);
 					await webhook.send(embed, {
 						content: userId,
@@ -73,15 +73,14 @@ module.exports = {
 					});
 				}
 
-				const telegram = app.Platform.get(2);
-				if (telegram) {
-					const messageText = [
-						`💰 Realm Currency`,
-						`UID: ${account.uid} ${account.nickname}`,
-						`Your realm currency is full!`
-					].join("\n");
+				const messageText = [
+					`💰 Realm Currency`,
+					`UID: ${account.uid} ${account.nickname}`,
+					`Your realm currency is full!`
+				].join("\n");
 
-					const escapedMessage = app.Utils.escapeCharacters(messageText);
+				const escapedMessage = app.Utils.escapeCharacters(messageText);
+				for (const telegram of platforms.filter(p => p.name === "telegram")) {
 					await telegram.send(escapedMessage);
 				}
 			}

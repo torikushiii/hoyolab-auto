@@ -42,28 +42,28 @@ module.exports = {
 					continue;
 				}
 
-				const webhook = app.Platform.get(3);
-				if (webhook) {
-					const embed = {
-						color: data.assets.color,
-						title: "Expedition Reminder",
-						author: {
-							name: data.assets.author,
-							icon_url: data.assets.logo
-						},
-						description: "All expeditions are completed!",
-						fields: [
-							{ name: "UID", value: account.uid, inline: true },
-							{ name: "Username", value: account.nickname, inline: true },
-							{ name: "Region", value: app.HoyoLab.getRegion(account.region), inline: true }
-						],
-						timestamp: new Date(),
-						footer: {
-							text: "Expedition Reminder",
-							icon_url: data.assets.logo
-						}
-					};
+				const platforms = app.Platform.getForAccount(account);
+				const embed = {
+					color: data.assets.color,
+					title: "Expedition Reminder",
+					author: {
+						name: data.assets.author,
+						icon_url: data.assets.logo
+					},
+					description: "All expeditions are completed!",
+					fields: [
+						{ name: "UID", value: account.uid, inline: true },
+						{ name: "Username", value: account.nickname, inline: true },
+						{ name: "Region", value: app.HoyoLab.getRegion(account.region), inline: true }
+					],
+					timestamp: new Date(),
+					footer: {
+						text: "Expedition Reminder",
+						icon_url: data.assets.logo
+					}
+				};
 
+				for (const webhook of platforms.filter(p => p.name === "webhook")) {
 					const userId = webhook.createUserMention(account.discord);
 					await webhook.send(embed, {
 						content: userId,
@@ -72,15 +72,14 @@ module.exports = {
 					});
 				}
 
-				const telegram = app.Platform.get(2);
-				if (telegram) {
-					const messageText = [
-						`📢 Expedition Reminder, All Expeditions are Completed!`,
-						`🎮 **Game**: ${data.assets.game}`,
-						`🆔 **UID**: ${account.uid} ${account.nickname}`
-					].join("\n");
+				const messageText = [
+					`📢 Expedition Reminder, All Expeditions are Completed!`,
+					`🎮 **Game**: ${data.assets.game}`,
+					`🆔 **UID**: ${account.uid} ${account.nickname}`
+				].join("\n");
 
-					const escapedMessage = app.Utils.escapeCharacters(messageText);
+				const escapedMessage = app.Utils.escapeCharacters(messageText);
+				for (const telegram of platforms.filter(p => p.name === "telegram")) {
 					await telegram.send(escapedMessage);
 				}
 			}

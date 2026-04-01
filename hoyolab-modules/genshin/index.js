@@ -156,7 +156,8 @@ module.exports = class Genshin extends require("../template.js") {
 					check: account.hilichurl?.check ?? false,
 					redeem: account.hilichurl?.redeem ?? true,
 					lastRun: null
-				}
+				},
+				allowedPlatforms: account.allowedPlatforms ?? null
 			});
 
 			const region = app.HoyoLab.getRegion(data.region);

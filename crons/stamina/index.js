@@ -51,30 +51,30 @@ module.exports = {
 					? "Your stamina is full!"
 					: "Your stamina is within the set threshold!";
 
-				const webhook = app.Platform.get(3);
-				if (webhook) {
-					const embed = {
-						color: data.assets.color,
-						title: "Stamina Reminder",
-						author: {
-							name: data.assets.author,
-							icon_url: data.assets.logo
-						},
-						description,
-						fields: [
-							{ name: "UID", value: account.uid, inline: true },
-							{ name: "Username", value: account.nickname, inline: true },
-							{ name: "Region", value: app.HoyoLab.getRegion(account.region), inline: true },
-							{ name: "Stamina", value: `${current}/${max}`, inline: true },
-							{ name: "Recovery Time", value: delta, inline: true }
-						],
-						timestamp: new Date(),
-						footer: {
-							text: "Stamina Reminder",
-							icon_url: data.assets.logo
-						}
-					};
+				const platforms = app.Platform.getForAccount(account);
+				const embed = {
+					color: data.assets.color,
+					title: "Stamina Reminder",
+					author: {
+						name: data.assets.author,
+						icon_url: data.assets.logo
+					},
+					description,
+					fields: [
+						{ name: "UID", value: account.uid, inline: true },
+						{ name: "Username", value: account.nickname, inline: true },
+						{ name: "Region", value: app.HoyoLab.getRegion(account.region), inline: true },
+						{ name: "Stamina", value: `${current}/${max}`, inline: true },
+						{ name: "Recovery Time", value: delta, inline: true }
+					],
+					timestamp: new Date(),
+					footer: {
+						text: "Stamina Reminder",
+						icon_url: data.assets.logo
+					}
+				};
 
+				for (const webhook of platforms.filter(p => p.name === "webhook")) {
 					const userId = webhook.createUserMention(account.discord);
 					await webhook.send(embed, {
 						content: userId,
@@ -83,18 +83,17 @@ module.exports = {
 					});
 				}
 
-				const telegram = app.Platform.get(2);
-				if (telegram) {
-					const messageText = [
-						`📢 Stamina Reminder, ${description}`,
-						`🎮 **Game**: ${data.assets.game}`,
-						`🆔 **UID**: ${account.uid} ${account.nickname}`,
-						`🌍 **Region**: ${app.HoyoLab.getRegion(account.region)}`,
-						`🔋 **Stamina**: ${current}/${max}`,
-						`🕒 **Recovery Time**: ${delta}`
-					].join("\n");
+				const messageText = [
+					`📢 Stamina Reminder, ${description}`,
+					`🎮 **Game**: ${data.assets.game}`,
+					`🆔 **UID**: ${account.uid} ${account.nickname}`,
+					`🌍 **Region**: ${app.HoyoLab.getRegion(account.region)}`,
+					`🔋 **Stamina**: ${current}/${max}`,
+					`🕒 **Recovery Time**: ${delta}`
+				].join("\n");
 
-					const escapedMessage = app.Utils.escapeCharacters(messageText);
+				const escapedMessage = app.Utils.escapeCharacters(messageText);
+				for (const telegram of platforms.filter(p => p.name === "telegram")) {
 					await telegram.send(escapedMessage);
 				}
 			}

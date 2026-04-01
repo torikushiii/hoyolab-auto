@@ -111,7 +111,12 @@
                         // Make sure your Discord user ID is between single quotes such as ''
                         // e.g userId: '123456789'
                         userId: null,
-                    }
+                    },
+                    // Restrict which notification platforms receive messages for this account.
+                    // null  = all configured platforms (default behaviour)
+                    // []    = no platforms (silence this account entirely)
+                    // [3,4] = only the platforms whose id matches (e.g. two separate webhooks)
+                    allowedPlatforms: null,
                 },
             ],
         },
@@ -154,7 +159,12 @@
                         // Make sure your Discord user ID is between single quotes such as ''
                         // e.g userId: '123456789'
                         userId: null,
-                    }
+                    },
+                    // Restrict which notification platforms receive messages for this account.
+                    // null  = all configured platforms (default behaviour)
+                    // []    = no platforms (silence this account entirely)
+                    // [3,4] = only the platforms whose id matches (e.g. two separate webhooks)
+                    allowedPlatforms: null,
                 },
                 // Account #2
                 // Delete this if you only have one account

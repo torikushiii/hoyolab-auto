@@ -15,8 +15,10 @@ RegionalTaskManager.registerTask("WeekliesReminder", 21, 0, async (account) => {
 	const { data } = notes;
 	const weeklies = data.weeklies;
 
-	const webhook = app.Platform.get(3);
-	if (webhook) {
+	const platforms = app.Platform.getForAccount(account);
+	const webhooks = platforms.filter(p => p.name === "webhook");
+	const telegrams = platforms.filter(p => p.name === "telegram");
+	if (webhooks.length > 0) {
 		const embed = {
 			color: data.assets.color,
 			title: "Weeklies Reminder",
@@ -102,16 +104,17 @@ RegionalTaskManager.registerTask("WeekliesReminder", 21, 0, async (account) => {
 			}
 		}
 
-		const userId = webhook.createUserMention(account.discord);
-		await webhook.send(embed, {
-			content: userId,
-			author: data.assets.author,
-			icon: data.assets.logo
-		});
+		for (const webhook of webhooks) {
+			const userId = webhook.createUserMention(account.discord);
+			await webhook.send(embed, {
+				content: userId,
+				author: data.assets.author,
+				icon: data.assets.logo
+			});
+		}
 	}
 
-	const telegram = app.Platform.get(2);
-	if (telegram) {
+	if (telegrams.length > 0) {
 		const message = [
 			"📅 **Weeklies Reminder**",
 			"",
@@ -165,7 +168,9 @@ RegionalTaskManager.registerTask("WeekliesReminder", 21, 0, async (account) => {
 		}
 
 		const escapedMessage = app.Utils.escapeCharacters(message.join("\n"));
-		await telegram.send(escapedMessage);
+		for (const telegram of telegrams) {
+			await telegram.send(escapedMessage);
+		}
 	}
 });
 

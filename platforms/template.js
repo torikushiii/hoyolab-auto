@@ -127,6 +127,20 @@ module.exports = class Platform {
 
 	destroy () {}
 
+	static getForAccount (account) {
+		if (!account) {
+			return [...Platform.list];
+		}
+		const allowed = account.allowedPlatforms;
+		if (allowed === null || allowed === undefined) {
+			return [...Platform.list];
+		}
+		if (allowed.length === 0) {
+			return [];
+		}
+		return Platform.list.filter(p => allowed.includes(p.id));
+	}
+
 	static get (identifier) {
 		if (identifier instanceof Platform) {
 			return identifier;
