@@ -517,6 +517,10 @@ module.exports = class TravelingMimo {
 						code: drawResult.data.code
 					});
 					results.points -= cost;
+					const pointsReward = drawResult.data.name?.match(/^Points x(\d+)$/);
+					if (pointsReward) {
+						results.points += Number(pointsReward[1]);
+					}
 					drawsRemaining--;
 
 					app.Logger.info(`${this.#instance.fullName}:Mimo`, `(${accountData.uid}) Lottery draw: ${drawResult.data.name}`);
