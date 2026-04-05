@@ -95,7 +95,8 @@ class Logger {
 	}
 
 	warn (type, text) {
-		this.winstonLogger.warn(this.formatMessage(type, text));
+		const target = (typeof text === "object") ? util.inspect(text) : text;
+		this.winstonLogger.warn(this.formatMessage(type, target));
 	}
 
 	debug (type, text) {
