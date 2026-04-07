@@ -9,7 +9,7 @@ const definition = {
 
 		return {
 			responseType: "json",
-			http2: true,
+			http2: false,
 			retry: {
 				limit: retryAttempts,
 				calculateDelay: ({ computedValue }) => (computedValue === 0 ? 0 : retryDelayMs)
