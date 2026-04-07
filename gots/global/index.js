@@ -49,6 +49,14 @@ const definition = {
 
 						return err;
 					}
+				],
+				afterResponse: [
+					(response) => {
+						const method = response.request?.options?.method?.toUpperCase?.() ?? "UNKNOWN";
+						const url = response.url ?? response.request?.options?.url?.toString?.() ?? "UNKNOWN";
+						app.Logger.debug("GotRequest", `${method} ${url} → ${response.statusCode}`);
+						return response;
+					}
 				]
 			}
 		};
