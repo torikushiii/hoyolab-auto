@@ -562,21 +562,15 @@ class Game {
 	}
 
 	delay (ms) {
-		return new Promise(resolve => {
-			setTimeout(() => {
-				resolve();
-			}, ms);
-		});
+		Utilities.sleep(ms);
 	}
 }
 
 function setTimeout (func, timeout) {
-	const lock = LockService.getScriptLock();
-	lock.waitLock(timeout);
-
+	if (timeout && timeout > 0) {
+		Utilities.sleep(timeout);
+	}
 	func();
-
-	lock.releaseLock();
 }
 
 function checkInGame (gameName) {
