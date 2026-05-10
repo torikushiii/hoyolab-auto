@@ -595,7 +595,7 @@ function checkInGame (gameName) {
 			}
 
 			if (DISCORD_WEBHOOK) {
-				return Promise.all(successes.map(sendDiscordNotification));
+				return Promise.all(successes.filter(Boolean).map(sendDiscordNotification));
 			}
 			return successes;
 		})
@@ -606,6 +606,10 @@ function checkInGame (gameName) {
 }
 
 function sendDiscordNotification (success) {
+	if (!success) {
+		return;
+	}
+
 	const embed = {
 		color: 16748258,
 		title: `${success.assets.game} Daily Check-In`,
