@@ -663,6 +663,7 @@ function sendDiscordNotification (success) {
 		}
 	};
 
+	Utilities.sleep(5000);
 	UrlFetchApp.fetch(DISCORD_WEBHOOK, {
 		method: "POST",
 		contentType: "application/json",
