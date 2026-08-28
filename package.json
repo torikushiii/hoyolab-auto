@@ -4,6 +4,7 @@
   "type": "commonjs",
   "scripts": {
     "start": "node index.js",
+    "test": "node --test test/*.test.js",
     "watch": "nodemon index.js",
     "migrate": "node convert.js",
     "lint": "eslint .",
