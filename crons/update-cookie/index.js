@@ -12,7 +12,10 @@ module.exports = {
 		for (const account of accounts) {
 			const platform = app.HoyoLab.get(account.platform);
 			const refreshCookie = await platform.updateCookie(account);
-			if (!refreshCookie) {
+			// updateCookie returns { success: false } on failure, which is truthy.
+			// Testing the object itself let failures fall through to the destructure
+			// below and throw a TypeError.
+			if (!refreshCookie?.success) {
 				continue;
 			}
 
