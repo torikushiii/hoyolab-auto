@@ -108,14 +108,19 @@ const config = require("./config.js");
 	const end = process.hrtime.bigint();
 	app.Logger.info("Client", `Initialize completed (${Number(end - start) / 1e6}ms)`);
 
+	// `Error` in this scope is the project's custom class, so an `instanceof`
+	// gate here silently drops every native TypeError and SyntaxError - which is
+	// exactly what a broken cron throws. Log everything, at error level so it
+	// reaches logs/error.log.
 	process.on("unhandledRejection", (reason) => {
-		if (!(reason instanceof Error)) {
-			return;
-		}
+		const detail = (reason instanceof globalThis.Error)
+			? (reason.stack ?? reason.message)
+			: require("node:util").inspect(reason);
 
-		app.Logger.log("Client", {
-			message: "Unhandled promise rejection",
-			args: { reason }
-		});
+		app.Logger.error("Client", `Unhandled promise rejection: ${detail}`);
+	});
+
+	process.on("uncaughtException", (err) => {
+		app.Logger.error("Client", `Uncaught exception: ${err?.stack ?? String(err)}`);
 	});
 })();
