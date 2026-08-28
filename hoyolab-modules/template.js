@@ -1,5 +1,6 @@
 const DataCache = require("./cache.js");
 const CustomHoyoError = require("./error-messages.js");
+const Cookie = require("../object/cookie.js");
 
 module.exports = class HoyoLab {
 	#id;
@@ -219,31 +220,21 @@ module.exports = class HoyoLab {
 	destroy () {}
 
 	#parseCookie (cookie) {
-		const cookies = cookie.split("; ");
-		const cookieMap = Object.fromEntries(
-			cookies.map(c => {
-				const [key, value] = c.split("=");
-				return [key, value];
-			})
-		);
+		const cookieMap = Cookie.parseCookieMap(cookie);
+		const seenKeys = Object.keys(cookieMap);
 
-		const {
-			ltoken_v2,
-			ltuid_v2,
-			ltmid_v2,
-			cookie_token_v2,
-			account_mid_v2,
-			account_id_v2
-		} = cookieMap;
-
-		if (!ltoken_v2 || !ltuid_v2 || !ltmid_v2) {
+		const missingLogin = Cookie.missingKeys(cookieMap, ["ltoken_v2", "ltuid_v2", "ltmid_v2"]);
+		if (missingLogin.length !== 0) {
+			// Key names only. The cookie itself is a credential and must never
+			// reach a log line or an error message.
 			throw new app.Error({
-				message: "No ltoken_v2, ltuid_v2, or ltmid_v2 found in cookie.",
-				args: { cookie }
+				message: `Cookie is missing required login fields: ${missingLogin.join(", ")}.`,
+				args: { missing: missingLogin, seen: seenKeys }
 			});
 		}
 
-		if (cookie_token_v2 && account_mid_v2 && account_id_v2) {
+		const missingRedeem = Cookie.missingKeys(cookieMap, ["cookie_token_v2", "account_mid_v2", "account_id_v2"]);
+		if (missingRedeem.length === 0) {
 			return {
 				cookie: this.#buildCookie(cookieMap, { token: true }),
 				codeRedeem: true
@@ -251,7 +242,7 @@ module.exports = class HoyoLab {
 		}
 
 		if (this.name !== "honkai") {
-			app.Logger.warn("HoyoLab", `No cookie_token_v2 or account_mid_v2 found in cookie for ${this.name}. This will disable "redeemCode" functionality.`);
+			app.Logger.warn("HoyoLab", `Cookie for ${this.name} is missing ${missingRedeem.join(", ")}, so "redeemCode" is disabled. Keys present: ${seenKeys.join(", ")}.`);
 		}
 
 		return {
@@ -283,13 +274,7 @@ module.exports = class HoyoLab {
 	static parseCookie (cookie, options = {}) {
 		const { whitelist = [], blacklist = [], separator = ";" } = options;
 
-		const cookiesArray = cookie.split(separator).map(c => c.trim());
-		const cookieMap = Object.fromEntries(
-			cookiesArray.map(c => {
-				const [key, value] = c.split("=");
-				return [key, value];
-			})
-		);
+		const cookieMap = Cookie.parseCookieMap(cookie, separator);
 
 		if (whitelist.length !== 0) {
 			const filteredCookiesArray = Object.keys(cookieMap)
