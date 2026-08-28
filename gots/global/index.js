@@ -1,3 +1,5 @@
+const { redactUrl } = require("../../object/redact.js");
+
 const definition = {
 	name: "Global",
 	optionsType: "function",
@@ -30,13 +32,19 @@ const definition = {
 						}
 
 						const method = err.options?.method?.toUpperCase?.() ?? "UNKNOWN";
-						const endpoint = err.options?.url?.toString?.() ?? null;
+						const endpoint = redactUrl(err.options?.url?.toString?.() ?? null);
 						const code = err.code ?? null;
 						const responseType = err.options?.responseType ?? null;
 						const timeout = err.options?.timeout ?? null;
 
+						// Only named fields. Inspecting the whole got error would print
+						// its request options, which carry the Cookie header.
 						app.Logger.debug("GotRequest", {
-							error: err,
+							error: {
+								name: err.name,
+								message: redactUrl(err.message ?? ""),
+								stack: err.stack
+							},
 							context: {
 								code,
 								responseType,
@@ -54,7 +62,14 @@ const definition = {
 					(response) => {
 						const method = response.request?.options?.method?.toUpperCase?.() ?? "UNKNOWN";
 						const url = response.url ?? response.request?.options?.url?.toString?.() ?? "UNKNOWN";
-						app.Logger.debug("GotRequest", `${method} ${url} → ${response.statusCode}`);
+
+						// The Telegram long-poll runs every 5 seconds. Logging it buries
+						// everything else and burns the log retention we need during an
+						// incident, so it is the one request that stays silent.
+						if (!url.includes("/getUpdates")) {
+							app.Logger.debug("GotRequest", `${method} ${redactUrl(url)} → ${response.statusCode}`);
+						}
+
 						return response;
 					}
 				]
