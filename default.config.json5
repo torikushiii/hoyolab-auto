@@ -10,6 +10,16 @@
     testNotification: {
         enabled: false, // Set to false if you don't want to receive test notifications on startup
     },
+    // Credential health checks. The two credential classes in a HoyoLab cookie
+    // expire independently, and only code redemption uses cookie_token_v2 - so
+    // redemption can be dead for days while everything else looks fine. The
+    // 'health' cron verifies each class and reports the outcome.
+    health: {
+        // Uptime Kuma push URL. It pings on success and pushes an explicit
+        // 'down' naming the dead credential on failure, so a missing ping and a
+        // known failure both raise an alert. Leave empty to log results only.
+        kumaPushUrl: '',
+    },
     platforms: [
         {
             id: 1,
@@ -39,6 +49,7 @@
         // You can use this site to generate cron expression: https://crontab.guru/
         checkIn: '0 0 0 * * *',
         codeRedeem: '*/15 * * * *',
+        health: '*/30 * * * *', // Keep the Uptime Kuma heartbeat interval above this
         expedition: '0 */30 * * * *',
         mimo: '0 0 */6 * * *',
         mimoJitter: 0, // Random delay in seconds before running Mimo (0-N). Helps avoid rate limits at reset time.

@@ -100,6 +100,14 @@ const config = require("./config.js");
 
 	await Promise.all(promises);
 
+	// Probe the credentials once at boot as well as on the cron. A cookie that
+	// expired while the container was down would otherwise go unreported until
+	// the first scheduled run.
+	const { code: runHealthCheck } = require("./crons/health/index.js");
+	await runHealthCheck().catch((e) => {
+		app.Logger.error("Client", `Startup health check failed: ${e.stack ?? e.message}`);
+	});
+
 	// Send test notifications to confirm platform functionality
 	if (config.testNotification?.enabled !== false) {
 		await TestNotification.sendTestNotifications(platforms);
