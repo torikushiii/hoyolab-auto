@@ -164,10 +164,6 @@ dist
 
 .vscode/
 
-# Codex Agent settings
-
-AGENTS.md
-
 # yarn v2
 
 .yarn/cache
