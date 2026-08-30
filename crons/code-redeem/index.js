@@ -64,7 +64,10 @@ module.exports = {
 				await telegram.send(escapedMessage);
 			}
 			for (const webhook of platforms.filter(p => p.name === "webhook")) {
-				await webhook.send(message.embed);
+				const userId = webhook.createUserMention(data.account.discord);
+				await webhook.send(message.embed, {
+					content: userId
+				});
 			}
 		}
 
