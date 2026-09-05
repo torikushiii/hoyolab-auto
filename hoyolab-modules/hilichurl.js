@@ -328,7 +328,7 @@ module.exports = class HilichurlWorkshop {
 						task.status = TaskStatus.FINISHED;
 						app.Logger.info(`${this.#instance.fullName}:Hilichurl`, t `(${accountData.uid}) Finished task: ${task.name}`);
 					}
-					await sleep(1000);
+					await app.Utils.waitWithJitter(1000);
 				}
 
 				// Claim completed tasks
@@ -339,7 +339,7 @@ module.exports = class HilichurlWorkshop {
 						results.points += task.point;
 						app.Logger.info(`${this.#instance.fullName}:Hilichurl`, t `(${accountData.uid}) Claimed ${task.point} points for: ${task.name}`);
 					}
-					await sleep(1000);
+					await app.Utils.waitWithJitter(1000);
 				}
 			}
 		}
@@ -368,7 +368,7 @@ module.exports = class HilichurlWorkshop {
 					results.freeItemsClaimed.push(item.name);
 					app.Logger.info(`${this.#instance.fullName}:Hilichurl`, t `(${accountData.uid}) Claimed free item: ${item.name}`);
 				}
-				await sleep(1000);
+				await app.Utils.waitWithJitter(1000);
 			}
 
 			const currencyItems = shopItems.data
@@ -396,7 +396,7 @@ module.exports = class HilichurlWorkshop {
 					const shouldRedeem = accountData.redeemCode && (accountData.hilichurl?.redeem !== false);
 
 					if (code && shouldRedeem) {
-						await sleep(5000);
+						await app.Utils.waitWithJitter(5000);
 						const redeemResult = await this.#instance.redeemCode(accountData, code);
 						if (redeemResult.success) {
 							results.codesRedeemed.push(code);
@@ -413,7 +413,7 @@ module.exports = class HilichurlWorkshop {
 					}
 				}
 
-				await sleep(1500);
+				await app.Utils.waitWithJitter(1500);
 			}
 		}
 

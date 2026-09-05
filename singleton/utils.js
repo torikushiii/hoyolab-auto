@@ -1,6 +1,7 @@
 const { t } = require("../localization/index.js");
 
 const crypto = require("node:crypto");
+const { setTimeout: sleep } = require("node:timers/promises");
 
 module.exports = class UtilsSingleton {
 	static DS_SALT = "6s25p5ox5y14umn1p61aqyyvbvvl3lrt";
@@ -11,6 +12,11 @@ module.exports = class UtilsSingleton {
 		m: { s: 60, ms: 60.0e3 },
 		s: { ms: 1.0e3 }
 	};
+
+	async waitWithJitter (minimumMs, { random = Math.random, wait = sleep } = {}) {
+		// Keep existing cooldowns as a lower bound; add up to two seconds.
+		await wait(minimumMs + Math.floor(random() * 2000));
+	}
 
 	/**
 	 * @inheritdoc

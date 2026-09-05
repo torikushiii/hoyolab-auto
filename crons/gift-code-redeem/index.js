@@ -1,5 +1,3 @@
-const { setTimeout } = require("node:timers/promises");
-
 const { buildMessage, getRedemptionCookieHash } = require("../code-redeem/utils.js");
 
 const GAMES = [
@@ -78,7 +76,7 @@ module.exports = {
 				}
 				catch (e) {
 					app.Logger.warn("GiftCodeRedeem", `${game.code} request failed for account ${account.uid}: ${e.message}`);
-					await setTimeout(6000);
+					await app.Utils.waitWithJitter(6000);
 					continue;
 				}
 
@@ -92,7 +90,7 @@ module.exports = {
 					await app.Cache.delete(loginCacheKey);
 				}
 
-				await setTimeout(6000);
+				await app.Utils.waitWithJitter(6000);
 			}
 		}
 	})

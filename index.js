@@ -17,6 +17,7 @@ const Error = require("./object/error.js");
 const RegionalTaskManager = require("./object/regional-task-manager.js");
 
 const config = require("./config.js");
+const { RandomizedScheduler } = require("./crons/randomized-scheduler.js");
 
 (async () => {
 	const start = process.hrtime.bigint();
@@ -51,7 +52,7 @@ const config = require("./config.js");
 	await Command.importData(commands.definitions);
 
 	const { initCrons } = require("./crons/index.js");
-	initCrons();
+	const crons = initCrons();
 
 	const accountsConfig = config.accounts;
 	if (!accountsConfig || accountsConfig.length === 0) {
@@ -102,6 +103,13 @@ const config = require("./config.js");
 	}
 
 	await Promise.all(promises);
+
+	// Randomized schedules can be immediately due after a restart; wait for clients.
+	for (const cron of crons) {
+		if (cron.job instanceof RandomizedScheduler) {
+			await cron.job.start();
+		}
+	}
 
 	// Send test notifications to confirm platform functionality
 	if (config.testNotification?.enabled !== false) {

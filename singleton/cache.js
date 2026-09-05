@@ -16,15 +16,15 @@ const isValidInteger = (value) => {
 
 module.exports = class Cache {
 	#store;
+	#file;
 
 	constructor () {
-		this.#store = new Keyv({
-			store: new KeyvFile({
-				filename: "./data/cache.json",
-				serialize: JSON.stringify,
-				deserialize: JSON.parse
-			})
+		this.#file = new KeyvFile({
+			filename: "./data/cache.json",
+			serialize: JSON.stringify,
+			deserialize: JSON.parse
 		});
+		this.#store = new Keyv({ store: this.#file });
 	}
 
 	async set (data = {}) {
@@ -50,7 +50,13 @@ module.exports = class Cache {
 			return await this.#store.set(key, data.value, data.expiry);
 		}
 
-		return await this.#store.set(key, data.value);
+		const result = await this.#store.set(key, data.value);
+		if (data.durable) {
+			// A shared in-flight save may have captured its snapshot before this set.
+			// A second save after it completes includes this value before the caller proceeds.
+			await this.#file.save();
+		}
+		return result;
 	}
 
 	async get (keyIdentifier) {

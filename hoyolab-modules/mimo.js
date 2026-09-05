@@ -422,7 +422,7 @@ module.exports = class TravelingMimo {
 						task.status = MimoTaskStatus.FINISHED;
 						app.Logger.info(`${this.#instance.fullName}:Mimo`, t `(${accountData.uid}) Finished task: ${task.name}`);
 					}
-					await sleep(1000);
+					await app.Utils.waitWithJitter(1000);
 				}
 				if (task.status === MimoTaskStatus.FINISHED) {
 					const claimResult = await this.claimTaskReward(accountData, task.id, versionId);
@@ -431,7 +431,7 @@ module.exports = class TravelingMimo {
 						results.points += task.point;
 						app.Logger.info(`${this.#instance.fullName}:Mimo`, t `(${accountData.uid}) Claimed ${task.point} points for: ${task.name}`);
 					}
-					await sleep(1000);
+					await app.Utils.waitWithJitter(1000);
 				}
 			}
 		}
@@ -478,7 +478,7 @@ module.exports = class TravelingMimo {
 					const shouldRedeem = accountData.redeemCode && (accountData.mimo?.redeem !== false);
 
 					if (shouldRedeem) {
-						await sleep(5000);
+						await app.Utils.waitWithJitter(5000);
 						const redeemResult = await this.#instance.redeemCode(accountData, code);
 						if (redeemResult.success) {
 							results.codesRedeemed.push(code);
@@ -495,7 +495,7 @@ module.exports = class TravelingMimo {
 					}
 				}
 
-				await sleep(1500);
+				await app.Utils.waitWithJitter(1500);
 			}
 		}
 
@@ -530,7 +530,7 @@ module.exports = class TravelingMimo {
 					if (drawResult.data.code) {
 						const shouldRedeemDraw = accountData.redeemCode && (accountData.mimo?.redeemDraw !== false);
 						if (shouldRedeemDraw) {
-							await sleep(5000);
+							await app.Utils.waitWithJitter(5000);
 							const redeemResult = await this.#instance.redeemCode(accountData, drawResult.data.code);
 							if (redeemResult.success) {
 								results.codesRedeemed.push(drawResult.data.code);
@@ -545,7 +545,7 @@ module.exports = class TravelingMimo {
 						}
 					}
 
-					await sleep(1500);
+					await app.Utils.waitWithJitter(1500);
 				}
 			}
 		}

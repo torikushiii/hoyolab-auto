@@ -1,6 +1,5 @@
 const { t } = require("../../localization/index.js");
 
-const { setTimeout } = require("node:timers/promises");
 const crypto = require("node:crypto");
 
 const GAME_CONFIG = [
@@ -234,7 +233,7 @@ const checkAndRedeem = async (codes) => {
 					const cookieHash = getRedemptionCookieHash(account);
 					await app.Cache.set({ key: loginCacheKey, value: cookieHash });
 					failed.push(...getPausedEntries(account, `${loginCacheKey}:${cookieHash}`, pendingCodes, completedCodes));
-					await setTimeout(6000);
+					await app.Utils.waitWithJitter(6000);
 					break;
 				}
 
@@ -259,7 +258,7 @@ const checkAndRedeem = async (codes) => {
 					});
 				}
 
-				await setTimeout(6000);
+				await app.Utils.waitWithJitter(6000);
 			}
 		}
 

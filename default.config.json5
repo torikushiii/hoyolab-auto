@@ -46,21 +46,24 @@
         whitelist: [], // You can whitelist some crons if you only want to run specific crons
         blacklist: [], // You can blacklist some crons if you don't want to run them
         // You can use this site to generate cron expression: https://crontab.guru/
-        checkIn: '0 0 0 * * *',
-        codeRedeem: '*/15 * * * *',
+        checkIn: { mode: 'cron', expression: '0 0 0 * * *' },
+        codeRedeem: { mode: 'cron', expression: '*/15 * * * *' },
         dailiesReminderHour: 21, // Game server time (0-23)
         dailiesReminderMinute: 0, // 0-59
         dailiesReminderTimeZone: null, // Optional IANA timezone, e.g. 'America/New_York'; null uses game server time
-        expedition: '0 */30 * * * *',
-        giftCodeRedeem: '0 */3 * * *',
-        mimo: '0 0 */6 * * *',
+        expedition: { mode: 'cron', expression: '0 */30 * * * *' },
+        giftCodeRedeem: { mode: 'cron', expression: '0 */3 * * *' },
+        mimo: { mode: 'cron', expression: '0 0 */6 * * *' },
         mimoJitter: 0, // Random delay in seconds before running Mimo (0-N). Helps avoid rate limits at reset time.
-        hilichurl: '0 0 11 * * *', // 11:00 AM local time (adjust for your timezone if event resets at a different time)
+        hilichurl: { mode: 'cron', expression: '0 0 11 * * *' }, // 11:00 AM local time (adjust for your timezone if event resets at a different time)
         hilichurlJitter: 0, // Random delay in seconds before running Hilichurl Workshop (0-N).
-        missedCheckIn: '0 0 23 * * *', // UTC+8, one hour before HoYoLAB daily reset
-        realmCurrency: '0 */1 * * *',
-        shopStatus: '0 */1 * * *',
-        stamina: '0 */30 * * * *'
+        missedCheckIn: { mode: 'cron', expression: '0 0 23 * * *' }, // UTC+8, one hour before HoYoLAB daily reset
+        realmCurrency: { mode: 'cron', expression: '0 */1 * * *' },
+        shopStatus: { mode: 'cron', expression: '0 */1 * * *' },
+        stamina: { mode: 'cron', expression: '0 */30 * * * *' },
+        // To randomize a job, replace its object above (interval minimum: 5m):
+        // expedition: { mode: 'interval', min: '30m', max: '1h' },
+        // checkIn: { mode: 'daily-window', start: '00:30', end: '02:00' },
     },
     accounts: [
         {

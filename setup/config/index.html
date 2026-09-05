@@ -321,12 +321,6 @@
 
     <div class="platform-section">
         <div class="small-text" data-i18n="You can use this site to generate cron expression: https://crontab.guru/">You can use this site to generate cron expression: https://crontab.guru/</div>
-        <label for="checkIn" data-i18n="checkIn:">checkIn:</label>
-        <input type="text" id="checkInCron" placeholder="0 0 0 * * *">
-
-        <label for="codeRedeem" data-i18n="codeRedeem:">codeRedeem:</label>
-        <input type="text" id="codeRedeemCron" placeholder="*/15 * * * *">
-
         <label for="dailiesReminderHour" data-i18n="Dailies reminder hour:">Dailies reminder hour:</label>
         <input type="number" id="dailiesReminderHour" min="0" max="23" placeholder="21">
 
@@ -337,21 +331,8 @@
         <input type="text" id="dailiesReminderTimeZone" placeholder="America/New_York">
         <div class="small-text" data-i18n="Leave blank to use game server time. Use an IANA timezone for daylight-saving changes.">Leave blank to use game server time. Use an IANA timezone for daylight-saving changes.</div>
 
-        <label for="expedition" data-i18n="expedition:">expedition:</label>
-        <input type="text" id="expeditionCron" placeholder="0 */30 * * * *">
-
-        <label for="missedCheckIn" data-i18n="missedCheckIn:">missedCheckIn:</label>
-        <input type="text" id="missedCheckInCron" placeholder="0 0 23 * * *">
-
-        <label for="realmCurrency" data-i18n="realmCurrency:">realmCurrency:</label>
-        <input type="text" id="realmCurrencyCron" placeholder="0 */1 * * *">
-
-        <label for="shopStatus" data-i18n="shopStatus:">shopStatus:</label>
-        <input type="text" id="shopStatusCron" placeholder="0 */1 * * *">
-
-        <label for="stamina" data-i18n="stamina:">stamina:</label>
-        <input type="text" id="staminaCron" placeholder="0 */30 * * * *">
     </div>
+    <div class="platform-section" id="cronSchedules"></div>
 
     <!-- Account Settings -->
     <h2 data-i18n="Accounts">Accounts</h2>
@@ -837,27 +818,105 @@
             setInputValue(document.getElementById('gotifyPriority'), gotify.priority ?? 5);
         }
 
+        const cronDefaults = {
+            checkIn: '0 0 0 * * *',
+            codeRedeem: '*/15 * * * *',
+            expedition: '0 */30 * * * *',
+            giftCodeRedeem: '0 */3 * * *',
+            mimo: '0 0 */6 * * *',
+            hilichurl: '0 0 11 * * *',
+            missedCheckIn: '0 0 23 * * *',
+            realmCurrency: '0 */1 * * *',
+            shopStatus: '0 */1 * * *',
+            stamina: '0 */30 * * * *',
+        };
+        let importedCrons = {};
+
+        document.getElementById('cronSchedules').innerHTML = Object.keys(cronDefaults).map(name => `
+            <fieldset>
+                <legend>${name}</legend>
+                <label for="${name}Mode">Schedule:</label>
+                <select id="${name}Mode">
+                    <option value="cron">Cron expression</option>
+                    <option value="interval">Random interval</option>
+                    <option value="daily-window">Daily random window (local time)</option>
+                </select>
+                <div id="${name}CronFields">
+                    <label for="${name}Cron">Cron expression:</label>
+                    <input type="text" id="${name}Cron">
+                </div>
+                <div id="${name}IntervalFields" hidden>
+                    <div class="small-text">Use ms, s, m, h, d or w; combinations such as 1h30m or 1d 2h are supported. Both bounds must be at least 5m; maximum must be at least minimum.</div>
+                    <label for="${name}Min">Minimum delay after completion:</label>
+                    <input type="text" id="${name}Min" placeholder="30m">
+                    <label for="${name}Max">Maximum delay after completion:</label>
+                    <input type="text" id="${name}Max" placeholder="1h">
+                </div>
+                <div id="${name}WindowFields" hidden>
+                    <label for="${name}Start">Window start:</label>
+                    <input type="time" id="${name}Start">
+                    <label for="${name}End">Window end (next day if earlier than start):</label>
+                    <input type="time" id="${name}End">
+                </div>
+            </fieldset>
+        `).join('');
+        for (const name of Object.keys(cronDefaults)) {
+            document.getElementById(`${name}Mode`).addEventListener('change', () => updateCronFields(name));
+        }
+        applyCronConfig({});
+
+        function updateCronFields(name) {
+            const mode = document.getElementById(`${name}Mode`).value;
+            document.getElementById(`${name}CronFields`).hidden = mode !== 'cron';
+            document.getElementById(`${name}IntervalFields`).hidden = mode !== 'interval';
+            document.getElementById(`${name}WindowFields`).hidden = mode !== 'daily-window';
+        }
+
         function applyCronConfig(crons) {
             crons = crons || {};
+            importedCrons = { ...crons };
+            setInputValue(document.getElementById('whitelist'), Array.isArray(crons.whitelist) ? crons.whitelist.join(',') : '');
+            setInputValue(document.getElementById('blacklist'), Array.isArray(crons.blacklist) ? crons.blacklist.join(',') : '');
+            setInputValue(document.getElementById('dailiesReminderHour'), crons.dailiesReminderHour ?? 21);
+            setInputValue(document.getElementById('dailiesReminderMinute'), crons.dailiesReminderMinute ?? 0);
+            setInputValue(document.getElementById('dailiesReminderTimeZone'), crons.dailiesReminderTimeZone ?? '');
+            for (const [name, expression] of Object.entries(cronDefaults)) {
+                const value = crons[name];
+                const schedule = typeof value === 'string' ? { mode: 'cron', expression: value } : (value || {});
+                setInputValue(document.getElementById(`${name}Mode`), schedule.mode || 'cron');
+                setInputValue(document.getElementById(`${name}Cron`), schedule.expression || expression);
+                setInputValue(document.getElementById(`${name}Min`), schedule.min ?? '30m');
+                setInputValue(document.getElementById(`${name}Max`), schedule.max ?? '1h');
+                setInputValue(document.getElementById(`${name}Start`), schedule.start || '00:30');
+                setInputValue(document.getElementById(`${name}End`), schedule.end || '02:00');
+                updateCronFields(name);
+            }
+        }
 
-            setInputValue(
-                document.getElementById('whitelist'),
-                Array.isArray(crons.whitelist) ? crons.whitelist.join(',') : ''
-            );
-            setInputValue(
-                document.getElementById('blacklist'),
-                Array.isArray(crons.blacklist) ? crons.blacklist.join(',') : ''
-            );
-            setInputValue(document.getElementById('checkInCron'), crons.checkIn);
-            setInputValue(document.getElementById('codeRedeemCron'), crons.codeRedeem);
-            setInputValue(document.getElementById('dailiesReminderHour'), crons.dailiesReminderHour);
-            setInputValue(document.getElementById('dailiesReminderMinute'), crons.dailiesReminderMinute);
-            setInputValue(document.getElementById('dailiesReminderTimeZone'), crons.dailiesReminderTimeZone);
-            setInputValue(document.getElementById('expeditionCron'), crons.expedition);
-            setInputValue(document.getElementById('missedCheckInCron'), crons.missedCheckIn);
-            setInputValue(document.getElementById('realmCurrencyCron'), crons.realmCurrency);
-            setInputValue(document.getElementById('shopStatusCron'), crons.shopStatus);
-            setInputValue(document.getElementById('staminaCron'), crons.stamina);
+        function exportCronConfig() {
+            const crons = { ...importedCrons };
+            for (const name of Object.keys(cronDefaults)) {
+                const mode = document.getElementById(`${name}Mode`).value;
+                if (mode === 'cron') {
+                    crons[name] = { mode, expression: document.getElementById(`${name}Cron`).value };
+                } else if (mode === 'interval') {
+                    crons[name] = { mode,
+                        min: document.getElementById(`${name}Min`).value.trim(),
+                        max: document.getElementById(`${name}Max`).value.trim() };
+                } else if (mode === 'daily-window') {
+                    crons[name] = { mode,
+                        start: document.getElementById(`${name}Start`).value,
+                        end: document.getElementById(`${name}End`).value };
+                } else {
+                    throw new Error(`Unknown schedule mode for ${name}`);
+                }
+            }
+            crons.whitelist = document.getElementById('whitelist').value.split(',').map(item => item.trim()).filter(Boolean);
+            crons.blacklist = document.getElementById('blacklist').value.split(',').map(item => item.trim()).filter(Boolean);
+            crons.dailiesReminderHour = parseInt(document.getElementById('dailiesReminderHour').value || document.getElementById('dailiesReminderHour').placeholder, 10);
+            crons.dailiesReminderMinute = parseInt(document.getElementById('dailiesReminderMinute').value || document.getElementById('dailiesReminderMinute').placeholder, 10);
+            crons.dailiesReminderTimeZone = document.getElementById('dailiesReminderTimeZone').value.trim() || null;
+            return crons;
         }
 
         function applyAccountConfig(accounts) {
@@ -1213,20 +1272,7 @@
                         priority: gotifyPriority,
                     }
                 ],
-                crons: {
-                    whitelist: document.getElementById('whitelist').value.split(',').map(item => item.trim()).filter(item => item),
-                    blacklist: document.getElementById('blacklist').value.split(',').map(item => item.trim()).filter(item => item),
-                    checkIn: document.getElementById('checkInCron').value || document.getElementById('checkInCron').placeholder,
-                    codeRedeem: document.getElementById('codeRedeemCron').value || document.getElementById('codeRedeemCron').placeholder,
-                    dailiesReminderHour: parseInt(document.getElementById('dailiesReminderHour').value || document.getElementById('dailiesReminderHour').placeholder, 10),
-                    dailiesReminderMinute: parseInt(document.getElementById('dailiesReminderMinute').value || document.getElementById('dailiesReminderMinute').placeholder, 10),
-                    dailiesReminderTimeZone: document.getElementById('dailiesReminderTimeZone').value.trim() || null,
-                    expedition: document.getElementById('expeditionCron').value || document.getElementById('expeditionCron').placeholder,
-                    missedCheckIn: document.getElementById('missedCheckInCron').value || document.getElementById('missedCheckInCron').placeholder,
-                    realmCurrency: document.getElementById('realmCurrencyCron').value || document.getElementById('realmCurrencyCron').placeholder,
-                    shopStatus: document.getElementById('shopStatusCron').value || document.getElementById('shopStatusCron').placeholder,
-                    stamina: document.getElementById('staminaCron').value || document.getElementById('staminaCron').placeholder,
-                },
+                crons: exportCronConfig(),
                 accounts: [
                     {
                         id: 1,
