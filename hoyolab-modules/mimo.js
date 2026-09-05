@@ -112,7 +112,7 @@ module.exports = class TravelingMimo {
 		const cookieData = this.#getCookieData(accountData);
 
 		const res = await this.#request("index", {
-			params: { lang: "en-us" },
+			params: { lang: app.Config.get("language") || "en-us" },
 			cookie: cookieData
 		});
 
@@ -158,7 +158,7 @@ module.exports = class TravelingMimo {
 
 		const res = await this.#request("task-list", {
 			params: {
-				lang: "en-us",
+				lang: app.Config.get("language") || "en-us",
 				game_id: this.#gameId,
 				version_id: versionId
 			},
@@ -201,7 +201,7 @@ module.exports = class TravelingMimo {
 			data: {
 				task_id: taskId,
 				game_id: this.#gameId,
-				lang: "en-us",
+				lang: app.Config.get("language") || "en-us",
 				version_id: versionId
 			},
 			cookie: cookieData
@@ -226,7 +226,7 @@ module.exports = class TravelingMimo {
 		const requestParams = {
 			task_id: taskId,
 			game_id: this.#gameId,
-			lang: "en-us",
+			lang: app.Config.get("language") || "en-us",
 			version_id: versionId
 		};
 
@@ -252,7 +252,7 @@ module.exports = class TravelingMimo {
 
 		const res = await this.#request("exchange-list", {
 			params: {
-				lang: "en-us",
+				lang: app.Config.get("language") || "en-us",
 				game_id: this.#gameId,
 				version_id: versionId
 			},
@@ -294,7 +294,7 @@ module.exports = class TravelingMimo {
 			data: {
 				award_id: awardId,
 				game_id: this.#gameId,
-				lang: "en-us",
+				lang: app.Config.get("language") || "en-us",
 				version_id: versionId
 			},
 			cookie: cookieData
@@ -321,7 +321,7 @@ module.exports = class TravelingMimo {
 
 		const res = await this.#request("lottery-info", {
 			params: {
-				lang: "en-us",
+				lang: app.Config.get("language") || "en-us",
 				game_id: this.#gameId,
 				version_id: versionId
 			},
@@ -354,7 +354,7 @@ module.exports = class TravelingMimo {
 			method: "POST",
 			data: {
 				game_id: this.#gameId,
-				lang: "en-us",
+				lang: app.Config.get("language") || "en-us",
 				version_id: versionId
 			},
 			cookie: cookieData

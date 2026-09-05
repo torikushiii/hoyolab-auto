@@ -103,7 +103,7 @@ module.exports = class HilichurlWorkshop {
 		const cookieData = this.#getCookieData(accountData);
 
 		const res = await this.#request("index", {
-			params: { lang: "en-us" },
+			params: { lang: app.Config.get("language") || "en-us" },
 			cookie: cookieData
 		});
 
@@ -142,7 +142,7 @@ module.exports = class HilichurlWorkshop {
 
 		const res = await this.#request("task-list", {
 			params: {
-				lang: "en-us",
+				lang: app.Config.get("language") || "en-us",
 				game_id: 2,
 				version_id: versionId
 			},
@@ -207,7 +207,7 @@ module.exports = class HilichurlWorkshop {
 			data: {
 				task_id: taskId,
 				game_id: 2,
-				lang: "en-us",
+				lang: app.Config.get("language") || "en-us",
 				version_id: versionId
 			},
 			cookie: cookieData
@@ -229,7 +229,7 @@ module.exports = class HilichurlWorkshop {
 
 		const res = await this.#request("exchange-list", {
 			params: {
-				lang: "en-us",
+				lang: app.Config.get("language") || "en-us",
 				game_id: 2,
 				version_id: versionId
 			},

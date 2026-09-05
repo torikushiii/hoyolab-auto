@@ -190,6 +190,13 @@
 
     <h2>Platforms</h2>
 -->
+    <div class="platform-section">
+        <h3>Language</h3>
+        <label for="language">HoYoLAB locale:</label>
+        <input type="text" id="language" value="en-us" placeholder="en-us">
+        <div class="small-text">Use a lowercase locale, such as en-us or it-it.</div>
+    </div>
+
     <!-- Test Notification -->
     <div class="platform-section">
     <h3>Test Notification</h3>
@@ -733,6 +740,7 @@
                 throw new Error('Invalid configuration file.');
             }
 
+            setInputValue(document.getElementById('language'), config.language || 'en-us');
             applyTestNotificationConfig(config.testNotification);
             applyPlatformConfig(config.platforms);
             applyCronConfig(config.crons);
@@ -1104,6 +1112,7 @@
             const testNotifyEnabled = tnEl ? (tnEl.value === 'true') : false;
             const config = {
                 loglevel: 'info',
+                language: document.getElementById('language').value || 'en-us',
                 userAgent: 'Custom fork of HoyoLabAuto: github.com/torikushiii/hoyolab-auto',
                 // Test notification settings
                 testNotification: {

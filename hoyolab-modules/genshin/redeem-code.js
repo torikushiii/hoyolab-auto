@@ -27,7 +27,7 @@ module.exports = class RedeemCode {
 				lang: "en",
 				cdkey: code,
 				game_biz: "hk4e_global",
-				sLangKey: "en-us"
+				sLangKey: app.Config.get("language") || "en-us"
 			},
 			headers: {
 				Cookie: cookieData

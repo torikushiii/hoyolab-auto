@@ -97,6 +97,7 @@ module.exports = class CheckIn {
 			method: "POST",
 			responseType: "json",
 			searchParams: {
+				lang: app.Config.get("language") || "en-us",
 				act_id: this.#instance.config.ACT_ID
 			},
 			headers: {
@@ -142,6 +143,7 @@ module.exports = class CheckIn {
 			url: this.#instance.config.url.info,
 			responseType: "json",
 			searchParams: {
+				lang: app.Config.get("language") || "en-us",
 				act_id: this.#instance.config.ACT_ID
 			},
 			headers: {
@@ -193,6 +195,7 @@ module.exports = class CheckIn {
 			url: this.#instance.config.url.home,
 			responseType: "json",
 			searchParams: {
+				lang: app.Config.get("language") || "en-us",
 				act_id: this.#instance.config.ACT_ID
 			},
 			headers: {

@@ -1,5 +1,6 @@
 {
     loglevel: 'info',
+    language: 'en-us', // HoYoLAB locale (lowercase)
     userAgent: 'Custom fork of HoyoLabAuto: github.com/torikushiii/hoyolab-auto',
     retry: {
         attempts: 0, // Number of retries for API calls (0 disables retries)

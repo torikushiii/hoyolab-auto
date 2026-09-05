@@ -148,7 +148,7 @@ module.exports = class Diary {
 			const retryDelay = 5000;
 
 			const searchParams = {
-				lang: "en-us",
+				lang: app.Config.get("language") || "en-us",
 				uid: accountData.uid,
 				region: accountData.region,
 				month: getMonthString(month),

@@ -152,7 +152,7 @@ module.exports = class Diary {
 					month,
 					current_page: currentPage,
 					type,
-					lang: "en-us"
+					lang: app.Config.get("language") || "en-us"
 				},
 				headers: {
 					Cookie: accountData.cookie,
