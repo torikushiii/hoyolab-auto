@@ -1,3 +1,5 @@
+const crypto = require("node:crypto");
+
 let version;
 
 const fetchData = async () => {
@@ -53,17 +55,24 @@ const redeemCodes = async (accountData, code) => {
 	});
 
 	const res = await app.Got("HoYoLab", {
-		url: "https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkeyRisk",
+		url: "https://public-operation-hkrpg.hoyoverse.com/common/apicdkey/api/webExchangeCdkeyRisk",
 		method: "POST",
-		searchParams: {
+		json: {
 			uid: accountData.uid,
 			region: accountData.region,
 			lang: "en",
 			cdkey: code.code,
 			game_biz: "hkrpg_global",
-			t: app.Date.now()
+			device_uuid: crypto.randomUUID(),
+			platform: "4",
+			t: Date.now()
 		},
-		headers: { Cookie }
+		headers: {
+			Cookie,
+			Origin: "https://hsr.hoyoverse.com",
+			Referer: "https://hsr.hoyoverse.com/",
+			"x-rpc-language": "en"
+		}
 	});
 
 	if (res.statusCode !== 200) {

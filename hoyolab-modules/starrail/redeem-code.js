@@ -1,3 +1,5 @@
+const crypto = require("node:crypto");
+
 module.exports = class RedeemCode {
 	/** @type {import("../template")} */
 	#instance;
@@ -22,16 +24,21 @@ module.exports = class RedeemCode {
 			method: "POST",
 			responseType: "json",
 			throwHttpErrors: false,
-			searchParams: {
+			json: {
 				cdkey: code,
+				device_uuid: crypto.randomUUID(),
 				game_biz: "hkrpg_global",
 				lang: "en",
+				platform: "4",
 				region: accountData.region,
 				t: Date.now(),
 				uid: accountData.uid
 			},
 			headers: {
-				Cookie: cookieData
+				Cookie: cookieData,
+				Origin: "https://hsr.hoyoverse.com",
+				Referer: "https://hsr.hoyoverse.com/",
+				"x-rpc-language": "en"
 			}
 		});
 

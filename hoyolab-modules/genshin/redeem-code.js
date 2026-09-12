@@ -26,11 +26,12 @@ module.exports = class RedeemCode {
 				region: accountData.region,
 				lang: "en",
 				cdkey: code,
-				game_biz: "hk4e_global",
-				sLangKey: app.Config.get("language") || "en-us"
+				game_biz: "hk4e_global"
 			},
 			headers: {
-				Cookie: cookieData
+				Cookie: cookieData,
+				Origin: "https://genshin.hoyoverse.com",
+				Referer: "https://genshin.hoyoverse.com/"
 			}
 		});
 

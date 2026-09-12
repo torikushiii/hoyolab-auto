@@ -1,3 +1,5 @@
+const crypto = require("node:crypto");
+
 module.exports = class RedeemCode {
 	/** @type {import("../template")} */
 	#instance;
@@ -19,18 +21,24 @@ module.exports = class RedeemCode {
 
 		const res = await app.Got("HoYoLab", {
 			url: this.#instance.config.url.redemption,
+			method: "POST",
 			responseType: "json",
 			throwHttpErrors: false,
-			searchParams: {
-				t: Date.now(),
+			json: {
+				cdkey: code,
+				device_uuid: crypto.randomUUID(),
 				lang: "en",
 				game_biz: "nap_global",
-				uid: accountData.uid,
+				platform: "4",
 				region: accountData.region,
-				cdkey: code
+				t: Date.now(),
+				uid: accountData.uid
 			},
 			headers: {
-				Cookie: cookieData
+				Cookie: cookieData,
+				Origin: "https://zenless.hoyoverse.com",
+				Referer: "https://zenless.hoyoverse.com/",
+				"x-rpc-language": "en"
 			}
 		});
 

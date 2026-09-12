@@ -1,3 +1,5 @@
+const crypto = require("node:crypto");
+
 let version;
 
 const fetchData = async () => {
@@ -53,16 +55,24 @@ const redeemCodes = async (accountData, code) => {
 	});
 
 	const res = await app.Got("HoYoLab", {
-		url: "https://public-operation-nap.hoyoverse.com/common/apicdkey/api/webExchangeCdkey",
-		searchParams: {
+		url: "https://public-operation-nap.hoyoverse.com/common/apicdkey/api/webExchangeCdkeyRisk",
+		method: "POST",
+		json: {
 			uid: accountData.uid,
 			region: accountData.region,
 			lang: "en",
 			cdkey: code.code,
 			game_biz: "nap_global",
-			t: app.Date.now()
+			device_uuid: crypto.randomUUID(),
+			platform: "4",
+			t: Date.now()
 		},
-		headers: { Cookie }
+		headers: {
+			Cookie,
+			Origin: "https://zenless.hoyoverse.com",
+			Referer: "https://zenless.hoyoverse.com/",
+			"x-rpc-language": "en"
+		}
 	});
 
 	if (res.statusCode !== 200) {

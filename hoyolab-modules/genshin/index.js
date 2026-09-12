@@ -21,7 +21,7 @@ const DEFAULT_CONSTANTS = {
 		sign: "https://sg-hk4e-api.hoyolab.com/event/sol/sign",
 		notes: "https://bbs-api-os.mihoyo.com/game_record/genshin/api/dailyNote",
 		diary: "https://sg-hk4e-api.hoyolab.com/event/ysledgeros/month_detail",
-		redemption: "https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey"
+		redemption: "https://public-operation-hk4e.hoyoverse.com/common/apicdkey/api/webExchangeCdkey"
 	}
 };
 

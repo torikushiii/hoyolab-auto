@@ -53,16 +53,19 @@ const redeemCodes = async (accountData, code) => {
 	});
 
 	const res = await app.Got("HoYoLab", {
-		url: "https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey",
+		url: "https://public-operation-hk4e.hoyoverse.com/common/apicdkey/api/webExchangeCdkey",
 		searchParams: {
 			uid: accountData.uid,
 			region: accountData.region,
 			lang: "en",
 			cdkey: code.code,
-			game_biz: "hk4e_global",
-			sLangKey: app.Config.get("language") || "en-us"
+			game_biz: "hk4e_global"
 		},
-		headers: { Cookie }
+		headers: {
+			Cookie,
+			Origin: "https://genshin.hoyoverse.com",
+			Referer: "https://genshin.hoyoverse.com/"
+		}
 	});
 
 	if (res.statusCode !== 200) {
