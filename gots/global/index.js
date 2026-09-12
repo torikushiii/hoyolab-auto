@@ -36,7 +36,7 @@ const definition = {
 						const timeout = err.options?.timeout ?? null;
 
 						app.Logger.debug("GotRequest", {
-							error: err,
+							message: err.message,
 							context: {
 								code,
 								responseType,
