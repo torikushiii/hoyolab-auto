@@ -333,16 +333,18 @@ module.exports = class HoyoLab {
 		return cookie;
 	}
 
-	static async refreshStoredCookies () {
+	static async refreshStoredCookies (cookie = null) {
+		const requestedLtuid = cookie ? parseCookie(cookie).ltuid_v2 : null;
 		const accounts = new Map();
 		for (const platform of HoyoLab.list) {
 			for (const account of platform.data) {
-				if (account.refreshCookie) {
+				if (account.refreshCookie && (!requestedLtuid || account.ltuid === requestedLtuid)) {
 					accounts.set(account.ltuid, { account, platform });
 				}
 			}
 		}
 
+		let refreshed = false;
 		for (const { account, platform } of accounts.values()) {
 			try {
 				const result = await platform.updateCookie(account);
@@ -360,11 +362,18 @@ module.exports = class HoyoLab {
 						});
 					}
 				}
+				refreshed = true;
 			}
 			catch (e) {
 				app.Logger.error("HoyoAuth", `Could not refresh the cookie for account ${account.ltuid}: ${e.message}`);
 			}
 		}
+
+		return refreshed;
+	}
+
+	static isExpiredLogin (message) {
+		return /(?:please\s+)?log\s*in|login/i.test(String(message ?? ""));
 	}
 
 	update (account) {
@@ -435,7 +444,10 @@ module.exports = class HoyoLab {
 		const platform = HoyoLab.get(game);
 		const [account] = accountData;
 
-		const res = await platform.redeemCode(account, code);
+		let res = await platform.redeemCode(account, code);
+		if (!res.success && HoyoLab.isExpiredLogin(res.message) && await HoyoLab.refreshStoredCookies(account.cookie)) {
+			res = await platform.redeemCode(account, code);
+		}
 		if (res.success) {
 			return { success: true };
 		}

@@ -177,7 +177,11 @@ const checkAndRedeem = async (codes) => {
 			}
 
 			for (const code of pendingCodes) {
-				const result = await redeemCodes(account, code);
+				let result = await redeemCodes(account, code);
+				if (!result.success && app.HoyoLab.isExpiredLogin(result.reason) && await app.HoyoLab.refreshStoredCookies(account.cookie)) {
+					result = await redeemCodes(account, code);
+				}
+
 				if (result.success) {
 					success.push({ account, code });
 				}
