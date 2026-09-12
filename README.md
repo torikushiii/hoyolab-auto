@@ -168,6 +168,7 @@ If your cookie also contains `stoken`, HoyoLab Auto uses it to refresh
 `ltoken_v2` and `cookie_token_v2` on startup and every two hours. Keep the
 configured cookie private; `stoken` is not sent with regular HoYoLAB requests.
 Only one game entry needs it when several games use the same HoYoLAB account.
+Browser sessions do not normally expose `stoken`; it must come from an app login.
 
 ## Notifications Setup
 For setting up Discord or Telegram notifications, refer to the [setup folder](https://github.com/torikushiii/hoyolab-auto/tree/main/setup).
