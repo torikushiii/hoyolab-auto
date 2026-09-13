@@ -346,18 +346,23 @@ module.exports = class HoyoLab {
 		}
 
 		const results = [];
+		const configuredAccounts = HoyoLab.list.flatMap(instance => instance.data);
 		for (const { account, platform } of accounts.values()) {
 			const notificationAccount = {
 				ltuid: account.ltuid,
 				discord: account.discord,
 				allowedPlatforms: account.allowedPlatforms
 			};
+			const notificationAccounts = configuredAccounts
+				.filter(item => item.ltuid === account.ltuid)
+				.map(item => ({ discord: item.discord, allowedPlatforms: item.allowedPlatforms }));
 			try {
 				const result = await platform.updateCookie(account);
 				if (!result.success) {
 					app.Logger.warn("HoyoAuth", `Could not refresh the cookie for account ${account.ltuid}: ${result.reason}`);
 					results.push({
 						account: notificationAccount,
+						accounts: notificationAccounts,
 						success: false
 					});
 					continue;
@@ -380,6 +385,7 @@ module.exports = class HoyoLab {
 				}
 				results.push({
 					account: notificationAccount,
+					accounts: notificationAccounts,
 					success: true
 				});
 			}
@@ -387,6 +393,7 @@ module.exports = class HoyoLab {
 				app.Logger.error("HoyoAuth", `Could not refresh the cookie for account ${account.ltuid}: ${e.message}`);
 				results.push({
 					account: notificationAccount,
+					accounts: notificationAccounts,
 					success: false
 				});
 			}
