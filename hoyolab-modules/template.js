@@ -1,5 +1,36 @@
+const crypto = require("node:crypto");
+
 const DataCache = require("./cache.js");
 const CustomHoyoError = require("./error-messages.js");
+
+const APP_LOGIN_SALT = "IZPgfb0dRPtBeLuFkdDznSZ6f4wWt6y2";
+const REFRESH_API = "https://sg-public-api.hoyoverse.com/account/ma-passport/token/getBySToken";
+
+const parseCookie = (cookie, separator = ";") => {
+	const result = {};
+	for (const rawPair of cookie.split(separator)) {
+		const pair = rawPair.trim();
+		const index = pair.indexOf("=");
+		if (index > 0) {
+			result[pair.slice(0, index)] = pair.slice(index + 1);
+		}
+	}
+	return result;
+};
+
+const stringifyCookie = (cookie, separator = ";") => Object.entries(cookie)
+	.map(([key, value]) => `${key}=${value}`)
+	.join(`${separator} `);
+
+const generateDynamicSecret = () => {
+	const timestamp = Math.floor(Date.now() / 1000);
+	const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	const random = Array.from({ length: 6 }, () => alphabet[crypto.randomInt(alphabet.length)]).join("");
+	const hash = crypto.createHash("md5")
+		.update(`salt=${APP_LOGIN_SALT}&t=${timestamp}&r=${random}`)
+		.digest("hex");
+	return `${timestamp},${random},${hash}`;
+};
 
 module.exports = class HoyoLab {
 	#id;
@@ -13,7 +44,7 @@ module.exports = class HoyoLab {
 
 	/** @type {HoyoLab[]} */
 	static list = [];
-	static webAPI = "https://webapi-os.account.hoyoverse.com/Api/fetch_cookie_accountinfo";
+	static webAPI = REFRESH_API;
 
 	constructor (name, config, defaults = {}) {
 		this.#name = name;
@@ -60,10 +91,10 @@ module.exports = class HoyoLab {
 
 			if (this.#name === "honkai" || this.#name === "tot") {
 				const parsedCookie = this.#parseCookie(account.cookie);
-				const ltuid = account.cookie.match(/ltuid(?:|_v2)=([^;]+)/)[1];
 				this.#data.push({
 					cookie: parsedCookie.cookie,
-					ltuid,
+					ltuid: parsedCookie.ltuid,
+					refreshCookie: parsedCookie.refreshCookie,
 					allowedPlatforms: account.allowedPlatforms ?? null
 				});
 				break;
@@ -166,11 +197,11 @@ module.exports = class HoyoLab {
 			}
 
 			const parsedCookie = this.#parseCookie(account.cookie);
-			const ltuid = account.cookie.match(/ltuid(?:|_v2)=([^;]+)/)[1];
 
 			this.#data.push({
 				cookie: parsedCookie.cookie,
-				ltuid,
+				ltuid: parsedCookie.ltuid,
+				refreshCookie: parsedCookie.refreshCookie,
 				redeemCode: parsedCookie.codeRedeem !== false ? redeemCode : parsedCookie.codeRedeem,
 				shopStatus,
 				realm,
@@ -219,15 +250,10 @@ module.exports = class HoyoLab {
 	destroy () {}
 
 	#parseCookie (cookie) {
-		const cookies = cookie.split("; ");
-		const cookieMap = Object.fromEntries(
-			cookies.map(c => {
-				const [key, value] = c.split("=");
-				return [key, value];
-			})
-		);
+		const cookieMap = parseCookie(cookie);
 
 		const {
+			stoken,
 			ltoken_v2,
 			ltuid_v2,
 			ltmid_v2,
@@ -238,15 +264,20 @@ module.exports = class HoyoLab {
 
 		if (!ltoken_v2 || !ltuid_v2 || !ltmid_v2) {
 			throw new app.Error({
-				message: "No ltoken_v2, ltuid_v2, or ltmid_v2 found in cookie.",
-				args: { cookie }
+				message: "No ltoken_v2, ltuid_v2, or ltmid_v2 found in cookie."
 			});
 		}
+
+		const refreshCookie = stoken
+			? stringifyCookie({ stoken, mid: ltmid_v2 })
+			: null;
 
 		if (cookie_token_v2 && account_mid_v2 && account_id_v2) {
 			return {
 				cookie: this.#buildCookie(cookieMap, { token: true }),
-				codeRedeem: true
+				codeRedeem: true,
+				ltuid: ltuid_v2,
+				refreshCookie
 			};
 		}
 
@@ -256,7 +287,9 @@ module.exports = class HoyoLab {
 
 		return {
 			cookie: this.#buildCookie(cookieMap),
-			codeRedeem: false
+			codeRedeem: false,
+			ltuid: ltuid_v2,
+			refreshCookie
 		};
 	}
 
@@ -275,21 +308,12 @@ module.exports = class HoyoLab {
 			cookieObj.account_id_v2 = cookie.account_id_v2;
 		}
 
-		return Object.entries(cookieObj)
-			.map(([key, value]) => `${key}=${value}`)
-			.join("; ");
+		return stringifyCookie(cookieObj);
 	}
 
 	static parseCookie (cookie, options = {}) {
 		const { whitelist = [], blacklist = [], separator = ";" } = options;
-
-		const cookiesArray = cookie.split(separator).map(c => c.trim());
-		const cookieMap = Object.fromEntries(
-			cookiesArray.map(c => {
-				const [key, value] = c.split("=");
-				return [key, value];
-			})
-		);
+		const cookieMap = parseCookie(cookie, separator);
 
 		if (whitelist.length !== 0) {
 			const filteredCookiesArray = Object.keys(cookieMap)
@@ -307,6 +331,49 @@ module.exports = class HoyoLab {
 		}
 
 		return cookie;
+	}
+
+	static async refreshStoredCookies (cookie = null) {
+		const requestedLtuid = cookie ? parseCookie(cookie).ltuid_v2 : null;
+		const accounts = new Map();
+		for (const platform of HoyoLab.list) {
+			for (const account of platform.data) {
+				if (account.refreshCookie && (!requestedLtuid || account.ltuid === requestedLtuid)) {
+					accounts.set(account.ltuid, { account, platform });
+				}
+			}
+		}
+
+		let refreshed = false;
+		for (const { account, platform } of accounts.values()) {
+			try {
+				const result = await platform.updateCookie(account);
+				if (!result.success) {
+					app.Logger.warn("HoyoAuth", `Could not refresh the cookie for account ${account.ltuid}: ${result.reason}`);
+					continue;
+				}
+
+				for (const item of HoyoLab.list.flatMap(instance => [...instance.data, ...instance.accounts])) {
+					const cookie = parseCookie(item.cookie);
+					if (cookie.ltuid_v2 === account.ltuid) {
+						item.cookie = stringifyCookie({
+							...cookie,
+							...result.data
+						});
+					}
+				}
+				refreshed = true;
+			}
+			catch (e) {
+				app.Logger.error("HoyoAuth", `Could not refresh the cookie for account ${account.ltuid}: ${e.message}`);
+			}
+		}
+
+		return refreshed;
+	}
+
+	static isExpiredLogin (message) {
+		return /(?:please\s+)?log\s*in|login/i.test(String(message ?? ""));
 	}
 
 	update (account) {
@@ -377,7 +444,10 @@ module.exports = class HoyoLab {
 		const platform = HoyoLab.get(game);
 		const [account] = accountData;
 
-		const res = await platform.redeemCode(account, code);
+		let res = await platform.redeemCode(account, code);
+		if (!res.success && HoyoLab.isExpiredLogin(res.message) && await HoyoLab.refreshStoredCookies(account.cookie)) {
+			res = await platform.redeemCode(account, code);
+		}
 		if (res.success) {
 			return { success: true };
 		}
@@ -534,53 +604,71 @@ module.exports = class HoyoLab {
 	}
 
 	async updateCookie (accountData) {
+		if (!accountData.refreshCookie) {
+			return { success: false, reason: "No stoken configured" };
+		}
+
 		const res = await app.Got("HoYoLab", {
 			url: this.webAPI,
+			method: "POST",
 			responseType: "json",
 			throwHttpErrors: false,
+			json: {
+				dst_token_types: [2, 4]
+			},
 			headers: {
-				Cookie: accountData.cookie
+				ds: generateDynamicSecret(),
+				"x-rpc-app_id": "c9oqaq3s3gu8",
+				Cookie: accountData.refreshCookie
 			}
 		});
 
-		if (!res.ok) {
+		if (res.statusCode !== 200) {
 			app.Logger.log(`${this.fullName}:UpdateCookie`, {
 				message: "Failed to update cookie",
 				args: {
 					platform: this.name,
-					uid: accountData.uid,
+					uid: accountData.ltuid,
 					region: accountData.region,
-					body: res.body
+					statusCode: res.statusCode
 				}
 			});
 
-			return { success: false };
+			return { success: false, reason: `HTTP ${res.statusCode}` };
 		}
 
-		const data = res.body.data;
-		if (!data || data.status !== 1 || !data?.cookie_info) {
+		if (res.body?.retcode !== 0 || !Array.isArray(res.body?.data?.tokens)) {
 			app.Logger.log(`${this.fullName}:UpdateCookie`, {
 				message: "Failed to update cookie",
 				args: {
 					platform: this.name,
-					uid: accountData.uid,
+					uid: accountData.ltuid,
 					region: accountData.region,
-					body: JSON.parse(res.body)
+					retcode: res.body?.retcode,
+					reason: res.body?.message
 				}
 			});
 
-			return { success: false };
+			return { success: false, reason: res.body?.message ?? "Invalid response" };
 		}
 
-		const accountId = data.cookie_info.account_id;
-		const token = data.cookie_info.cookie_token;
+		const tokens = {};
+		for (const token of res.body.data.tokens) {
+			if (token.token_type === 2) {
+				tokens.ltoken_v2 = token.token;
+			}
+			else if (token.token_type === 4) {
+				tokens.cookie_token_v2 = token.token;
+			}
+		}
+
+		if (!tokens.ltoken_v2 || !tokens.cookie_token_v2) {
+			return { success: false, reason: "Missing tokens in response" };
+		}
 
 		return {
 			success: true,
-			data: {
-				accountId,
-				token
-			}
+			data: tokens
 		};
 	}
 

@@ -75,6 +75,7 @@ const config = require("./config.js");
 		Platform,
 		HoyoLab
 	};
+	await HoyoLab.refreshStoredCookies();
 
 	const hoyoPromises = [];
 	for (const account of accounts) {
