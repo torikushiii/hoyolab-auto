@@ -203,6 +203,7 @@ module.exports = class HoyoLab {
 				ltuid: parsedCookie.ltuid,
 				refreshCookie: parsedCookie.refreshCookie,
 				redeemCode: parsedCookie.codeRedeem !== false ? redeemCode : parsedCookie.codeRedeem,
+				redeemCodeConfigured: redeemCode,
 				shopStatus,
 				realm,
 				dailiesCheck,
@@ -358,8 +359,14 @@ module.exports = class HoyoLab {
 					if (cookie.ltuid_v2 === account.ltuid) {
 						item.cookie = stringifyCookie({
 							...cookie,
-							...result.data
+							...result.data,
+							account_id_v2: cookie.ltuid_v2,
+							account_mid_v2: cookie.ltmid_v2
 						});
+						// Restore the user's preference now that redemption credentials are available.
+						if (Object.hasOwn(item, "redeemCodeConfigured")) {
+							item.redeemCode = item.redeemCodeConfigured;
+						}
 					}
 				}
 				refreshed = true;

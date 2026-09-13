@@ -120,6 +120,7 @@ module.exports = class StarRail extends require("../template.js") {
 				timezone: (offset === "TW/HK/MO") ? "SEA" : offset,
 				level: data.level,
 				redeemCode: account.redeemCode,
+				redeemCodeConfigured: account.redeemCodeConfigured,
 				dailiesCheck: account.dailiesCheck,
 				weekliesCheck: account.weekliesCheck,
 				cookie: cookieData,

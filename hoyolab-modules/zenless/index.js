@@ -118,6 +118,7 @@ module.exports = class ZenlessZoneZero extends require("../template.js") {
 				timezone: (offset === "TW/HK/MO") ? "SEA" : offset,
 				level: data.level,
 				redeemCode: account.redeemCode,
+				redeemCodeConfigured: account.redeemCodeConfigured,
 				dailiesCheck: account.dailiesCheck,
 				game: {
 					name: "Zenless Zone Zero",
