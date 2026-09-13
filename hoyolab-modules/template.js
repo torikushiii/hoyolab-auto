@@ -334,7 +334,7 @@ module.exports = class HoyoLab {
 		return cookie;
 	}
 
-	static async refreshStoredCookies (cookie = null) {
+	static async refreshCookieAccounts (cookie = null) {
 		const requestedLtuid = cookie ? parseCookie(cookie).ltuid_v2 : null;
 		const accounts = new Map();
 		for (const platform of HoyoLab.list) {
@@ -345,12 +345,21 @@ module.exports = class HoyoLab {
 			}
 		}
 
-		let refreshed = false;
+		const results = [];
 		for (const { account, platform } of accounts.values()) {
+			const notificationAccount = {
+				ltuid: account.ltuid,
+				discord: account.discord,
+				allowedPlatforms: account.allowedPlatforms
+			};
 			try {
 				const result = await platform.updateCookie(account);
 				if (!result.success) {
 					app.Logger.warn("HoyoAuth", `Could not refresh the cookie for account ${account.ltuid}: ${result.reason}`);
+					results.push({
+						account: notificationAccount,
+						success: false
+					});
 					continue;
 				}
 
@@ -369,14 +378,26 @@ module.exports = class HoyoLab {
 						}
 					}
 				}
-				refreshed = true;
+				results.push({
+					account: notificationAccount,
+					success: true
+				});
 			}
 			catch (e) {
 				app.Logger.error("HoyoAuth", `Could not refresh the cookie for account ${account.ltuid}: ${e.message}`);
+				results.push({
+					account: notificationAccount,
+					success: false
+				});
 			}
 		}
 
-		return refreshed;
+		return results;
+	}
+
+	static async refreshStoredCookies (cookie = null) {
+		const results = await HoyoLab.refreshCookieAccounts(cookie);
+		return results.some(result => result.success);
 	}
 
 	static isExpiredLogin (message) {
