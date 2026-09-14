@@ -1,6 +1,10 @@
 const RegionalTaskManager = new app.RegionalTaskManager();
 
 RegionalTaskManager.registerTask("HowlScratchCard", 21, 0, async (account) => {
+	if (account.dailyLotteryCheck === false) {
+		return;
+	}
+
 	const platform = app.HoyoLab.get(account.platform);
 	const notes = await platform.notes(account);
 	if (notes.success === false) {

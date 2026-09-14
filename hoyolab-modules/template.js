@@ -100,7 +100,7 @@ module.exports = class HoyoLab {
 				break;
 			}
 
-			const { redeemCode, shopStatus, dailiesCheck, weekliesCheck } = account;
+			const { redeemCode, shopStatus, dailiesCheck, weekliesCheck, dailyLotteryCheck } = account;
 			if (dailiesCheck && typeof dailiesCheck !== "boolean") {
 				throw new app.Error({
 					message: "Invalid check provided for HoyoLab expected boolean.",
@@ -134,6 +134,15 @@ module.exports = class HoyoLab {
 					args: {
 						shopStatus,
 						type: typeof shopStatus
+					}
+				});
+			}
+			if (dailyLotteryCheck && typeof dailyLotteryCheck !== "boolean") {
+				throw new app.Error({
+					message: "Invalid check provided for HoyoLab expected boolean.",
+					args: {
+						dailyLotteryCheck,
+						type: typeof dailyLotteryCheck
 					}
 				});
 			}
@@ -207,6 +216,7 @@ module.exports = class HoyoLab {
 				shopStatus,
 				realm,
 				dailiesCheck,
+				dailyLotteryCheck,
 				weekliesCheck,
 				stamina,
 				expedition,

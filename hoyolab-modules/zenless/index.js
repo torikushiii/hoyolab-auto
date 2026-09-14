@@ -120,6 +120,7 @@ module.exports = class ZenlessZoneZero extends require("../template.js") {
 				redeemCode: account.redeemCode,
 				redeemCodeConfigured: account.redeemCodeConfigured,
 				dailiesCheck: account.dailiesCheck,
+				dailyLotteryCheck: account.dailyLotteryCheck ?? true,
 				game: {
 					name: "Zenless Zone Zero",
 					short: "ZZZ"
