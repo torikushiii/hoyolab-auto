@@ -169,6 +169,9 @@ If your cookie also contains `stoken`, HoyoLab Auto uses it to refresh
 configured cookie private; `stoken` is not sent with regular HoYoLAB requests.
 Only one game entry needs it when several games use the same HoYoLAB account.
 Browser sessions do not normally expose `stoken`; it must come from an app login.
+The optional [HoYoLAB cookie helper](https://github.com/Smexhy/hoyolab-cookie-helper)
+can obtain it locally on Windows, macOS, or Linux. It is a third-party helper
+and is only needed for automatic cookie refresh.
 
 ## Notifications Setup
 For setting up Discord or Telegram notifications, refer to the [setup folder](https://github.com/torikushiii/hoyolab-auto/tree/main/setup).
