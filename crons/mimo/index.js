@@ -201,12 +201,15 @@ module.exports = {
 							}
 						};
 
-						const hasSignificantActivity = data.itemsExchanged.length > 0
-							|| data.codesRedeemed.length > 0
-							|| data.codesObtained?.length > 0;
+						const shouldMention = data.errors?.length > 0
+							|| data.codesObtained?.length > 0
+							|| (account.mimo?.mentionOnSuccess !== false && (
+								data.itemsExchanged.length > 0
+								|| data.codesRedeemed.length > 0
+							));
 
 						for (const webhook of webhooks) {
-							const userId = hasSignificantActivity
+							const userId = shouldMention
 								? webhook.createUserMention(account.discord)
 								: null;
 

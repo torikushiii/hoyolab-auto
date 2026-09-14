@@ -69,7 +69,7 @@ If you don't have a server to run this script and simply just want to use it for
   - **Daily check-in**: Runs every midnight local time.
   - **Dailies**: Reminds you to do your dailies, such as commissions if you haven't done them at 09:00 (local time).
   - **Stamina check**: Reminds you to spend your stamina if you're at your set threshold or capped.
-  - **Howl Scracth Card**: Notifies you if you haven't scratched the card for the day at 09:00 (local time).
+  - **Daily Lottery**: Notifies you if you haven't claimed the daily lottery reward.
   - **Shop Status**: Notifies you if the shop has finished selling videos.
   - **Code Redeems**: Search for codes and redeem them automatically.
   - **Traveling Mimo**: Automatically complete Mimo tasks, claim points, and exchange for Polychrome.

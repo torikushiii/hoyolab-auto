@@ -17,18 +17,18 @@ RegionalTaskManager.registerTask("HowlScratchCard", 21, 0, async (account) => {
 	const region = app.HoyoLab.getRegion(account.region);
 	const embed = {
 		color: data.assets.color,
-		title: "Howl's News Stand",
+		title: "ZZZ Daily Lottery",
 		author: {
 			name: `${region} Server - ${account.nickname}`,
 			icon_url: data.assets.logo
 		},
-		description: "You haven't scratched the card at Howl's News Stand yet!",
+		description: "You haven't claimed your daily lottery reward yet!",
 		thumbnail: {
 			url: data.assets.logo
 		},
 		timestamp: new Date(),
 		footer: {
-			text: "Howl's News Stand",
+			text: "ZZZ Daily Lottery",
 			icon_url: data.assets.logo
 		}
 	};
@@ -44,8 +44,8 @@ RegionalTaskManager.registerTask("HowlScratchCard", 21, 0, async (account) => {
 
 	const messageText = [
 		`${region} Server - ${account.nickname}`,
-		`📰 Howl's News Stand`,
-		`You haven't scratched the card at Howl's News Stand yet!`
+		"🎲 ZZZ Daily Lottery",
+		"You haven't claimed your daily lottery reward yet!"
 	].join("\n");
 
 	const escapedMessage = app.Utils.escapeCharacters(messageText);
@@ -57,7 +57,7 @@ RegionalTaskManager.registerTask("HowlScratchCard", 21, 0, async (account) => {
 module.exports = {
 	name: "howl-scratch-card",
 	expression: "*/5 * * * *",
-	description: "Reminds you if you haven't scratched the card at Howl's News Stand.",
+	description: "Reminds you if you haven't claimed the ZZZ daily lottery reward.",
 	code: (async function howlScratchCard () {
 		await RegionalTaskManager.executeTasks({ whitelist: "nap" });
 	})
