@@ -56,7 +56,7 @@ const initCrons = () => {
 			const name = app.Utils.convertCase(definition.name, "kebab", "camel");
 
 			const expression = definition.expression;
-			const job = new CronJob(expression, () => definition.code());
+			const job = new CronJob(expression, () => definition.code(), null, false, definition.timeZone);
 			job.start();
 
 			crons.job = job;
@@ -74,7 +74,7 @@ const initCrons = () => {
 		const name = app.Utils.convertCase(definition.name, "kebab", "camel");
 
 		const expression = config.crons[name] || definition.expression;
-		const job = new CronJob(expression, () => cron.code(cron));
+		const job = new CronJob(expression, () => cron.code(cron), null, false, definition.timeZone);
 		job.start();
 
 		crons.job = job;

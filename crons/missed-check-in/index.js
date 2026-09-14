@@ -1,6 +1,7 @@
 module.exports = {
 	name: "missed-check-in",
 	expression: "0 0 23 * * *",
+	timeZone: "Asia/Shanghai",
 	description: "This check if all accounts successfully checked in today before daily reset",
 	code: (async function missedCheckIn () {
 		const accounts = app.HoyoLab.getActiveAccounts();
