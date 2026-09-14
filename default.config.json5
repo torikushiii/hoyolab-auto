@@ -40,6 +40,8 @@
         // You can use this site to generate cron expression: https://crontab.guru/
         checkIn: '0 0 0 * * *',
         codeRedeem: '*/15 * * * *',
+        dailiesReminderHour: 21, // Game server time (0-23)
+        dailiesReminderMinute: 0, // 0-59
         expedition: '0 */30 * * * *',
         mimo: '0 0 */6 * * *',
         mimoJitter: 0, // Random delay in seconds before running Mimo (0-N). Helps avoid rate limits at reset time.

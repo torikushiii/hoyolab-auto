@@ -1,6 +1,10 @@
 const RegionalTaskManager = new app.RegionalTaskManager();
+const config = require("../../config.js");
 
-RegionalTaskManager.registerTask("DailiesReminder", 21, 0, async (account) => {
+const reminderHour = config.crons?.dailiesReminderHour ?? 21;
+const reminderMinute = config.crons?.dailiesReminderMinute ?? 0;
+
+RegionalTaskManager.registerTask("DailiesReminder", reminderHour, reminderMinute, async (account) => {
 	if (account.dailiesCheck === false) {
 		return;
 	}
