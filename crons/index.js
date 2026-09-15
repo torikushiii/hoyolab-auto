@@ -32,10 +32,10 @@ const definitions = [
 	WeekliesReminder
 ];
 
-const BlacklistedCrons = [
-	"dailiesReminder",
-	"howlScratchCard",
-	"weekliesReminder"
+const FixedScheduleCrons = [
+	"dailies-reminder",
+	"howl-scratch-card",
+	"weeklies-reminder"
 ];
 
 const initCrons = () => {
@@ -52,18 +52,6 @@ const initCrons = () => {
 		else if (whitelist.length > 0 && !whitelist.includes(definition.name)) {
 			continue;
 		}
-		else if (BlacklistedCrons.includes(definition.name)) {
-			const name = app.Utils.convertCase(definition.name, "kebab", "camel");
-
-			const expression = definition.expression;
-			const job = new CronJob(expression, () => definition.code(), null, false, definition.timeZone);
-			job.start();
-
-			crons.job = job;
-			crons.push({ name, job });
-
-			continue;
-		}
 
 		const cron = {
 			name: definition.name,
@@ -73,7 +61,9 @@ const initCrons = () => {
 
 		const name = app.Utils.convertCase(definition.name, "kebab", "camel");
 
-		const expression = config.crons[name] || definition.expression;
+		const expression = FixedScheduleCrons.includes(definition.name)
+			? definition.expression
+			: config.crons[name] || definition.expression;
 		const job = new CronJob(expression, () => cron.code(cron), null, false, definition.timeZone);
 		job.start();
 

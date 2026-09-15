@@ -149,12 +149,7 @@ module.exports = class Platform {
 			return Platform.list.find(i => i.id === identifier) ?? null;
 		}
 		else if (typeof identifier === "string") {
-			const platform = Platform.list.find(i => i.name === identifier);
-			if (platform.length === 0) {
-				return null;
-			}
-
-			return platform;
+			return Platform.list.find(i => i.name === identifier) ?? null;
 		}
 		else {
 			throw new app.Error({

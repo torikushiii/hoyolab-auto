@@ -614,12 +614,7 @@ module.exports = class HoyoLab {
 			return HoyoLab.list.find(i => i.id === identifier) ?? null;
 		}
 		else if (typeof identifier === "string") {
-			const platform = HoyoLab.list.find(i => i.name === identifier);
-			if (platform.length === 0) {
-				return null;
-			}
-
-			return platform;
+			return HoyoLab.list.find(i => i.name === identifier) ?? null;
 		}
 		else {
 			throw new app.Error({
