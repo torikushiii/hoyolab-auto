@@ -73,7 +73,7 @@ RegionalTaskManager.registerTask("DailiesReminder", reminderHour, reminderMinute
 
 module.exports = {
 	name: "dailies-reminder",
-	expression: "*/5 * * * *",
+	expression: "* * * * *",
 	description: "Reminds you to complete your dailies.",
 	code: (async function dailiesReminder () {
 		// eslint-disable-next-line object-curly-spacing
