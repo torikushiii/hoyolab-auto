@@ -42,6 +42,9 @@ If you don't have a server to run this script and simply just want to use it for
 - [x] Zenless Zone Zero
 
 ## Features
+Daily reminders use game server time by default. Set `crons.dailiesReminderTimeZone`
+to an IANA timezone such as `America/New_York` to use local time with daylight-saving changes.
+
 - **Honkai Impact 3rd**:
   - **Daily check-in**: Runs every midnight local time.
 
@@ -59,7 +62,7 @@ If you don't have a server to run this script and simply just want to use it for
   - **Traveler's Diary**: Check your monthly currency income.
 - **Honkai: Star Rail**:
   - **Daily check-in**: Runs every midnight local time.
-  - **Dailies**: Reminds you to do your dailies, such as commissions if you haven't done them at 09:00 (local time).
+  - **Dailies**: Reminds you to do your dailies at the configured time (21:00 game server time by default).
   - **Stamina check**: Reminds you to spend your stamina if you're at your set threshold or capped.
   - **Expedition check**: Check your expeditions and sends a notification if they're done.
   - **Code Redeems**: Search for codes and redeem them automatically.
@@ -67,7 +70,7 @@ If you don't have a server to run this script and simply just want to use it for
   - **Traveling Mimo**: Automatically complete Mimo tasks, claim points, and exchange for Stellar Jade.
 - **Zenless Zone Zero**:
   - **Daily check-in**: Runs every midnight local time.
-  - **Dailies**: Reminds you to do your dailies, such as commissions if you haven't done them at 09:00 (local time).
+  - **Dailies**: Reminds you to do your dailies at the configured time (21:00 game server time by default).
   - **Stamina check**: Reminds you to spend your stamina if you're at your set threshold or capped.
   - **Daily Lottery**: Notifies you at 21:00 game server time if you haven't claimed the daily lottery reward. Set `dailyLotteryCheck` to `false` on a ZZZ account to disable it.
   - **Shop Status**: Notifies you if the shop has finished selling videos.

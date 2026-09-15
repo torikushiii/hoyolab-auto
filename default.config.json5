@@ -42,6 +42,7 @@
         codeRedeem: '*/15 * * * *',
         dailiesReminderHour: 21, // Game server time (0-23)
         dailiesReminderMinute: 0, // 0-59
+        dailiesReminderTimeZone: null, // Optional IANA timezone, e.g. 'America/New_York'; null uses game server time
         expedition: '0 */30 * * * *',
         mimo: '0 0 */6 * * *',
         mimoJitter: 0, // Random delay in seconds before running Mimo (0-N). Helps avoid rate limits at reset time.

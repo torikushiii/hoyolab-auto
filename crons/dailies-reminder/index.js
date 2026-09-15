@@ -3,6 +3,7 @@ const config = require("../../config.js");
 
 const reminderHour = config.crons?.dailiesReminderHour ?? 21;
 const reminderMinute = config.crons?.dailiesReminderMinute ?? 0;
+const reminderTimeZone = config.crons?.dailiesReminderTimeZone || null;
 
 RegionalTaskManager.registerTask("DailiesReminder", reminderHour, reminderMinute, async (account) => {
 	if (account.dailiesCheck === false) {
@@ -69,7 +70,7 @@ RegionalTaskManager.registerTask("DailiesReminder", reminderHour, reminderMinute
 	for (const telegram of platforms.filter(p => p.name === "telegram")) {
 		await telegram.send(escapedMessage);
 	}
-});
+}, { timeZone: reminderTimeZone });
 
 module.exports = {
 	name: "dailies-reminder",

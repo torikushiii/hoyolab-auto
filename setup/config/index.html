@@ -299,6 +299,16 @@
         <label for="codeRedeem">codeRedeem:</label>
         <input type="text" id="codeRedeemCron" placeholder="*/15 * * * *">
 
+        <label for="dailiesReminderHour">Dailies reminder hour:</label>
+        <input type="number" id="dailiesReminderHour" min="0" max="23" placeholder="21">
+
+        <label for="dailiesReminderMinute">Dailies reminder minute:</label>
+        <input type="number" id="dailiesReminderMinute" min="0" max="59" placeholder="0">
+
+        <label for="dailiesReminderTimeZone">Dailies reminder timezone (optional):</label>
+        <input type="text" id="dailiesReminderTimeZone" placeholder="America/New_York">
+        <div class="small-text">Leave blank to use game server time. Use an IANA timezone for daylight-saving changes.</div>
+
         <label for="expedition">expedition:</label>
         <input type="text" id="expeditionCron" placeholder="0 */30 * * * *">
 
@@ -793,6 +803,9 @@
             );
             setInputValue(document.getElementById('checkInCron'), crons.checkIn);
             setInputValue(document.getElementById('codeRedeemCron'), crons.codeRedeem);
+            setInputValue(document.getElementById('dailiesReminderHour'), crons.dailiesReminderHour);
+            setInputValue(document.getElementById('dailiesReminderMinute'), crons.dailiesReminderMinute);
+            setInputValue(document.getElementById('dailiesReminderTimeZone'), crons.dailiesReminderTimeZone);
             setInputValue(document.getElementById('expeditionCron'), crons.expedition);
             setInputValue(document.getElementById('missedCheckInCron'), crons.missedCheckIn);
             setInputValue(document.getElementById('realmCurrencyCron'), crons.realmCurrency);
@@ -1146,6 +1159,9 @@
                     blacklist: document.getElementById('blacklist').value.split(',').map(item => item.trim()).filter(item => item),
                     checkIn: document.getElementById('checkInCron').value || document.getElementById('checkInCron').placeholder,
                     codeRedeem: document.getElementById('codeRedeemCron').value || document.getElementById('codeRedeemCron').placeholder,
+                    dailiesReminderHour: parseInt(document.getElementById('dailiesReminderHour').value || document.getElementById('dailiesReminderHour').placeholder, 10),
+                    dailiesReminderMinute: parseInt(document.getElementById('dailiesReminderMinute').value || document.getElementById('dailiesReminderMinute').placeholder, 10),
+                    dailiesReminderTimeZone: document.getElementById('dailiesReminderTimeZone').value.trim() || null,
                     expedition: document.getElementById('expeditionCron').value || document.getElementById('expeditionCron').placeholder,
                     missedCheckIn: document.getElementById('missedCheckInCron').value || document.getElementById('missedCheckInCron').placeholder,
                     realmCurrency: document.getElementById('realmCurrencyCron').value || document.getElementById('realmCurrencyCron').placeholder,
