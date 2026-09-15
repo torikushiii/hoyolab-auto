@@ -3,13 +3,15 @@ const FakeAgent = require("./fake-agent/index.js");
 const Global = require("./global/index.js");
 const HoyoClient = require("./hoyo-client/index.js");
 const HoyoLab = require("./hoyolab/index.js");
+const HoyoLabContexts = require("./hoyolab-contexts/index.js");
 
 const definitions = [
 	API,
 	FakeAgent,
 	Global,
 	HoyoClient,
-	HoyoLab
+	HoyoLab,
+	...HoyoLabContexts
 ];
 
 module.exports = definitions;

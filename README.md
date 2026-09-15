@@ -323,6 +323,9 @@ If you prefer not to use the Makefile, you can use the following Docker Compose 
   ```
 
 ## Contributing
+
+Run `npm test` for offline HTTP request-contract tests and `npm run lint` for lint checks. The tests use synthetic responses and do not require account cookies or network access. See [HTTP request contexts](gots/hoyolab-contexts/README.md) when adding a request profile.
+
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change. If there are any bugs, please open an issue.
 
 If you have any suggestions or ideas, feel free to open an issue.
