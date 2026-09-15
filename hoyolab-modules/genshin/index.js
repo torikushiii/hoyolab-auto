@@ -20,7 +20,7 @@ const DEFAULT_CONSTANTS = {
 	},
 	url: {
 		...checkInDescriptor.urls,
-		notes: "https://bbs-api-os.mihoyo.com/game_record/genshin/api/dailyNote",
+		notes: "https://sg-act-public-api.hoyolab.com/event/game_record/app/genshin/api/dailyNote",
 		diary: "https://sg-hk4e-api.hoyolab.com/event/ysledgeros/month_detail",
 		redemption: "https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey"
 	}
@@ -55,8 +55,8 @@ module.exports = class Genshin extends require("../template.js") {
 			const cookieData = account.cookie;
 			const ltuid = account.ltuid;
 
-			const { body, statusCode } = await app.Got("HoYoLab", {
-				url: "https://bbs-api-os.hoyolab.com/game_record/card/wapi/getGameRecordCard",
+			const { body, statusCode } = await app.Got("HoYoLabGameRecordDesktopWeb", {
+				url: "https://sg-act-public-api.hoyolab.com/event/game_record/card/wapi/getGameRecordCard",
 				responseType: "json",
 				throwHttpErrors: false,
 				searchParams: {

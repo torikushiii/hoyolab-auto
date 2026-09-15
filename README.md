@@ -139,6 +139,10 @@ for adding or updating a language through one catalog file.
 Genshin daily check-in uses the desktop web event API and reports a new claim as
 successful only after a follow-up status request confirms today’s check-in.
 
+Genshin account discovery and Realtime Notes use the current Game Record APIs.
+If Notes reports error `10102`, enable Realtime Notes in HoYoLAB's Genshin Impact
+Battle Chronicle settings. The application does not change your privacy settings.
+
 ### Cache File Location
 
 After running the application for the first time, a cache file will be automatically created at:

@@ -30,15 +30,7 @@ module.exports = class RealtimeNotes {
 			};
 		}
 
-		const cookieData = app.HoyoLab.parseCookie(accountData.cookie, {
-			whitelist: [
-				"ltoken_v2",
-				"ltmid_v2",
-				"ltuid_v2"
-			]
-		});
-
-		const res = await app.Got("HoYoLab", {
+		const res = await app.Got("HoYoLabGameRecordAppWebView", {
 			url: this.#instance.config.url.notes,
 			responseType: "json",
 			throwHttpErrors: false,
@@ -47,8 +39,8 @@ module.exports = class RealtimeNotes {
 				role_id: accountData.uid
 			},
 			headers: {
-				Cookie: cookieData,
-				DS: app.Utils.generateDS()
+				// The minimum cookie subset for this app route has not been established.
+				Cookie: accountData.cookie
 			}
 		});
 
@@ -68,7 +60,9 @@ module.exports = class RealtimeNotes {
 		if (res.body.retcode !== 0) {
 			if (res.body.retcode !== -501000) {
 				app.Logger.log(`${this.#instance.fullName}:Notes`, {
-					message: t("HoyoLab returned non-zero retcode"),
+					message: res.body.retcode === 10102
+						? t("Enable Realtime Notes in HoYoLAB's Genshin Impact Battle Chronicle settings to access your game data.")
+						: t("HoyoLab returned non-zero retcode"),
 					args: {
 						cause: app.HoyoLab.errorMessage(this.#instance.name, res.body.retcode),
 						platform: this.#instance.name,
