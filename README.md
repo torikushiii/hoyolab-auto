@@ -143,6 +143,13 @@ Genshin account discovery and Realtime Notes use the current Game Record APIs.
 If Notes reports error `10102`, enable Realtime Notes in HoYoLAB's Genshin Impact
 Battle Chronicle settings. The application does not change your privacy settings.
 
+Hilichurl Workshop uses the event WebView API with the configured full locale in
+the query, including task completion, reward claims, and exchanges. Timed reading
+and video tasks (types `101`/`102`) are logged as unsupported for automatic
+completion; complete them in HoYoLAB and automation can collect their available
+rewards. Successful cosmetic exchanges may return no redemption code. Point-cost
+exchanges have not been validated against a successful official-client capture.
+
 ### Cache File Location
 
 After running the application for the first time, a cache file will be automatically created at:

@@ -10,6 +10,7 @@ const { t } = require("../localization/index.js");
  */
 
 const { setTimeout: sleep } = require("node:timers/promises");
+const { getLanguage } = require("../gots/hoyolab-contexts/language.js");
 const HILICHURL_BASE_URL = "https://sg-public-api.hoyolab.com/event/e2023mimotravel/qiuqiu";
 
 // Task status enum matching HoYoLab API
@@ -19,9 +20,9 @@ const TaskStatus = {
 	CLAIMED: 3 // Already claimed
 };
 
-// Task types that can be auto-completed via API
-const FinishableTaskTypes = [1, 2, 4, 10, 101, 102];
-const TimedTaskTypes = [101, 102];
+// Existing WebView finish whitelist; timed native tasks must not use this path.
+const FinishableTaskTypes = [1, 2]; // FINISHABLE, VISIT
+const NativeTimedTaskTypes = [101, 102];
 
 // Shop item status
 const ShopItemStatus = {
@@ -55,15 +56,15 @@ module.exports = class HilichurlWorkshop {
 			url,
 			responseType: "json",
 			throwHttpErrors: false,
+			searchParams: { lang: getLanguage(), ...params },
 			headers: {
-				Cookie: cookie
+				Cookie: cookie,
+				"x-rpc-client_type": 2,
+				"x-rpc-language": getLanguage()
 			}
 		};
 
-		if (method === "GET") {
-			requestOptions.searchParams = params;
-		}
-		else {
+		if (method !== "GET") {
 			requestOptions.method = "POST";
 			requestOptions.json = data || params;
 		}
@@ -74,7 +75,8 @@ module.exports = class HilichurlWorkshop {
 		const maxDelay = 30000; // 30s max delay
 
 		for (let attempt = 1; attempt <= maxRetries; attempt++) {
-			const res = await app.Got("HoYoLab", requestOptions);
+			// Event WebView identity, without Game Record RPC fields or DS.
+			const res = await app.Got("HoYoLabAppWebView", requestOptions);
 
 			// Check for rate limit errors:
 			// - retcode -500004 = VisitsTooFrequently (JSON response)
@@ -211,7 +213,6 @@ module.exports = class HilichurlWorkshop {
 			data: {
 				task_id: taskId,
 				game_id: 2,
-				lang: app.Config.get("language") || "en-us",
 				version_id: versionId
 			},
 			cookie: cookieData
@@ -322,12 +323,12 @@ module.exports = class HilichurlWorkshop {
 		const tasks = await this.getTasks(accountData, versionId);
 		if (tasks.success) {
 			for (const task of tasks.data) {
+				if (task.status === TaskStatus.ONGOING && NativeTimedTaskTypes.includes(task.taskType)) {
+					app.Logger.info(`${this.#instance.fullName}:Hilichurl`, `(${accountData.uid}) Automatic completion is unsupported for task type ${task.taskType}: ${task.name}. Complete the timed content in HoYoLAB; available rewards can still be claimed.`);
+				}
+
 				// Try to auto-complete finishable tasks
 				if (task.status === TaskStatus.ONGOING && FinishableTaskTypes.includes(task.taskType)) {
-					if (TimedTaskTypes.includes(task.taskType) && task.readSeconds > 0) {
-						await sleep((task.readSeconds + 1) * 1000);
-					}
-
 					const finishResult = await this.finishTask(accountData, task.id, versionId);
 					if (finishResult.success) {
 						results.tasksFinished.push(task.name);
