@@ -139,6 +139,12 @@ for adding or updating a language through one catalog file.
 Genshin daily check-in uses the desktop web event API and reports a new claim as
 successful only after a follow-up status request confirms today’s check-in.
 
+HSR, ZZZ, Honkai Impact 3rd, and Tears of Themis check-in use game-specific
+WebView requests without DS. The configured locale is sent in GET queries and
+in sign JSON for HSR/ZZZ/Themis, or the sign query for Honkai Impact 3rd.
+These request shapes were observed with no linked character; successful claims,
+already-signed responses, and post-sign state still require real-account validation.
+
 Genshin account discovery and Realtime Notes use the current Game Record APIs.
 If Notes reports error `10102`, enable Realtime Notes in HoYoLAB's Genshin Impact
 Battle Chronicle settings. The application does not change your privacy settings.

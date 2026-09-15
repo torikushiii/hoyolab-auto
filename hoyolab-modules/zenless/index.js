@@ -1,12 +1,13 @@
 const { t } = require("../../localization/index.js");
 
+const checkInDescriptor = require("./check-in-descriptor.js");
 const CheckIn = require("./check-in.js");
 const Notes = require("./notes.js");
 const RedeemCode = require("./redeem-code.js");
 const TravelingMimo = require("./mimo.js");
 
 const DEFAULT_CONSTANTS = {
-	ACT_ID: "e202406031448091",
+	ACT_ID: checkInDescriptor.actId,
 	successMessage: "Congratulations Proxy! You have successfully checked in today!~",
 	signedMessage: "You have already checked in today, Proxy!~",
 	regenRate: 360,
@@ -16,9 +17,7 @@ const DEFAULT_CONSTANTS = {
 		game: "Zenless Zone Zero"
 	},
 	url: {
-		info: "https://sg-public-api.hoyolab.com/event/luna/zzz/os/info",
-		home: "https://sg-public-api.hoyolab.com/event/luna/zzz/os/home",
-		sign: "https://sg-public-api.hoyolab.com/event/luna/zzz/os/sign",
+		...checkInDescriptor.urls,
 		notes: "https://sg-act-nap-api.hoyolab.com/event/game_record_zzz/api/zzz/note",
 		redemption: "https://public-operation-nap.hoyoverse.com/common/apicdkey/api/webExchangeCdkey"
 	}

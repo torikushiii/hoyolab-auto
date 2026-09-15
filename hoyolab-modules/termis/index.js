@@ -1,9 +1,9 @@
 const { t } = require("../../localization/index.js");
-
+const checkInDescriptor = require("./check-in-descriptor.js");
 const CheckIn = require("./check-in.js");
 
 const DEFAULT_CONSTANTS = {
-	ACT_ID: "e202202281857121",
+	ACT_ID: checkInDescriptor.actId,
 	successMessage: t("Successfully signed in"),
 	signedMessage: t("Already signed in today"),
 	assets: {
@@ -11,9 +11,7 @@ const DEFAULT_CONSTANTS = {
 		game: "Tears of Themis"
 	},
 	url: {
-		info: "https://sg-public-api.hoyolab.com/event/luna/os/info",
-		home: "https://sg-public-api.hoyolab.com/event/luna/os/home",
-		sign: "https://sg-public-api.hoyolab.com/event/luna/os/sign"
+		...checkInDescriptor.urls
 	}
 };
 

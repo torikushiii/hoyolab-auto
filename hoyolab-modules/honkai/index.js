@@ -1,9 +1,10 @@
 const { t } = require("../../localization/index.js");
 
+const checkInDescriptor = require("./check-in-descriptor.js");
 const CheckIn = require("./check-in.js");
 
 const DEFAULT_CONSTANTS = {
-	ACT_ID: "e202110291205111",
+	ACT_ID: checkInDescriptor.actId,
 	successMessage: "You have successfully checked in today, Captain~",
 	signedMessage: "You've already checked in today, Captain~",
 	assets: {
@@ -11,9 +12,7 @@ const DEFAULT_CONSTANTS = {
 		game: "Honkai Impact 3rd"
 	},
 	url: {
-		info: "https://sg-public-api.hoyolab.com/event/mani/info",
-		home: "https://sg-public-api.hoyolab.com/event/mani/home",
-		sign: "https://sg-public-api.hoyolab.com/event/mani/sign"
+		...checkInDescriptor.urls
 	}
 };
 

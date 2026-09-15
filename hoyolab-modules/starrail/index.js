@@ -1,5 +1,6 @@
 const { t } = require("../../localization/index.js");
 
+const checkInDescriptor = require("./check-in-descriptor.js");
 const CheckIn = require("./check-in.js");
 const Diary = require("./diary.js");
 const Notes = require("./notes.js");
@@ -7,7 +8,7 @@ const RedeemCode = require("./redeem-code.js");
 const TravelingMimo = require("./mimo.js");
 
 const DEFAULT_CONSTANTS = {
-	ACT_ID: "e202303301540311",
+	ACT_ID: checkInDescriptor.actId,
 	successMessage: "You have successfully checked in today, Trailblazer~",
 	signedMessage: "You've already checked in today, Trailblazer~",
 	regenRate: 360,
@@ -17,9 +18,7 @@ const DEFAULT_CONSTANTS = {
 		game: "Honkai: Star Rail"
 	},
 	url: {
-		info: "https://sg-public-api.hoyolab.com/event/luna/os/info",
-		home: "https://sg-public-api.hoyolab.com/event/luna/os/home",
-		sign: "https://sg-public-api.hoyolab.com/event/luna/os/sign",
+		...checkInDescriptor.urls,
 		notes: "https://bbs-api-os.hoyolab.com/game_record/hkrpg/api/note",
 		diary: "https://sg-public-api.hoyolab.com/event/srledger/month_detail",
 		redemption: "https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkeyRisk"
