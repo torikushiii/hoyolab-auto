@@ -26,11 +26,6 @@ module.exports = {
 					continue;
 				}
 
-				const { fired, persistent } = account.stamina;
-				if (fired && !persistent) {
-					continue;
-				}
-
 				const { data } = notes;
 				const stamina = data.stamina;
 
@@ -38,6 +33,11 @@ module.exports = {
 				if (current < account.stamina.threshold) {
 					account.stamina.fired = false;
 					platform.update(account);
+					continue;
+				}
+
+				const { fired, persistent } = account.stamina;
+				if (fired && !persistent) {
 					continue;
 				}
 

@@ -40,12 +40,14 @@
         // You can use this site to generate cron expression: https://crontab.guru/
         checkIn: '0 0 0 * * *',
         codeRedeem: '*/15 * * * *',
+        dailiesReminderHour: 21, // Game server time (0-23)
+        dailiesReminderMinute: 0, // 0-59
         expedition: '0 */30 * * * *',
         mimo: '0 0 */6 * * *',
         mimoJitter: 0, // Random delay in seconds before running Mimo (0-N). Helps avoid rate limits at reset time.
         hilichurl: '0 0 11 * * *', // 11:00 AM local time (adjust for your timezone if event resets at a different time)
         hilichurlJitter: 0, // Random delay in seconds before running Hilichurl Workshop (0-N).
-        missedCheckIn: '0 0 23 * * *',
+        missedCheckIn: '0 0 23 * * *', // UTC+8, one hour before HoYoLAB daily reset
         realmCurrency: '0 */1 * * *',
         shopStatus: '0 */1 * * *',
         stamina: '0 */30 * * * *'
@@ -149,6 +151,7 @@
                     mimo: {
                         check: false,
                         redeem: true,
+                        mentionOnSuccess: true, // Ping Discord after a successful Mimo exchange or code redemption
                         lottery: false,
                         reservePoints: 0,
                         redeemDraw: true,
@@ -185,6 +188,7 @@
                     mimo: {
                         check: false,
                         redeem: true,
+                        mentionOnSuccess: true, // Ping Discord after a successful Mimo exchange or code redemption
                         lottery: false,
                         reservePoints: 0,
                         redeemDraw: true,
@@ -210,9 +214,11 @@
                     redeemCode: false,
                     shopStatus: false, // This will check if your shop has finished selling videos
                     dailiesCheck: false,
+                    dailyLotteryCheck: true, // Set to false to disable the ZZZ daily lottery reminder
                     mimo: {
                         check: false,
                         redeem: true,
+                        mentionOnSuccess: true, // Ping Discord after a successful Mimo exchange or code redemption
                         lottery: false,
                         reservePoints: 0,
                         redeemDraw: true,
