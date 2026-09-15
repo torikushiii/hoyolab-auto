@@ -136,6 +136,9 @@ is imported, and preserves the locale when exporting. Startup errors before a
 configuration can be read remain in English. See [translation maintenance](localization/README.md)
 for adding or updating a language through one catalog file.
 
+Genshin daily check-in uses the desktop web event API and reports a new claim as
+successful only after a follow-up status request confirms today’s check-in.
+
 ### Cache File Location
 
 After running the application for the first time, a cache file will be automatically created at:

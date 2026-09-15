@@ -1,6 +1,7 @@
 const { t } = require("../../localization/index.js");
 
 const CheckIn = require("./check-in.js");
+const checkInDescriptor = require("./check-in-descriptor.js");
 const Diary = require("./diary.js");
 const Notes = require("./notes.js");
 const RedeemCode = require("./redeem-code.js");
@@ -8,7 +9,7 @@ const TravelingMimo = require("./mimo.js");
 const HilichurlWorkshop = require("./hilichurl.js");
 
 const DEFAULT_CONSTANTS = {
-	ACT_ID: "e202102251931481",
+	ACT_ID: checkInDescriptor.actId,
 	successMessage: "Congratulations, Traveler! You have successfully checked in today~",
 	signedMessage: "Traveler, you've already checked in today~",
 	regenRate: 480,
@@ -18,9 +19,7 @@ const DEFAULT_CONSTANTS = {
 		game: "Genshin Impact"
 	},
 	url: {
-		info: "https://sg-hk4e-api.hoyolab.com/event/sol/info",
-		home: "https://sg-hk4e-api.hoyolab.com/event/sol/home",
-		sign: "https://sg-hk4e-api.hoyolab.com/event/sol/sign",
+		...checkInDescriptor.urls,
 		notes: "https://bbs-api-os.mihoyo.com/game_record/genshin/api/dailyNote",
 		diary: "https://sg-hk4e-api.hoyolab.com/event/ysledgeros/month_detail",
 		redemption: "https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey"

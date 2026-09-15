@@ -1,4 +1,6 @@
 const { t } = require("../../localization/index.js");
+const descriptor = require("./check-in-descriptor.js");
+const { getLanguage } = require("../../gots/hoyolab-contexts/language.js");
 
 module.exports = class CheckIn {
 	/** @type {import("../template")} */
@@ -40,7 +42,7 @@ module.exports = class CheckIn {
 				isSigned: info.data.issign
 			};
 
-			const totalSigned = data.total;
+			const totalSigned = data.isSigned ? data.total - 1 : data.total;
 			const awardObject = {
 				name: awards[totalSigned].name,
 				count: awards[totalSigned].cnt,
@@ -74,6 +76,12 @@ module.exports = class CheckIn {
 				continue;
 			}
 
+			const confirmation = await this.#getSignInfo(account.cookie);
+			if (!confirmation.success || confirmation.data.issign !== true || confirmation.data.today !== data.today) {
+				app.Logger.warn(`${this.#instance.fullName}:CheckIn`, "Check-in could not be confirmed for today");
+				continue;
+			}
+
 			app.Logger.info(`${this.#instance.fullName}:CheckIn`, t `(${account.uid}) ${account.nickname} Today's Reward: ${awardObject.name} x${awardObject.count}`);
 
 			results.push({
@@ -82,7 +90,7 @@ module.exports = class CheckIn {
 				rank: account.level,
 				username: account.nickname,
 				region: app.HoyoLab.getRegion(account.region),
-				total: data.total + 1,
+				total: confirmation.data.total,
 				result: t(this.#instance.config.successMessage),
 				assets: {
 					...this.#instance.config.assets,
@@ -114,17 +122,14 @@ module.exports = class CheckIn {
 	}
 
 	async #sign (cookieData) {
-		const res = await app.Got("HoYoLab", {
+		const options = descriptor.signOptions(this.#instance.config.ACT_ID);
+		const res = await app.Got(descriptor.profile, {
+			...options,
 			url: this.#instance.config.url.sign,
-			method: "POST",
 			responseType: "json",
-			searchParams: {
-				lang: app.Config.get("language") || "en-us",
-				act_id: this.#instance.config.ACT_ID
-			},
 			headers: {
-				Cookie: cookieData,
-				"x-rpc-signgame": "hk4e"
+				...options.headers,
+				Cookie: cookieData
 			}
 		});
 
@@ -163,16 +168,15 @@ module.exports = class CheckIn {
 	}
 
 	async #getSignInfo (cookieData) {
-		const res = await app.Got("HoYoLab", {
+		const res = await app.Got(descriptor.profile, {
 			url: this.#instance.config.url.info,
 			responseType: "json",
 			searchParams: {
-				lang: app.Config.get("language") || "en-us",
+				lang: getLanguage(),
 				act_id: this.#instance.config.ACT_ID
 			},
 			headers: {
-				Cookie: cookieData,
-				"x-rpc-signgame": "hk4e"
+				Cookie: cookieData
 			}
 		});
 
@@ -206,6 +210,11 @@ module.exports = class CheckIn {
 		}
 
 		const data = res.body.data;
+		if (!data || typeof data.is_sign !== "boolean" || !Number.isInteger(data.total_sign_day)
+			|| data.total_sign_day < (data.is_sign ? 1 : 0) || typeof data.today !== "string" || !data.today) {
+			app.Logger.warn(this.#instance.fullName, "Invalid sign info received");
+			return { success: false };
+		}
 		return {
 			success: true,
 			data: {
@@ -217,16 +226,15 @@ module.exports = class CheckIn {
 	}
 
 	async #getAwardsData (cookieData) {
-		const res = await app.Got("HoYoLab", {
+		const res = await app.Got(descriptor.profile, {
 			url: this.#instance.config.url.home,
 			responseType: "json",
 			searchParams: {
-				lang: app.Config.get("language") || "en-us",
+				lang: getLanguage(),
 				act_id: this.#instance.config.ACT_ID
 			},
 			headers: {
-				Cookie: cookieData,
-				"x-rpc-signgame": "hk4e"
+				Cookie: cookieData
 			}
 		});
 
