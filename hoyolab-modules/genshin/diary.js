@@ -1,6 +1,6 @@
 const { t } = require("../../localization/index.js");
-
-const { setTimeout, setTimeout: sleep } = require("node:timers/promises");
+const timers = require("node:timers/promises");
+const { getLanguage } = require("../../gots/hoyolab-contexts/language.js");
 
 module.exports = class Diary {
 	/** @type {import("../template")} */
@@ -33,93 +33,26 @@ module.exports = class Diary {
 		const currentMonth = new Date().getMonth() + 1;
 		const lastMonth = (currentMonth === 1) ? 12 : currentMonth - 1;
 
-		const [primoPromises, moraPromises] = await Promise.allSettled([
-			this.fetchResultsForType(accountData, 1, { currentMonth, lastMonth }),
-			this.fetchResultsForType(accountData, 2, { currentMonth, lastMonth })
-		]);
-
-		if (primoPromises.status === "rejected" || moraPromises.status === "rejected") {
+		let diaryData;
+		try {
+			const current = await this.fetchMonth(accountData, currentMonth);
+			await timers.setTimeout(10_000);
+			const previous = await this.fetchMonth(accountData, lastMonth);
+			diaryData = {
+				currentMonth: current,
+				lastMonth: previous,
+				primoIncomeDecreasePercentage: previous.primo.totalNum === 0
+					? null
+					: (((previous.primo.totalNum - current.primo.totalNum) / previous.primo.totalNum) * 100).toFixed(0)
+			};
+		}
+		catch {
 			app.Logger.log(`${this.#instance.fullName}:Diary`, {
 				message: t("Failed to fetch diary data"),
-				args: {
-					platform: this.#instance.name,
-					uid: accountData.uid,
-					region: accountData.region,
-					primoData: primoPromises.reason,
-					moraData: moraPromises.reason
-				}
+				args: { platform: this.#instance.name, uid: accountData.uid, region: accountData.region }
 			});
-
 			return { success: false };
 		}
-
-		const primoData = primoPromises.value;
-		const moraData = moraPromises.value;
-
-		const calculateTotalsAndPercentages = (data) => {
-			const totalNum = data.reduce((acc, curr) => acc + curr.num, 0);
-
-			const actionCounts = data.reduce((acc, curr) => {
-				let category;
-
-				const action = curr.action.toLowerCase();
-				switch (true) {
-					case action.includes("daily commission"):
-						category = "Daily Commission";
-						break;
-					case action.includes("event"):
-						category = "Event";
-						break;
-					case action.includes("spiral abyss"):
-						category = "Spiral Abyss";
-						break;
-					case action.includes("mail"):
-						category = "Mail";
-						break;
-					default:
-						category = "Other";
-						break;
-				}
-
-				if (!acc[category]) {
-					acc[category] = { total: 0, count: 0 };
-				}
-				acc[category].total += curr.num;
-				acc[category].count += 1;
-				return acc;
-			}, {});
-
-			const actionPercentages = Object.keys(actionCounts).map(category => ({
-				category,
-				total: actionCounts[category].total,
-				percentage: ((actionCounts[category].total / totalNum) * 100).toFixed(0)
-			}));
-
-			actionPercentages.sort((a, b) => b.total - a.total);
-			return { totalNum, actionPercentages };
-		};
-
-		const calculateTotalNum = (data) => data.reduce((acc, curr) => acc + curr.num, 0);
-
-		const currentMonthPrimo = calculateTotalsAndPercentages(primoData.currentMonthResults);
-		const currentMonthMora = calculateTotalNum(moraData.currentMonthResults);
-
-		const lastMonthPrimo = calculateTotalsAndPercentages(primoData.lastMonthResults);
-		const lastMonthPass = calculateTotalNum(moraData.lastMonthResults);
-
-		const primoIncomeDecreasePercentage = (((lastMonthPrimo.totalNum - currentMonthPrimo.totalNum) / lastMonthPrimo.totalNum) * 100).toFixed(0);
-
-		const diaryData = {
-			currentMonth: {
-				primo: currentMonthPrimo,
-				mora: currentMonthMora
-			},
-			lastMonth: {
-				primo: lastMonthPrimo,
-				mora: lastMonthPass
-			},
-			primoIncomeDecreasePercentage
-		};
 
 		await app.Cache.set({
 			key: `${this.#instance.name}:${accountData.uid}:diary`,
@@ -140,89 +73,53 @@ module.exports = class Diary {
 		};
 	}
 
-	async fetchResultsForType (accountData, type, options = {}) {
-		const maxRetries = 3;
-		const retryDelay = 5000;
+	async fetchMonth (accountData, month, retryCount = 0) {
+		const response = await app.Got("HoYoLabAppWebView", {
+			url: this.#instance.config.url.diary,
+			responseType: "json",
+			searchParams: {
+				uid: accountData.uid,
+				region: accountData.region,
+				month,
+				lang: getLanguage()
+			},
+			headers: { Cookie: accountData.cookie }
+		});
 
-		const fetchPage = async (type, month, currentPage, retryCount = 0) => {
-			const response = await app.Got("HoyoClient", {
-				url: this.#instance.config.url.diary,
-				responseType: "json",
-				searchParams: {
-					uid: accountData.uid,
-					region: accountData.region,
-					month,
-					current_page: currentPage,
-					type,
-					lang: app.Config.get("language") || "en-us"
-				},
-				headers: {
-					Cookie: accountData.cookie,
-					DS: app.Utils.generateDS()
-				}
-			});
+		if (!response.ok) {
+			throw new Error("Diary HTTP request failed");
+		}
+		if (response.body?.retcode === -500001 && retryCount < 3) {
+			app.Logger.debug(`${this.#instance.fullName}:Diary`, `Rate limited, retrying in 5s... (attempt ${retryCount + 1}/3)`);
+			await timers.setTimeout(5000);
+			return this.fetchMonth(accountData, month, retryCount + 1);
+		}
+		if (response.body?.retcode !== 0) {
+			throw new Error("Diary API request failed");
+		}
 
-			if (!response.ok) {
-				app.Logger.log(`${this.#instance.fullName}:Diary`, {
-					message: t("Hoyolab API returned non-200 status code"),
-					args: {
-						platform: this.#instance.name,
-						uid: accountData.uid,
-						response: response.body
-					}
-				});
-			}
-
-			if (response.body.retcode !== 0) {
-				if (response.body.retcode === -500001 && retryCount < maxRetries) {
-					app.Logger.debug(`${this.#instance.fullName}:Diary`, t `Rate limited, retrying in ${retryDelay / 1000}s... (attempt ${retryCount + 1}/${maxRetries})`);
-					await sleep(retryDelay);
-					return fetchPage(type, month, currentPage, retryCount + 1);
-				}
-
-				app.Logger.log(`${this.#instance.fullName}:Diary`, {
-					message: t("Hoyolab API returned non-zero retcode"),
-					args: {
-						cause: app.HoyoLab.errorMessage(this.#instance.name, response.body.retcode),
-						platform: this.#instance.name,
-						uid: accountData.uid,
-						response: response.body
-					}
-				});
-			}
-
-			return response.body.data;
-		};
-
-		const fetchAllPages = async (type, month) => {
-			let currentPage = 1;
-			let hasMorePages = true;
-			let allData = [];
-
-			while (hasMorePages) {
-				const data = await fetchPage(type, month, currentPage);
-
-				if (data && data.list && data.list.length > 0) {
-					allData = allData.concat(data.list);
-					currentPage++;
-				}
-				else {
-					hasMorePages = false;
-				}
-			}
-
-			return allData;
-		};
-
-		const { currentMonth, lastMonth } = options;
-
-		const currentMonthData = await fetchAllPages(type, currentMonth);
-		await setTimeout(10_000);
-		const lastMonthData = await fetchAllPages(type, lastMonth);
+		const data = response.body.data;
+		const validAmount = value => Number.isFinite(value) && value >= 0;
+		if (!data || !validAmount(data.current_primogems) || !validAmount(data.current_mora)
+			|| !Array.isArray(data.group_by)
+			|| (data.current_primogems > 0 && data.group_by.length === 0)
+			|| data.group_by.some(item => !item || !Number.isInteger(item.action_id)
+				|| typeof item.action !== "string" || !item.action.trim()
+				|| !validAmount(item.num) || !validAmount(item.percent))) {
+			// Do not turn an unavailable historical breakdown into an empty successful report.
+			throw new Error("Invalid Diary monthly summary");
+		}
 
 		return {
-			currentMonthResults: currentMonthData,
-			lastMonthResults: lastMonthData
+			primo: {
+				totalNum: data.current_primogems,
+				actionPercentages: data.group_by.map(item => ({
+					category: item.action,
+					total: item.num,
+					percentage: String(item.percent)
+				})).sort((a, b) => b.total - a.total)
+			},
+			mora: data.current_mora
 		};
 	}
 };

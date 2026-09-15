@@ -20,7 +20,9 @@ const createEmbed = (type, diary, options = {}) => {
 				thumbnail: {
 					url: data.assets.logo
 				},
-				description: t `Primo income is decreased by ${data.primoIncomeDecreasePercentage}% compared to last month.`,
+				description: data.primoIncomeDecreasePercentage === null
+					? t("Primo income comparison is unavailable because last month had no income.")
+					: t `Primo income is decreased by ${data.primoIncomeDecreasePercentage}% compared to last month.`,
 				fields: [
 					{
 						name: t("**Obtained This Month**"),
@@ -39,7 +41,7 @@ const createEmbed = (type, diary, options = {}) => {
 					},
 					{
 						name: t("**Current Month\nBreakdown**"),
-						value: currentMonth.primo.actionPercentages.map(item => `${t(item.category)}: ${item.total} (${item.percentage}%)`).join("\n"),
+						value: currentMonth.primo.actionPercentages.map(item => `${t(item.category)}: ${item.total} (${item.percentage}%)`).join("\n") || t("No income recorded."),
 						inline: true
 					},
 					{
@@ -49,7 +51,7 @@ const createEmbed = (type, diary, options = {}) => {
 					},
 					{
 						name: t("**Last Month\nBreakdown**"),
-						value: lastMonth.primo.actionPercentages.map(item => `${t(item.category)}: ${item.total} (${item.percentage}%)`).join("\n"),
+						value: lastMonth.primo.actionPercentages.map(item => `${t(item.category)}: ${item.total} (${item.percentage}%)`).join("\n") || t("No income recorded."),
 						inline: true
 					}
 				],

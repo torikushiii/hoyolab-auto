@@ -21,7 +21,7 @@ const DEFAULT_CONSTANTS = {
 	url: {
 		...checkInDescriptor.urls,
 		notes: "https://sg-act-public-api.hoyolab.com/event/game_record/app/genshin/api/dailyNote",
-		diary: "https://sg-hk4e-api.hoyolab.com/event/ysledgeros/month_detail",
+		diary: "https://sg-act-public-api.hoyolab.com/event/ysledgeros/month_info",
 		redemption: "https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey"
 	}
 };

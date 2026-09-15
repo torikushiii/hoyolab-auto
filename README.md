@@ -59,7 +59,7 @@ to an IANA timezone such as `America/New_York` to use local time with daylight-s
   - **Expedition check**: Check your expeditions and sends a notification if they're done.
   - **Realm currency**: Sends a notification if your realm currency is capped.
   - **Code Redeems**: Search for codes and redeem them automatically.
-  - **Traveler's Diary**: Check your monthly currency income.
+  - **Traveler's Diary**: Check current and previous monthly currency totals and official category breakdowns in your configured language. Results are cached for two hours. A percentage comparison is unavailable when the previous month has no Primogem income.
 - **Honkai: Star Rail**:
   - **Daily check-in**: Runs every midnight local time.
   - **Dailies**: Reminds you to do your dailies at the configured time (21:00 game server time by default).
