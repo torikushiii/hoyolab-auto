@@ -1,5 +1,5 @@
 const { t } = require("../../localization/index.js");
-const redemptionRequest = require("../../hoyolab-modules/redemption-request.js");
+const { requestRedemption } = require("../../hoyolab-modules/genshin/redemption-request.js");
 
 let version;
 
@@ -51,22 +51,7 @@ const fetchData = async () => {
 };
 
 const redeemCodes = async (accountData, code) => {
-	const Cookie = app.HoyoLab.parseCookie(accountData.cookie, {
-		whitelist: ["cookie_token_v2", "account_mid_v2", "account_id_v2", "cookie_token", "account_id"]
-	});
-
-	const res = await redemptionRequest({
-		url: "https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey",
-		searchParams: {
-			uid: accountData.uid,
-			region: accountData.region,
-			lang: "en",
-			cdkey: code.code,
-			game_biz: "hk4e_global",
-			sLangKey: app.Config.get("language") || "en-us"
-		},
-		headers: { Cookie }
-	});
+	const res = await requestRedemption(accountData, code.code);
 
 	if (res.statusCode !== 200) {
 		throw new app.Error({

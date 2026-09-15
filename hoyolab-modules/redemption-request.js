@@ -42,7 +42,7 @@ const updatePending = async (key, code, add) => {
 };
 
 // Public codes, event rewards and manual redemptions share the same account cooldown.
-const redemptionRequest = async (options, { persist = false } = {}) => {
+const redemptionRequest = async (options, { persist = false, profile = "HoYoLab" } = {}) => {
 	const params = options.searchParams;
 	const key = accountKey(params.game_biz, params);
 	const code = String(params.cdkey).toUpperCase();
@@ -60,7 +60,7 @@ const redemptionRequest = async (options, { persist = false } = {}) => {
 				await sleep(delay);
 			}
 			try {
-				res = await app.Got("HoYoLab", {
+				res = await app.Got(profile, {
 					...options,
 					searchParams: { ...params, ...(params.t !== undefined && { t: Date.now() }) }
 				});

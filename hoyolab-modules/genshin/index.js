@@ -4,6 +4,7 @@ const CheckIn = require("./check-in.js");
 const checkInDescriptor = require("./check-in-descriptor.js");
 const Diary = require("./diary.js");
 const Notes = require("./notes.js");
+const { REDEMPTION_URL } = require("./redemption-request.js");
 const RedeemCode = require("./redeem-code.js");
 const TravelingMimo = require("./mimo.js");
 const HilichurlWorkshop = require("./hilichurl.js");
@@ -22,7 +23,7 @@ const DEFAULT_CONSTANTS = {
 		...checkInDescriptor.urls,
 		notes: "https://sg-act-public-api.hoyolab.com/event/game_record/app/genshin/api/dailyNote",
 		diary: "https://sg-act-public-api.hoyolab.com/event/ysledgeros/month_info",
-		redemption: "https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey"
+		redemption: REDEMPTION_URL
 	}
 };
 

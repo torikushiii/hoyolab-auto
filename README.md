@@ -331,7 +331,9 @@ If you prefer not to use the Makefile, you can use the following Docker Compose 
 
 ## Contributing
 
-Run `npm test` for offline HTTP request-contract tests and `npm run lint` for lint checks. The tests use synthetic responses and do not require account cookies or network access. See [HTTP request contexts](gots/hoyolab-contexts/README.md) when adding a request profile.
+Genshin code redemption uses the browser gift endpoint for both commands and automatic redemption, without DS or native-app headers. The configured language is sent as a short language code; `sLangKey` remains `en-us`, matching the observed gift-page requests. Existing account eligibility and code-cache behavior are preserved.
+
+Run `npm test` for offline HTTP request-contract tests and Genshin redemption result/cache regression tests, and `npm run lint` for lint checks. The tests use synthetic responses and do not require account cookies or network access. See [HTTP request contexts](gots/hoyolab-contexts/README.md) when adding a request profile.
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change. If there are any bugs, please open an issue.
 

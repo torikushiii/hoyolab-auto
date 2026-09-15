@@ -1,5 +1,5 @@
 const { t } = require("../../localization/index.js");
-const redemptionRequest = require("../redemption-request.js");
+const { requestRedemption } = require("./redemption-request.js");
 
 module.exports = class RedeemCode {
 	/** @type {import("../template")} */
@@ -10,32 +10,7 @@ module.exports = class RedeemCode {
 	}
 
 	async redeemCode (accountData, code) {
-		const cookieData = app.HoyoLab.parseCookie(accountData.cookie, {
-			whitelist: [
-				"cookie_token_v2",
-				"account_mid_v2",
-				"account_id_v2",
-				"cookie_token",
-				"account_id"
-			]
-		});
-
-		const res = await redemptionRequest({
-			url: this.#instance.config.url.redemption,
-			responseType: "json",
-			throwHttpErrors: false,
-			searchParams: {
-				uid: accountData.uid,
-				region: accountData.region,
-				lang: "en",
-				cdkey: code,
-				game_biz: "hk4e_global",
-				sLangKey: app.Config.get("language") || "en-us"
-			},
-			headers: {
-				Cookie: cookieData
-			}
-		}, { persist: true });
+		const res = await requestRedemption(accountData, code, this.#instance.config.url.redemption, { persist: true });
 
 		if (res.statusCode !== 200) {
 			app.Logger.log(`${this.#instance.fullName}:RedeemCode`, {
