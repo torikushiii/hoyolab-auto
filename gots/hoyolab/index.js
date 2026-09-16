@@ -1,3 +1,5 @@
+// Legacy desktop/RPC defaults retained for unmigrated callers, including auth.
+// New requests should select an endpoint-specific context in hoyolab-contexts.
 const definition = {
 	name: "HoYoLab",
 	optionsType: "object",

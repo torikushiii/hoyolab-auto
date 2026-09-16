@@ -1,8 +1,14 @@
 # HoYoLAB request contexts
 
 These opt-in Got profiles inherit transport, retry, timeout and error logging from
-`Global`. Existing callers continue to use the unchanged `HoYoLab` and `HoyoClient`
-profiles until each flow is migrated.
+`Global`. Unmigrated flows retain their legacy request defaults:
+
+- `HoYoLab`: HSR/ZZZ/HI3 discovery, HSR/ZZZ Notes and redemption (module and cron),
+  Traveling Mimo, and shared cookie refresh.
+- `HoyoClient`: HSR Diary. This is an embedded WebView identity, not native Android.
+
+Their headers and existing DS generators remain in use; changing them requires
+separate endpoint evidence and request-contract tests.
 
 | Profile | Identity / locale headers |
 | --- | --- |
@@ -10,7 +16,7 @@ profiles until each flow is migrated.
 | `HoYoLabAppWebView` | Android WebView; no RPC defaults |
 | `HoYoLabGameRecordDesktopWeb` | Desktop Game Record; full locale in both RPC language headers |
 | `HoYoLabGameRecordAppWebView` | App Game Record; full locale in both RPC language headers |
-| `HoYoLabNative` | Android OkHttp; full locale in `x-rpc-language` |
+| `HoYoLabNative` | Android OkHttp foundation; no production caller or verified signing implementation |
 
 Select the profile by the endpoint's client context, not its hostname. Supply
 routes, query/body, cookies and endpoint-specific headers on each request. DS is
@@ -20,7 +26,7 @@ the correct signing algorithm must be established for each migrated endpoint.
 
 `language.js` reads the existing `language` preference with fallback `en-us`.
 `getLanguage()` preserves the full locale; `getLanguageOnly()` extracts its primary
-language for APIs such as native redemption (`it-it` → `it`). It does not validate
+language for Genshin browser redemption (`it-it` → `it`). It does not validate
 backend support for other locales. Neither helper changes configuration or adds
 query/body fields automatically. Locale headers are resolved when profiles load,
 matching the application's initialization model.
@@ -28,3 +34,11 @@ matching the application's initialization model.
 The new Android profiles share one app-version constant. Their generic user agent
 and omitted device/fingerprint metadata still require endpoint compatibility
 validation; these foundations alone do not establish a working live request.
+
+Offline tests verify constructed requests and synthetic responses. Successful
+official-client captures support the migrated Genshin contracts, but do not prove
+that the headless client's reduced cookie/header set works live. Non-empty
+historical Genshin Diary summaries and point-cost Hilichurl exchanges have only
+synthetic regression coverage. Other-game check-in captures reached the missing
+character error; success, already-signed behavior and post-sign state remain
+unverified on real accounts. Native redemption signing remains deferred.
