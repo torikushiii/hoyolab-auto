@@ -77,7 +77,9 @@ const createEmbed = (type, diary, options = {}) => {
 				thumbnail: {
 					url: data.assets.logo
 				},
-				description: t `Jades income is decreased by ${data.jadeIncomeDecreasePercentage}% compared to last month.`,
+				description: data.jadeIncomeDecreasePercentage === null
+					? t("Jades income comparison is unavailable because last month had no income.")
+					: t `Jades income is decreased by ${data.jadeIncomeDecreasePercentage}% compared to last month.`,
 				fields: [
 					{
 						name: t("**Obtained This Month**"),
@@ -96,7 +98,7 @@ const createEmbed = (type, diary, options = {}) => {
 					},
 					{
 						name: t("**Current Month\nBreakdown**"),
-						value: currentMonth.jades.actionPercentages.map(item => `${t(item.category)}: ${item.total} (${item.percentage}%)`).join("\n"),
+						value: currentMonth.jades.actionPercentages.map(item => `${t(item.category)}: ${item.total} (${item.percentage}%)`).join("\n") || t("No income recorded."),
 						inline: true
 					},
 					{
@@ -106,7 +108,7 @@ const createEmbed = (type, diary, options = {}) => {
 					},
 					{
 						name: t("**Last Month\nBreakdown**"),
-						value: lastMonth.jades.actionPercentages.map(item => `${t(item.category)}: ${item.total} (${item.percentage}%)`).join("\n"),
+						value: lastMonth.jades.actionPercentages.map(item => `${t(item.category)}: ${item.total} (${item.percentage}%)`).join("\n") || t("No income recorded."),
 						inline: true
 					}
 				],

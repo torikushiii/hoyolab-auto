@@ -20,7 +20,7 @@ const DEFAULT_CONSTANTS = {
 	url: {
 		...checkInDescriptor.urls,
 		notes: "https://bbs-api-os.hoyolab.com/game_record/hkrpg/api/note",
-		diary: "https://sg-public-api.hoyolab.com/event/srledger/month_detail",
+		diary: "https://sg-act-public-api.hoyolab.com/event/srledger/month_info",
 		redemption: "https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkeyRisk"
 	}
 };

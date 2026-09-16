@@ -1,6 +1,6 @@
 const { t } = require("../../localization/index.js");
-
-const { setTimeout: sleep } = require("node:timers/promises");
+const timers = require("node:timers/promises");
+const { getLanguage } = require("../../gots/hoyolab-contexts/language.js");
 
 module.exports = class Diary {
 	/** @type {import("../template")} */
@@ -30,94 +30,32 @@ module.exports = class Diary {
 			};
 		}
 
-		const [jadesPromise, passPromises] = await Promise.allSettled([
-			this.fetchResultsForType(accountData, 1),
-			this.fetchResultsForType(accountData, 2)
-		]);
+		const today = new Date();
+		const year = today.getFullYear();
+		const month = today.getMonth() + 1;
+		const currentMonth = String(year * 100 + month);
+		const lastMonth = String(month === 1 ? (year - 1) * 100 + 12 : year * 100 + month - 1);
 
-		if (jadesPromise.status === "rejected" || passPromises.status === "rejected") {
+		let diaryData;
+		try {
+			const current = await this.fetchMonth(accountData, currentMonth);
+			await timers.setTimeout(1000);
+			const previous = await this.fetchMonth(accountData, lastMonth);
+			diaryData = {
+				currentMonth: current,
+				lastMonth: previous,
+				jadeIncomeDecreasePercentage: previous.jades.totalNum === 0
+					? null
+					: (((previous.jades.totalNum - current.jades.totalNum) / previous.jades.totalNum) * 100).toFixed(0)
+			};
+		}
+		catch {
 			app.Logger.log(`${this.#instance.fullName}:Diary`, {
 				message: t("Failed to fetch diary data"),
-				args: {
-					platform: this.#instance.name,
-					uid: accountData.uid,
-					region: accountData.region,
-					jadesData: jadesPromise.reason,
-					passData: passPromises.reason
-				}
+				args: { platform: this.#instance.name, uid: accountData.uid, region: accountData.region }
 			});
-
 			return { success: false };
 		}
-
-		const jadesData = jadesPromise.value;
-		const passData = passPromises.value;
-
-		const calculateTotalsAndPercentages = (data) => {
-			const totalNum = data.reduce((acc, curr) => acc + curr.num, 0);
-
-			const actionCounts = data.reduce((acc, curr) => {
-				let category;
-				switch (true) {
-					case curr.action.includes("day_active_reward"):
-					case curr.action.includes("day_train_depot"):
-						category = "Daily Activity";
-						break;
-					// case curr.action.startsWith("v2024"):
-					// 	category = "Events";
-					// 	break;
-					case curr.action.includes("universe_point"):
-						category = "Simulated Universe";
-						break;
-					case curr.action.includes("wangquezhiting"):
-						category = "Pure Fiction";
-						break;
-					case curr.action === "mail_reward":
-						category = "Mail";
-						break;
-					default:
-						category = "Others";
-				}
-
-				if (!acc[category]) {
-					acc[category] = { total: 0, count: 0 };
-				}
-				acc[category].total += curr.num;
-				acc[category].count += 1;
-				return acc;
-			}, {});
-
-			const actionPercentages = Object.keys(actionCounts).map(category => ({
-				category,
-				total: actionCounts[category].total,
-				percentage: ((actionCounts[category].total / totalNum) * 100).toFixed(0)
-			}));
-
-			actionPercentages.sort((a, b) => b.total - a.total);
-			return { totalNum, actionPercentages };
-		};
-
-		const calculateTotalNum = (data) => data.reduce((acc, curr) => acc + curr.num, 0);
-
-		const currentMonthJades = calculateTotalsAndPercentages(jadesData.currentMonthResults);
-		const currentMonthPass = calculateTotalNum(passData.currentMonthResults);
-
-		const lastMonthJades = calculateTotalsAndPercentages(jadesData.lastMonthResults);
-		const lastMonthPass = calculateTotalNum(passData.lastMonthResults);
-
-		const jadeIncomeDecreasePercentage = (((lastMonthJades.totalNum - currentMonthJades.totalNum) / lastMonthJades.totalNum) * 100).toFixed(0);
-
-		const diaryData = {
-			currentMonth: {
-				jades: currentMonthJades,
-				pass: currentMonthPass
-			},
-			lastMonth: {
-				jades: lastMonthJades,
-				pass: lastMonthPass
-			},
-			jadeIncomeDecreasePercentage
-		};
 
 		await app.Cache.set({
 			key: `${this.#instance.name}:${accountData.uid}:diary`,
@@ -138,83 +76,58 @@ module.exports = class Diary {
 		};
 	}
 
-	async fetchResultsForType (accountData, type) {
-		const today = new Date();
-		const currentMonth = today.getFullYear() * 100 + (today.getMonth() + 1);
-		const lastMonth = today.getFullYear() * 100 + today.getMonth();
-
-		const getMonthString = (month) => month.toString().padStart(6, "0");
-
-		const fetchMonthData = async (month, retryCount = 0) => {
-			const maxRetries = 3;
-			const retryDelay = 5000;
-
-			const searchParams = {
-				lang: app.Config.get("language") || "en-us",
+	async fetchMonth (accountData, month, retryCount = 0) {
+		const response = await app.Got("HoYoLabAppWebView", {
+			url: this.#instance.config.url.diary,
+			responseType: "json",
+			searchParams: {
 				uid: accountData.uid,
 				region: accountData.region,
-				month: getMonthString(month),
-				type,
-				current_page: 1,
-				page_size: 100,
-				total: 0
-			};
+				month,
+				lang: getLanguage()
+			},
+			headers: { Cookie: accountData.cookie }
+		});
 
-			let allResults = [];
-			let currentPage = 1;
-			let totalResults = 0;
+		if (!response.ok) {
+			throw new Error("Diary HTTP request failed");
+		}
+		if (response.body?.retcode === -500001 && retryCount < 3) {
+			app.Logger.debug(`${this.#instance.fullName}:Diary`, `Rate limited, retrying in 5s... (attempt ${retryCount + 1}/3)`);
+			await timers.setTimeout(5000);
+			return this.fetchMonth(accountData, month, retryCount + 1);
+		}
+		if (response.body?.retcode !== 0) {
+			throw new Error("Diary API request failed");
+		}
 
-			do {
-				searchParams.current_page = currentPage;
+		const summary = response.body.data;
+		// `month` may still identify the current month in a historical response.
+		if (summary?.login_flag !== true || summary.data_month !== month) {
+			throw new Error("Invalid Diary month identity or login state");
+		}
+		const data = summary.month_data;
+		const validAmount = value => Number.isFinite(value) && value >= 0;
+		if (!data || !validAmount(data.current_hcoin) || !validAmount(data.current_rails_pass)
+			|| !Array.isArray(data.group_by)
+			|| (data.current_hcoin > 0 && data.group_by.length === 0)
+			|| data.group_by.some(item => !item || typeof item.action !== "string" || !item.action.trim()
+				|| typeof item.action_name !== "string" || !item.action_name.trim()
+				|| !validAmount(item.num) || !validAmount(item.percent))) {
+			// Do not turn an unavailable historical breakdown into an empty successful report.
+			throw new Error("Invalid Diary monthly summary");
+		}
 
-				const res = await app.Got("HoyoClient", {
-					url: this.#instance.config.url.diary,
-					responseType: "json",
-					searchParams,
-					headers: {
-						Cookie: accountData.cookie,
-						DS: app.Utils.generateDS()
-					}
-				});
-
-				if (res.body.retcode !== 0) {
-					if (res.body.retcode === -500001 && retryCount < maxRetries) {
-						app.Logger.debug(`${this.#instance.fullName}:Diary`, t `Rate limited, retrying in ${retryDelay / 1000}s... (attempt ${retryCount + 1}/${maxRetries})`);
-						await sleep(retryDelay);
-						return fetchMonthData(month, retryCount + 1);
-					}
-
-					app.Logger.log(`${this.#instance.fullName}:Diary`, {
-						message: t("Failed to fetch diary data"),
-						args: {
-							cause: app.HoyoLab.errorMessage(this.#instance.name, res.body.retcode),
-							platform: this.#instance.name,
-							uid: accountData.uid,
-							region: accountData.region,
-							body: res.body
-						}
-					});
-
-					break;
-				}
-
-				const data = res.body.data;
-				allResults = allResults.concat(data.list);
-				totalResults = data.total;
-				currentPage++;
-
-				if (allResults.length < totalResults) {
-					await sleep(500);
-				}
-			} while (allResults.length < totalResults);
-
-			return allResults;
+		return {
+			jades: {
+				totalNum: data.current_hcoin,
+				actionPercentages: data.group_by.filter(item => item.num > 0).map(item => ({
+					category: item.action_name,
+					total: item.num,
+					percentage: String(item.percent)
+				})).sort((a, b) => b.total - a.total)
+			},
+			pass: data.current_rails_pass
 		};
-
-		const currentMonthResults = await fetchMonthData(currentMonth);
-		await sleep(1000);
-		const lastMonthResults = await fetchMonthData(lastMonth);
-
-		return { currentMonthResults, lastMonthResults };
 	}
 };

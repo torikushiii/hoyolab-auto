@@ -66,7 +66,7 @@ to an IANA timezone such as `America/New_York` to use local time with daylight-s
   - **Stamina check**: Reminds you to spend your stamina if you're at your set threshold or capped.
   - **Expedition check**: Check your expeditions and sends a notification if they're done.
   - **Code Redeems**: Search for codes and redeem them automatically.
-  - **Trailblazer Monthly Calendar**: Check your monthly currency income.
+  - **Trailblazer Monthly Calendar**: Check current and previous monthly Jade/Pass totals and official category breakdowns in your configured language. Results are cached for two hours. A percentage comparison is unavailable when the previous month has no Jade income.
   - **Traveling Mimo**: Automatically complete Mimo tasks, claim points, and exchange for Stellar Jade.
 - **Zenless Zone Zero**:
   - **Daily check-in**: Runs every midnight local time.

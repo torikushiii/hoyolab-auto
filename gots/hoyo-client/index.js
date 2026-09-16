@@ -1,5 +1,5 @@
-// Legacy embedded WebView identity used by HSR Diary, not native Android/OkHttp.
-// Preserve its headers until that endpoint has a separately verified migration.
+// Legacy embedded WebView identity, not native Android/OkHttp; no production callers remain.
+// Retained pending the final legacy-profile cleanup.
 const definition = {
 	name: "HoyoClient",
 	optionsType: "object",

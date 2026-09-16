@@ -5,9 +5,10 @@ These opt-in Got profiles inherit transport, retry, timeout and error logging fr
 
 - `HoYoLab`: HSR/HI3 discovery, HSR Notes, HSR/ZZZ redemption (module and cron),
   Traveling Mimo, and shared cookie refresh.
-- `HoyoClient`: HSR Diary. This is an embedded WebView identity, not native Android.
+- `HoyoClient`: no production callers remain; retained pending final legacy cleanup.
+  This is an embedded WebView identity, not native Android.
 
-Their headers and existing DS generators remain in use; changing them requires
+The remaining legacy callers still use HoYoLab headers and existing DS generators; changing them requires
 separate endpoint evidence and request-contract tests.
 
 | Profile | Identity / locale headers |
@@ -47,3 +48,11 @@ historical Genshin Diary summaries and point-cost Hilichurl exchanges have only
 synthetic regression coverage. Other-game check-in captures reached the missing
 character error; success, already-signed behavior and post-sign state remain
 unverified on real accounts. Native redemption signing remains deferred.
+
+HSR Diary uses the simple AppWebView context and `srledger/month_info`, without DS
+or RPC defaults. It forwards the complete controller-normalized cookie and reads
+nested monthly totals and localized categories, checking `data_month` for the
+requested month. Successful official captures cover current Jade income and an
+empty prior month; non-empty history, positive Pass totals and configured locales
+beyond captured `en-us` have synthetic coverage only. Omitted metadata and minimum
+authentication requirements have not been tested live.
