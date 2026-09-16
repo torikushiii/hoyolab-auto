@@ -3,7 +3,7 @@
 These opt-in Got profiles inherit transport, retry, timeout and error logging from
 `Global`. Unmigrated flows retain their legacy request defaults:
 
-- `HoYoLab`: HSR/ZZZ/HI3 discovery, HSR/ZZZ Notes and redemption (module and cron),
+- `HoYoLab`: HSR/HI3 discovery, HSR Notes, HSR/ZZZ redemption (module and cron),
   Traveling Mimo, and shared cookie refresh.
 - `HoyoClient`: HSR Diary. This is an embedded WebView identity, not native Android.
 
@@ -16,6 +16,7 @@ separate endpoint evidence and request-contract tests.
 | `HoYoLabAppWebView` | Android WebView; no RPC defaults |
 | `HoYoLabGameRecordDesktopWeb` | Desktop Game Record; full locale in both RPC language headers |
 | `HoYoLabGameRecordAppWebView` | App Game Record; full locale in both RPC language headers |
+| `HoYoLabZZZGameRecordAppWebView` | ZZZ Game Record WebView; full locale in both RPC language headers, no client_type/env |
 | `HoYoLabNative` | Android OkHttp foundation; no production caller or verified signing implementation |
 
 Select the profile by the endpoint's client context, not its hostname. Supply
@@ -37,7 +38,11 @@ validation; these foundations alone do not establish a working live request.
 
 Offline tests verify constructed requests and synthetic responses. Successful
 official-client captures support the migrated Genshin contracts, but do not prove
-that the headless client's reduced cookie/header set works live. Non-empty
+that the headless client's reduced cookie/header set works live. ZZZ discovery and
+Notes also have successful official WebView captures; both forward the complete
+controller-normalized cookie, without an additional Notes whitelist. Minimum
+authentication/metadata requirements and configured locales beyond the captured
+`en-us` remain unverified live. Non-empty
 historical Genshin Diary summaries and point-cost Hilichurl exchanges have only
 synthetic regression coverage. Other-game check-in captures reached the missing
 character error; success, already-signed behavior and post-sign state remain

@@ -66,6 +66,19 @@ module.exports = [
 		})
 	},
 	{
+		name: "HoYoLabZZZGameRecordAppWebView",
+		parent: "HoYoLabAppWebView",
+		optionsType: "function",
+		options: () => ({
+			headers: {
+				"x-rpc-app_version": APP_VERSION,
+				"x-rpc-platform": 2,
+				"x-rpc-language": getLanguage(),
+				"x-rpc-lang": getLanguage()
+			}
+		})
+	},
+	{
 		name: "HoYoLabNative",
 		parent: "Global",
 		optionsType: "function",

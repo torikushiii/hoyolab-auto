@@ -30,15 +30,7 @@ module.exports = class RealtimeNotes {
 			};
 		}
 
-		const cookieData = app.HoyoLab.parseCookie(accountData.cookie, {
-			whitelist: [
-				"ltoken_v2",
-				"ltmid_v2",
-				"ltuid_v2"
-			]
-		});
-
-		const res = await app.Got("HoYoLab", {
+		const res = await app.Got("HoYoLabZZZGameRecordAppWebView", {
 			url: this.#instance.config.url.notes,
 			responseType: "json",
 			throwHttpErrors: false,
@@ -47,8 +39,7 @@ module.exports = class RealtimeNotes {
 				role_id: accountData.uid
 			},
 			headers: {
-				Cookie: cookieData,
-				DS: app.Utils.generateDS()
+				Cookie: accountData.cookie
 			}
 		});
 

@@ -8,7 +8,8 @@ const profiles = [
 	"HoYoLabAppWebView",
 	"HoYoLabGameRecordDesktopWeb",
 	"HoYoLabGameRecordAppWebView",
-	"HoYoLabNative"
+	"HoYoLabNative",
+	"HoYoLabZZZGameRecordAppWebView"
 ];
 const url = "https://example.invalid/event/contract";
 
@@ -88,7 +89,7 @@ test("desktop, WebView, Game Record and native identities remain distinct", asyn
 	for (const profile of profiles) {
 		await Got(profile, { url });
 	}
-	const [desktop, webview, recordDesktop, recordWebview, native] = requests.map((request) => request.headers);
+	const [desktop, webview, recordDesktop, recordWebview, native, zzz] = requests.map((request) => request.headers);
 	for (const headers of [desktop, webview]) {
 		assert.equal(Object.keys(headers).some((name) => name.startsWith("x-rpc-")), false);
 	}
@@ -110,6 +111,10 @@ test("desktop, WebView, Game Record and native identities remain distinct", asyn
 		assert.equal(headers.origin, "https://act.hoyolab.com");
 		assert.equal(headers.referer, "https://act.hoyolab.com/");
 	}
+	assert.equal(zzz["user-agent"], webview["user-agent"]);
+	assert.equal(zzz["x-rpc-app_version"], "4.20.0");
+	assert.equal(String(zzz["x-rpc-platform"]), "2");
+	assertAbsent(zzz, ["x-rpc-client_type", "x-rpc-env"]);
 	assert.equal(native["user-agent"], "okhttp/4.12.0");
 	assert.equal(native.referer, "https://app.hoyolab.com");
 	assert.equal(String(native["x-rpc-client_type"]), "2");
@@ -143,7 +148,7 @@ for (const [language, full, short] of [
 		for (const [index, { headers, url: requestUrl }] of requests.entries()) {
 			assert.equal(requestUrl.searchParams.get("lang"), index === 4 ? short : full);
 			assert.equal(headers["x-rpc-language"], index >= 2 ? full : undefined);
-			assert.equal(headers["x-rpc-lang"], index === 2 || index === 3 ? full : undefined);
+			assert.equal(headers["x-rpc-lang"], index === 2 || index === 3 || index === 5 ? full : undefined);
 		}
 		assert.equal(config.language, language);
 	});

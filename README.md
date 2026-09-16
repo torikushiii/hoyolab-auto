@@ -149,6 +149,9 @@ Genshin account discovery and Realtime Notes use the current Game Record APIs.
 If Notes reports error `10102`, enable Realtime Notes in HoYoLAB's Genshin Impact
 Battle Chronicle settings. The application does not change your privacy settings.
 
+ZZZ account discovery and Realtime Notes use the current Game Record WebView
+APIs without DS, preserving the configured locale and existing Notes/cache output.
+
 Hilichurl Workshop uses the event WebView API with the configured full locale in
 the query, including task completion, reward claims, and exchanges. Timed reading
 and video tasks (types `101`/`102`) are logged as unsupported for automatic

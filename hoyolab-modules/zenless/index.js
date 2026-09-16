@@ -18,7 +18,7 @@ const DEFAULT_CONSTANTS = {
 	},
 	url: {
 		...checkInDescriptor.urls,
-		notes: "https://sg-act-nap-api.hoyolab.com/event/game_record_zzz/api/zzz/note",
+		notes: "https://sg-act-public-api.hoyolab.com/event/game_record_zzz/api/zzz/note",
 		redemption: "https://public-operation-nap.hoyoverse.com/common/apicdkey/api/webExchangeCdkey"
 	}
 };
@@ -52,8 +52,8 @@ module.exports = class ZenlessZoneZero extends require("../template.js") {
 			const cookieData = account.cookie;
 			const ltuid = account.ltuid;
 
-			const { body, statusCode } = await app.Got("HoYoLab", {
-				url: "https://bbs-api-os.hoyolab.com/game_record/card/wapi/getGameRecordCard",
+			const { body, statusCode } = await app.Got("HoYoLabZZZGameRecordAppWebView", {
+				url: "https://sg-act-public-api.hoyolab.com/game_record/card/wapi/getGameRecordCard",
 				responseType: "json",
 				throwHttpErrors: false,
 				searchParams: {
