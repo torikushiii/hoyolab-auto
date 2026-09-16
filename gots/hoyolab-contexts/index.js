@@ -79,6 +79,31 @@ module.exports = [
 		})
 	},
 	{
+		name: "HoYoLabHSRGameRecordDesktopWeb",
+		parent: "HoYoLabDesktopWeb",
+		optionsType: "function",
+		options: () => ({
+			headers: {
+				"x-rpc-client_type": 5,
+				"x-rpc-app_version": "1.5.0",
+				"x-rpc-platform": 4,
+				"x-rpc-language": getLanguage()
+			}
+		})
+	},
+	{
+		name: "HoYoLabHI3GameRecordDesktopWeb",
+		parent: "HoYoLabDesktopWeb",
+		optionsType: "function",
+		options: () => ({
+			headers: {
+				"x-rpc-client_type": 5,
+				"x-rpc-app_version": "1.5.0",
+				"x-rpc-language": getLanguage()
+			}
+		})
+	},
+	{
 		name: "HoYoLabNative",
 		parent: "Global",
 		optionsType: "function",

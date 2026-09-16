@@ -9,7 +9,9 @@ const profiles = [
 	"HoYoLabGameRecordDesktopWeb",
 	"HoYoLabGameRecordAppWebView",
 	"HoYoLabNative",
-	"HoYoLabZZZGameRecordAppWebView"
+	"HoYoLabZZZGameRecordAppWebView",
+	"HoYoLabHSRGameRecordDesktopWeb",
+	"HoYoLabHI3GameRecordDesktopWeb"
 ];
 const url = "https://example.invalid/event/contract";
 

@@ -25,6 +25,7 @@ const setup = async (t, language) => {
 	app.Error = class extends Error {
 		constructor ({ message }) { super(message); }
 	};
+	app.Utils = new (require("../singleton/utils.js"))();
 	app.Date = { now: () => Date.now() };
 	const cache = new Map();
 	const writes = [];

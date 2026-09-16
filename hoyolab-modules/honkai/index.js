@@ -45,15 +45,16 @@ module.exports = class HonkaiImpact extends require("../template.js") {
 			const cookieData = account.cookie;
 			const ltuid = account.ltuid;
 
-			const { body, statusCode } = await app.Got("HoYoLab", {
-				url: "https://bbs-api-os.hoyolab.com/game_record/card/wapi/getGameRecordCard",
+			const { body, statusCode } = await app.Got("HoYoLabHI3GameRecordDesktopWeb", {
+				url: "https://sg-act-public-api.hoyolab.com/game_record/card/wapi/getGameRecordCard",
 				responseType: "json",
 				throwHttpErrors: false,
 				searchParams: {
 					uid: ltuid
 				},
 				headers: {
-					Cookie: cookieData
+					Cookie: cookieData,
+					DS: app.Utils.generateDS()
 				}
 			});
 

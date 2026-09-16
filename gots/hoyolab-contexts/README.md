@@ -3,7 +3,7 @@
 These opt-in Got profiles inherit transport, retry, timeout and error logging from
 `Global`. Unmigrated flows retain their legacy request defaults:
 
-- `HoYoLab`: HSR/HI3 discovery, HSR Notes, HSR/ZZZ redemption (module and cron),
+- `HoYoLab`: HSR/ZZZ redemption (module and cron),
   Traveling Mimo, and shared cookie refresh.
 - `HoyoClient`: no production callers remain; retained pending final legacy cleanup.
   This is an embedded WebView identity, not native Android.
@@ -18,6 +18,8 @@ separate endpoint evidence and request-contract tests.
 | `HoYoLabGameRecordDesktopWeb` | Desktop Game Record; full locale in both RPC language headers |
 | `HoYoLabGameRecordAppWebView` | App Game Record; full locale in both RPC language headers |
 | `HoYoLabZZZGameRecordAppWebView` | ZZZ Game Record WebView; full locale in both RPC language headers, no client_type/env |
+| `HoYoLabHSRGameRecordDesktopWeb` | HSR desktop Game Record; client_type 5, app_version 1.5.0, platform 4, full RPC language |
+| `HoYoLabHI3GameRecordDesktopWeb` | HI3 desktop Game Record; client_type 5, app_version 1.5.0, full RPC language; no platform |
 | `HoYoLabNative` | Android OkHttp foundation; no production caller or verified signing implementation |
 
 Select the profile by the endpoint's client context, not its hostname. Supply
@@ -56,3 +58,11 @@ requested month. Successful official captures cover current Jade income and an
 empty prior month; non-empty history, positive Pass totals and configured locales
 beyond captured `en-us` have synthetic coverage only. Omitted metadata and minimum
 authentication requirements have not been tested live.
+
+HSR discovery/Notes and HI3 discovery use signed desktop Game Record routes.
+Each request explicitly uses the existing desktop DS generator; their profiles
+add neither RPC lang/env nor device metadata. Both preserve controller cookies,
+with no additional Notes whitelist. Successful official desktop captures support
+the route/header/signature contracts; omitted device/risk metadata and minimum
+authentication have not been tested live. Configured `it-it` and active HSR
+expeditions have synthetic coverage only.

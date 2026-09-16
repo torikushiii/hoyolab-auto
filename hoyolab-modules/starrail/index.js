@@ -19,7 +19,7 @@ const DEFAULT_CONSTANTS = {
 	},
 	url: {
 		...checkInDescriptor.urls,
-		notes: "https://bbs-api-os.hoyolab.com/game_record/hkrpg/api/note",
+		notes: "https://sg-act-public-api.hoyolab.com/event/game_record/hkrpg/api/note",
 		diary: "https://sg-act-public-api.hoyolab.com/event/srledger/month_info",
 		redemption: "https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkeyRisk"
 	}
@@ -54,15 +54,16 @@ module.exports = class StarRail extends require("../template.js") {
 			const cookieData = account.cookie;
 			const ltuid = account.ltuid;
 
-			const { body, statusCode } = await app.Got("HoYoLab", {
-				url: "https://bbs-api-os.hoyolab.com/game_record/card/wapi/getGameRecordCard",
+			const { body, statusCode } = await app.Got("HoYoLabHSRGameRecordDesktopWeb", {
+				url: "https://sg-act-public-api.hoyolab.com/event/game_record/card/wapi/getGameRecordCard",
 				responseType: "json",
 				throwHttpErrors: false,
 				searchParams: {
 					uid: ltuid
 				},
 				headers: {
-					Cookie: cookieData
+					Cookie: cookieData,
+					DS: app.Utils.generateDS()
 				}
 			});
 

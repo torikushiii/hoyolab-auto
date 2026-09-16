@@ -149,6 +149,11 @@ Genshin account discovery and Realtime Notes use the current Game Record APIs.
 If Notes reports error `10102`, enable Realtime Notes in HoYoLAB's Genshin Impact
 Battle Chronicle settings. The application does not change your privacy settings.
 
+HSR account discovery and Realtime Notes, and Honkai Impact 3rd account discovery,
+use signed desktop Game Record APIs while preserving the configured language.
+Their request and result/cache contracts are tested offline; headless authentication
+with omitted browser metadata has not been verified live.
+
 ZZZ account discovery and Realtime Notes use the current Game Record WebView
 APIs without DS, preserving the configured locale and existing Notes/cache output.
 
