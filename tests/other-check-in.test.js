@@ -3,8 +3,8 @@ const { test } = require("node:test");
 const { createHttpHarness } = require("./helpers/http.js");
 const HoyoLab = require("../hoyolab-modules/template.js");
 
-// Synthetic response fixtures preserve the existing consumer contract; these are
-// not captured successful claims or proof of post-sign state for these games.
+// Synthetic fixtures model the captured false -> sign -> true transitions for
+// HSR, ZZZ, and HI3. ToT has no captured successful linked-character claim.
 const cookie = "ltoken_v2=synthetic-token; ltuid_v2=synthetic-id; ltmid_v2=synthetic-mid";
 const awards = [
 	{ name: "Synthetic first", cnt: 2, icon: "https://example.invalid/first.png" },
@@ -20,6 +20,7 @@ const games = [
 	["honkai", "honkai", "mani", "bh3", "e202110291205111"],
 	["termis", "tot", "luna/nxx/os", "nxx", "e202202281857121"]
 ];
+const confirmedGames = new Set(["starrail", "zenless", "honkai"]);
 
 for (const [folder, platform, route, signgame, actId] of games) {
 	const setup = async (t, language) => {
@@ -75,6 +76,9 @@ for (const [folder, platform, route, signgame, actId] of games) {
 		test(`${folder}: request contract and synthetic success (${language ?? "default"})`, async (t) => {
 			const { game, requests, replies } = await setup(t, language);
 			replies.push(info(), home(), { body: { retcode: 0, data: {} } });
+			if (confirmedGames.has(folder)) {
+				replies.push(info(true, 2));
+			}
 			assert.deepEqual(await game.checkIn(), [{
 				uid: "synthetic-role",
 				platform,
@@ -86,7 +90,7 @@ for (const [folder, platform, route, signgame, actId] of games) {
 				assets: { ...game.config.assets, logo: undefined, color: undefined },
 				award: { name: awards[1].name, count: awards[1].cnt, icon: awards[1].icon }
 			}]);
-			assertRequests(requests, ["info", "home", "sign"], language);
+			assertRequests(requests, ["info", "home", "sign", ...(confirmedGames.has(folder) ? ["info"] : [])], language);
 		});
 	}
 
@@ -130,4 +134,42 @@ for (const [folder, platform, route, signgame, actId] of games) {
 		assert.equal(await game.checkIn(), undefined);
 		assert.equal(requests.length, 0);
 	});
+
+	if (confirmedGames.has(folder)) {
+		for (const [name, response] of [
+			["unsigned state", info(false, 1)],
+			["different date", { body: { retcode: 0, data: { is_sign: true, total_sign_day: 2, today: "2026-09-17" } } }],
+			["malformed state", { body: { retcode: 0, data: { is_sign: "true", total_sign_day: 2, today: "2026-09-16" } } }],
+			["API failure", { body: { retcode: -1, data: null } }]
+		]) {
+			test(`${folder}: confirmation ${name} does not report success`, async (t) => {
+				const { game, requests, replies } = await setup(t);
+				replies.push(info(), home(), { body: { retcode: 0, data: {} } }, response);
+				assert.deepEqual(await game.checkIn(), []);
+				assertRequests(requests, ["info", "home", "sign", "info"]);
+			});
+		}
+	}
 }
+
+test("starrail: captured duplicate-sign retcode is not reported as success", async (t) => {
+	const harness = await createHttpHarness(t);
+	for (const name of ["info", "warn", "log"]) {
+		app.Logger[name] = (...args) => harness.logs.push(args);
+	}
+	app.HoyoLab = { getRegion: () => "EU" };
+	const previousList = [...HoyoLab.list];
+	t.after(() => {
+		HoyoLab.list = previousList;
+	});
+	const StarRail = require("../hoyolab-modules/starrail/index.js");
+	const game = new StarRail({ id: 1, data: [{ cookie, stamina: { check: false, threshold: 100, persistent: false } }]});
+	game.accounts.push({ cookie, uid: "synthetic-role", nickname: "Synthetic player", level: 20, region: "synthetic-region" });
+	harness.replies.push(info(), home(), { body: { retcode: -5003, message: "Synthetic already checked in", data: null } });
+	assert.deepEqual(await game.checkIn(), []);
+	assert.deepEqual(harness.requests.map(request => request.url.pathname), [
+		"/event/luna/hkrpg/os/info",
+		"/event/luna/hkrpg/os/home",
+		"/event/luna/hkrpg/os/sign"
+	]);
+});

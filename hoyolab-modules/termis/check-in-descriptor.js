@@ -1,7 +1,7 @@
 const { getLanguage } = require("../../gots/hoyolab-contexts/language.js");
 const { APP_VERSION } = require("../../gots/hoyolab-contexts/constants.js");
 
-// WebView request shape observed without a linked character; success remains unverified.
+// WebView request shape observed without a linked character; successful claims remain unverified.
 module.exports = {
 	profile: "HoYoLabAppWebView",
 	actId: "e202202281857121",

@@ -142,8 +142,9 @@ successful only after a follow-up status request confirms today’s check-in.
 HSR, ZZZ, Honkai Impact 3rd, and Tears of Themis check-in use game-specific
 WebView requests without DS. The configured locale is sent in GET queries and
 in sign JSON for HSR/ZZZ/Themis, or the sign query for Honkai Impact 3rd.
-These request shapes were observed with no linked character; successful claims,
-already-signed responses, and post-sign state still require real-account validation.
+Successful official check-ins and post-sign states have been observed for HSR,
+ZZZ, and Honkai Impact 3rd; the application confirms their status after claiming.
+Tears of Themis still lacks a successful linked-character capture.
 
 Genshin account discovery and Realtime Notes use the current Game Record APIs.
 If Notes reports error `10102`, enable Realtime Notes in HoYoLAB's Genshin Impact

@@ -75,6 +75,12 @@ module.exports = class CheckIn {
 				continue;
 			}
 
+			const confirmation = await this.#getSignInfo(account.cookie);
+			if (!confirmation.success || confirmation.data.issign !== true || confirmation.data.today !== data.today) {
+				app.Logger.warn(`${this.#instance.fullName}:CheckIn`, "Check-in could not be confirmed for today");
+				continue;
+			}
+
 			app.Logger.info(`${this.#instance.fullName}:CheckIn`, t `(${account.uid}) ${account.nickname} Today's Reward: ${awardObject.name} x${awardObject.count}`);
 
 			results.push({
@@ -83,7 +89,7 @@ module.exports = class CheckIn {
 				rank: account.level,
 				username: account.nickname,
 				region: app.HoyoLab.getRegion(account.region),
-				total: data.total + 1,
+				total: confirmation.data.total,
 				result: t(this.#instance.config.successMessage),
 				assets: {
 					...this.#instance.config.assets,
@@ -196,6 +202,11 @@ module.exports = class CheckIn {
 		}
 
 		const data = res.body.data;
+		if (!data || typeof data.is_sign !== "boolean" || !Number.isInteger(data.total_sign_day)
+			|| data.total_sign_day < (data.is_sign ? 1 : 0) || typeof data.today !== "string" || !data.today) {
+			app.Logger.warn(this.#instance.fullName, "Invalid sign info received");
+			return { success: false };
+		}
 		return {
 			success: true,
 			data: {
