@@ -21,7 +21,7 @@ const DEFAULT_CONSTANTS = {
 		...checkInDescriptor.urls,
 		notes: "https://sg-act-public-api.hoyolab.com/event/game_record/hkrpg/api/note",
 		diary: "https://sg-act-public-api.hoyolab.com/event/srledger/month_info",
-		redemption: "https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkeyRisk"
+		redemption: "https://public-operation-hkrpg.hoyoverse.com/common/apicdkey/api/webExchangeCdkeyRisk"
 	}
 };
 
@@ -123,6 +123,7 @@ module.exports = class StarRail extends require("../template.js") {
 				level: data.level,
 				redeemCode: account.redeemCode,
 				redeemCodeConfigured: account.redeemCodeConfigured,
+				redemptionDeviceUuid: account.redemptionDeviceUuid,
 				dailiesCheck: account.dailiesCheck,
 				weekliesCheck: account.weekliesCheck,
 				cookie: cookieData,

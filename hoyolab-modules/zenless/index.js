@@ -19,7 +19,7 @@ const DEFAULT_CONSTANTS = {
 	url: {
 		...checkInDescriptor.urls,
 		notes: "https://sg-act-public-api.hoyolab.com/event/game_record_zzz/api/zzz/note",
-		redemption: "https://public-operation-nap.hoyoverse.com/common/apicdkey/api/webExchangeCdkey"
+		redemption: "https://public-operation-nap.hoyoverse.com/common/apicdkey/api/webExchangeCdkeyRisk"
 	}
 };
 
@@ -120,6 +120,7 @@ module.exports = class ZenlessZoneZero extends require("../template.js") {
 				level: data.level,
 				redeemCode: account.redeemCode,
 				redeemCodeConfigured: account.redeemCodeConfigured,
+				redemptionDeviceUuid: account.redemptionDeviceUuid,
 				dailiesCheck: account.dailiesCheck,
 				dailyLotteryCheck: account.dailyLotteryCheck ?? true,
 				game: {

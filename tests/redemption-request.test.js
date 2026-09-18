@@ -6,7 +6,7 @@ const test = require("node:test");
 const vm = require("node:vm");
 
 const root = path.resolve(__dirname, "..");
-const account = { uid: "123", region: "test", cookie: "test-cookie", redeemCode: true };
+const account = { uid: "123", region: "test", cookie: "test-cookie", redemptionDeviceUuid: "synthetic-device", redeemCode: true };
 const response = (retcode = 0, message = "OK") => ({ statusCode: 200, body: { retcode, message } });
 const options = (code, overrides = {}) => ({
 	searchParams: { game_biz: "nap_global", ...account, cdkey: code, ...overrides }
@@ -39,7 +39,7 @@ const harness = (store = new Map()) => {
 			if (name === "API") {
 				return { statusCode: 200, body: { active: []} };
 			}
-			calls.push({ at: now, ...data });
+			calls.push({ at: now, profile: name, ...data });
 			return await state.respond(data);
 		}
 	};
@@ -84,9 +84,12 @@ for (const game of ["genshin", "starrail", "zenless"]) {
 			rewardCodes.redeemCode(account, "REWARD")
 		]);
 		assert.equal(h.calls.length, 2);
-		assert.equal(h.calls[1].searchParams.cdkey, "REWARD");
+		assert.equal((h.calls[1].json ?? h.calls[1].searchParams).cdkey, "REWARD");
 		assert.ok(h.calls[1].at - h.calls[0].at >= 6000);
-		assert.equal(h.calls[0].searchParams.game_biz, h.calls[1].searchParams.game_biz);
+		assert.equal((h.calls[0].json ?? h.calls[0].searchParams).game_biz, (h.calls[1].json ?? h.calls[1].searchParams).game_biz);
+		assert.ok(h.calls.every(call => call.profile === "HoYoLabDesktopWeb"));
+		assert.equal(h.calls[1].searchParams === undefined, game !== "genshin");
+		assert.equal(h.calls[1].json === undefined, game === "genshin");
 	});
 }
 
@@ -158,7 +161,7 @@ test("the scheduled job retries saved codes when every public feed is empty", as
 	h.state.respond = async () => response();
 	await h.load("crons/code-redeem/index.js").code();
 	assert.equal(h.calls.length, 2);
-	assert.equal(h.calls[1].searchParams.cdkey, "REWARD");
+	assert.equal((h.calls[1].json ?? h.calls[1].searchParams).cdkey, "REWARD");
 	assert.equal((await h.request.getPendingCodes("nap_global", account)).length, 0);
 });
 

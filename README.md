@@ -354,6 +354,10 @@ If you prefer not to use the Makefile, you can use the following Docker Compose 
 
 Genshin code redemption uses the browser gift endpoint for both commands and automatic redemption, without DS or native-app headers. The configured language is sent as a short language code; `sLangKey` remains `en-us`, matching the observed gift-page requests. Existing account eligibility and code-cache behavior are preserved.
 
+Public codes, event rewards, and manual redemptions share a per-account cooldown queue. Temporary failures leave reward and manual codes pending for the code-redemption job to retry while `redeemCode` is enabled, including when no new public codes are available.
+
+Honkai: Star Rail and Zenless Zone Zero redemption also use their captured browser gift endpoints. Their POST requests require the configured cookie's `_MHYUUID` value as both the browser identity cookie and `device_uuid`; if it is missing, redemption is skipped and the account needs a newly acquired cookie. Other account features remain available.
+
 Run `npm test` for offline HTTP request-contract, result/cache, and setup locale round-trip tests, and `npm run lint` for lint checks. The tests use synthetic data and do not require account cookies or network access. See [HTTP request contexts](gots/hoyolab-contexts/README.md) for profile selection, remaining legacy callers, and validation limits.
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change. If there are any bugs, please open an issue.

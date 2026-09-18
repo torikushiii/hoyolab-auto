@@ -1,7 +1,6 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
-const timers = require("node:timers/promises");
-const { createHttpHarness } = require("./helpers/http.js");
+const { createRedemptionHarness } = require("./helpers/http.js");
 const Genshin = require("../hoyolab-modules/genshin/index.js");
 const { REDEMPTION_URL } = require("../hoyolab-modules/genshin/redemption-request.js");
 const HoyoLab = require("../hoyolab-modules/template.js");
@@ -19,7 +18,7 @@ const account = {
 const code = { code: "SYNTHETICCODE", rewards: ["Synthetic reward"]};
 
 const setup = async (t, language) => {
-	const harness = await createHttpHarness(t, { language });
+	const harness = await createRedemptionHarness(t, { language });
 	for (const name of ["info", "warn", "log"]) {
 		app.Logger[name] = (...args) => harness.logs.push(args);
 	}
@@ -119,8 +118,7 @@ const setupCache = async (t, initial = ["PREVIOUSCODE"]) => {
 		get: async (key) => structuredClone(cache.get(key)),
 		set: async ({ key, value }) => cache.set(key, structuredClone(value))
 	};
-	const delays = [];
-	t.mock.method(timers, "setTimeout", async (ms) => delays.push(ms));
+	const { delays } = harness;
 	const utilsPath = require.resolve("../crons/code-redeem/utils.js");
 	delete require.cache[utilsPath];
 	t.after(() => {
@@ -132,7 +130,7 @@ const setupCache = async (t, initial = ["PREVIOUSCODE"]) => {
 
 test("cron seeds an empty code cache without redemption", async (t) => {
 	const { checkAndRedeem, cache, requests } = await setupCache(t, null);
-	assert.equal(await checkAndRedeem({ genshin: [code]}), undefined);
+	assert.deepEqual(await checkAndRedeem({ genshin: [code]}), { success: [], failed: [], manual: []});
 	assert.deepEqual(cache.get("genshin-code"), [code.code]);
 	assert.equal(requests.length, 0);
 });
@@ -157,9 +155,9 @@ for (const retcode of [0, -2011]) {
 			manual: []
 		});
 		assert.deepEqual(cache.get("genshin-code"), retcode === 0 ? ["PREVIOUSCODE", code.code] : ["PREVIOUSCODE"]);
-		assert.deepEqual(delays, [6000]);
+		assert.deepEqual(delays, []);
 		if (retcode === 0) {
-			assert.equal(await checkAndRedeem({ genshin: [{ ...code, code: code.code.toLowerCase() }]}), undefined);
+			assert.deepEqual(await checkAndRedeem({ genshin: [{ ...code, code: code.code.toLowerCase() }]}), { success: [], failed: [], manual: []});
 			assert.equal(requests.length, 1);
 		}
 		else {
@@ -170,6 +168,7 @@ for (const retcode of [0, -2011]) {
 				manual: []
 			});
 			assert.equal(requests.length, 2);
+			assert.deepEqual(delays, [6000]);
 		}
 	});
 }
@@ -189,5 +188,5 @@ test("cron HTTP failure does not cache the pending code", async (t) => {
 		manual: []
 	});
 	assert.deepEqual(cache.get("genshin-code"), ["PREVIOUSCODE"]);
-	assert.deepEqual(delays, [6000]);
+	assert.deepEqual(delays, []);
 });

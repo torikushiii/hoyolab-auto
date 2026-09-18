@@ -1,5 +1,5 @@
 const { t } = require("../../localization/index.js");
-const redemptionRequest = require("../../hoyolab-modules/redemption-request.js");
+const { requestBrowserRedemption } = require("../../hoyolab-modules/browser-redemption-request.js");
 
 let version;
 
@@ -51,22 +51,11 @@ const fetchData = async () => {
 };
 
 const redeemCodes = async (accountData, code) => {
-	const Cookie = app.HoyoLab.parseCookie(accountData.cookie, {
-		whitelist: ["cookie_token_v2", "account_mid_v2", "account_id_v2", "cookie_token", "account_id"]
-	});
-
-	const res = await redemptionRequest({
-		url: "https://public-operation-nap.hoyoverse.com/common/apicdkey/api/webExchangeCdkey",
-		searchParams: {
-			uid: accountData.uid,
-			region: accountData.region,
-			lang: "en",
-			cdkey: code.code,
-			game_biz: "nap_global",
-			t: app.Date.now()
-		},
-		headers: { Cookie }
-	});
+	const redemption = requestBrowserRedemption("zenless", accountData, code.code, "https://public-operation-nap.hoyoverse.com/common/apicdkey/api/webExchangeCdkeyRisk");
+	if (redemption.error) {
+		return { success: false, reason: redemption.error };
+	}
+	const res = await redemption.request;
 
 	if (res.statusCode !== 200) {
 		throw new app.Error({

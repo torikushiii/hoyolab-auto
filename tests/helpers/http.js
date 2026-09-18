@@ -77,3 +77,27 @@ const createHttpHarness = async (t, config = {}) => {
 };
 
 module.exports = { createHttpHarness };
+
+// Keep account cooldowns deterministic while exercising the real Got serialization.
+let redemptionTestTime = Date.now();
+const createRedemptionHarness = async (t, config) => {
+	const harness = await createHttpHarness(t, config);
+	redemptionTestTime += 3600000;
+	let now = redemptionTestTime;
+	const delays = [];
+	t.mock.method(Date, "now", () => now);
+	t.mock.method(require("node:timers/promises"), "setTimeout", async (ms) => {
+		delays.push(ms);
+		now += ms;
+	});
+	const cache = new Map();
+	app.Cache = {
+		get: async key => structuredClone(cache.get(key)),
+		set: async ({ key, value }) => cache.set(key, structuredClone(value)),
+		delete: async key => cache.delete(key)
+	};
+	app.HoyoLab = { isExpiredLogin: () => false };
+	return { ...harness, cache, delays };
+};
+
+module.exports.createRedemptionHarness = createRedemptionHarness;

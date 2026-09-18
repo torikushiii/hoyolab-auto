@@ -1,5 +1,5 @@
 const { t } = require("../../localization/index.js");
-const redemptionRequest = require("../redemption-request.js");
+const { requestBrowserRedemption } = require("../browser-redemption-request.js");
 
 module.exports = class RedeemCode {
 	/** @type {import("../template")} */
@@ -10,33 +10,11 @@ module.exports = class RedeemCode {
 	}
 
 	async redeemCode (accountData, code) {
-		const cookieData = app.HoyoLab.parseCookie(accountData.cookie, {
-			whitelist: [
-				"cookie_token_v2",
-				"account_mid_v2",
-				"account_id_v2",
-				"cookie_token",
-				"account_id"
-			]
-		});
-
-		const res = await redemptionRequest({
-			url: this.#instance.config.url.redemption,
-			method: "POST",
-			responseType: "json",
-			throwHttpErrors: false,
-			searchParams: {
-				cdkey: code,
-				game_biz: "hkrpg_global",
-				lang: "en",
-				region: accountData.region,
-				t: Date.now(),
-				uid: accountData.uid
-			},
-			headers: {
-				Cookie: cookieData
-			}
-		}, { persist: true });
+		const redemption = requestBrowserRedemption("starrail", accountData, code, this.#instance.config.url.redemption, { persist: true });
+		if (redemption.error) {
+			return { success: false, message: redemption.error };
+		}
+		const res = await redemption.request;
 
 		if (res.statusCode !== 200) {
 			app.Logger.log(`${this.#instance.fullName}:RedeemCode`, {

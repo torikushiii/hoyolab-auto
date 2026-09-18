@@ -1,7 +1,6 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
-const timers = require("node:timers/promises");
-const { createHttpHarness } = require("./helpers/http.js");
+const { createRedemptionHarness } = require("./helpers/http.js");
 const HoyoLab = require("../hoyolab-modules/template.js");
 const Genshin = require("../hoyolab-modules/genshin/index.js");
 const { REDEMPTION_URL } = require("../hoyolab-modules/genshin/redemption-request.js");
@@ -14,13 +13,12 @@ const task = (task_id, task_type, status = 2) => ({ task_id, task_type, status, 
 const shop = (items = []) => ok({ exchange_award_list: items });
 
 const setup = async (t, language) => {
-	const harness = await createHttpHarness(t, { language });
+	const harness = await createRedemptionHarness(t, { language });
 	for (const name of ["info", "warn", "log"]) {
 		app.Logger[name] = (...args) => harness.logs.push(args);
 	}
-	app.HoyoLab = { parseCookie: HoyoLab.parseCookie };
-	const delays = [];
-	t.mock.method(timers, "setTimeout", async (ms) => delays.push(ms));
+	app.HoyoLab = { parseCookie: HoyoLab.parseCookie, isExpiredLogin: () => false };
+	const { delays } = harness;
 	const path = require.resolve("../hoyolab-modules/hilichurl.js");
 	delete require.cache[path];
 	t.after(() => {
@@ -140,7 +138,7 @@ for (const redeem of [true, false]) {
 		assert.equal(data.points, 10);
 		assert.deepEqual(data.codesRedeemed, redeem ? ["SYNTHETICCODE"] : []);
 		assert.deepEqual(data.codesObtained, redeem ? [] : ["SYNTHETICCODE"]);
-		assert.deepEqual(delays, redeem ? [5000, 1500] : [1500]);
+		assert.deepEqual(delays, [1500]);
 		assert.equal(requests.length, redeem ? 6 : 5);
 		if (redeem) {
 			assert.equal(requests[5].url.origin + requests[5].url.pathname, REDEMPTION_URL);

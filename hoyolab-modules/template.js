@@ -108,6 +108,7 @@ module.exports = class HoyoLab {
 				this.#data.push({
 					cookie: parsedCookie.cookie,
 					ltuid: parsedCookie.ltuid,
+					redemptionDeviceUuid: parsedCookie.redemptionDeviceUuid,
 					refreshCookie: parsedCookie.refreshCookie,
 					allowedPlatforms: account.allowedPlatforms ?? null
 				});
@@ -220,10 +221,14 @@ module.exports = class HoyoLab {
 			}
 
 			const parsedCookie = this.#parseCookie(account.cookie);
+			if (redeemCode && ["starrail", "nap"].includes(this.#name) && !parsedCookie.redemptionDeviceUuid) {
+				app.Logger.warn("HoyoLab", `The cookie for ${this.name} is missing _MHYUUID. Configure a newly acquired cookie to enable code redemption.`);
+			}
 
 			this.#data.push({
 				cookie: parsedCookie.cookie,
 				ltuid: parsedCookie.ltuid,
+				redemptionDeviceUuid: parsedCookie.redemptionDeviceUuid,
 				refreshCookie: parsedCookie.refreshCookie,
 				redeemCode: parsedCookie.codeRedeem !== false ? redeemCode : parsedCookie.codeRedeem,
 				redeemCodeConfigured: redeemCode,
@@ -279,6 +284,7 @@ module.exports = class HoyoLab {
 
 		const {
 			stoken,
+			_MHYUUID: redemptionDeviceUuid,
 			ltoken_v2,
 			ltuid_v2,
 			ltmid_v2,
@@ -302,6 +308,7 @@ module.exports = class HoyoLab {
 				cookie: this.#buildCookie(cookieMap, { token: true }),
 				codeRedeem: true,
 				ltuid: ltuid_v2,
+				redemptionDeviceUuid: redemptionDeviceUuid || null,
 				refreshCookie
 			};
 		}
@@ -314,6 +321,7 @@ module.exports = class HoyoLab {
 			cookie: this.#buildCookie(cookieMap),
 			codeRedeem: false,
 			ltuid: ltuid_v2,
+			redemptionDeviceUuid: redemptionDeviceUuid || null,
 			refreshCookie
 		};
 	}

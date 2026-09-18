@@ -1,4 +1,4 @@
-const { setTimeout: sleep } = require("node:timers/promises");
+const timers = require("node:timers/promises");
 
 const FINAL_REDEMPTION_ERRORS = new Set([-2001, -2003, -2006, -2017]);
 const queues = new Map();
@@ -42,8 +42,9 @@ const updatePending = async (key, code, add) => {
 };
 
 // Public codes, event rewards and manual redemptions share the same account cooldown.
-const redemptionRequest = async (options, { persist = false, profile = "HoYoLab" } = {}) => {
-	const params = options.searchParams;
+const redemptionRequest = async (options, { persist = false, profile = "HoYoLabDesktopWeb" } = {}) => {
+	const params = options.json ?? options.searchParams;
+	const payloadKey = options.json ? "json" : "searchParams";
 	const key = accountKey(params.game_biz, params);
 	const code = String(params.cdkey).toUpperCase();
 	const previous = queues.get(key) ?? Promise.resolve();
@@ -57,12 +58,12 @@ const redemptionRequest = async (options, { persist = false, profile = "HoYoLab"
 		for (let attempt = 0; attempt < 3; attempt++) {
 			const delay = (nextRequestAt.get(key) ?? 0) - Date.now();
 			if (delay > 0) {
-				await sleep(delay);
+				await timers.setTimeout(delay);
 			}
 			try {
 				res = await app.Got(profile, {
 					...options,
-					searchParams: { ...params, ...(params.t !== undefined && { t: Date.now() }) }
+					[payloadKey]: { ...params, ...(params.t !== undefined && { t: Date.now() }) }
 				});
 			}
 			finally {
