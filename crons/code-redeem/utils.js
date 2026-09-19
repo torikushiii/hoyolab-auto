@@ -189,7 +189,8 @@ const checkAndRedeem = async (codes) => {
 					failed.push({
 						account,
 						code,
-						reason: result.reason
+						reason: result.reason,
+						retcode: result.retcode
 					});
 				}
 
