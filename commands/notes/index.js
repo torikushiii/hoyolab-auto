@@ -2,7 +2,7 @@ const getNotesEmbedData = async (accounts, game, platformId) => {
 	const embedData = [];
 	for (const account of accounts) {
 		const { stamina, expedition } = account;
-		if (!stamina.check && !expedition.check) {
+		if (!stamina.check && !expedition?.check) {
 			continue;
 		}
 
@@ -252,7 +252,7 @@ module.exports = {
 			const [account] = accounts;
 			const { stamina, expedition } = account;
 
-			if (!stamina.check && !expedition.check) {
+			if (!stamina.check && !expedition?.check) {
 				const message = "This account has no notes to check.";
 				return interaction
 					? interaction.reply({ content: message, ephemeral: true })
@@ -263,6 +263,9 @@ module.exports = {
 		const embedData = await getNotesEmbedData(accounts, game, context.platform.id);
 
 		if (interaction) {
+			if (embedData.length === 0) {
+				return interaction.reply({ content: "No notes data found for these accounts.", ephemeral: true });
+			}
 			await interaction.reply({ embeds: embedData, ephemeral: true });
 		}
 	})

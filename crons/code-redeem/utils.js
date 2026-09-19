@@ -56,6 +56,7 @@ const REDEMPTION_LINKS = GAME_CONFIG.reduce((acc, game) => {
 }, {});
 
 const DEFAULT_MANUAL_REASON = "Redeem this code from within the game client.";
+const FINAL_REDEMPTION_ERRORS = new Set([-2001, -2003, -2017]);
 
 const toUpperCase = (value) => String(value).toUpperCase();
 const formatCodeValue = (code) => String(code?.code ?? "").toUpperCase();
@@ -65,12 +66,12 @@ const getCachedCodes = async (cacheKey) => {
 	return Array.isArray(cachedCodes) ? cachedCodes.map(toUpperCase) : [];
 };
 
-const appendCodesToCache = async (game, codes) => {
+const appendCodesToCache = async (cacheKey, codes) => {
 	if (!Array.isArray(codes) || codes.length === 0) {
 		return;
 	}
 
-	const existingCodes = await getCachedCodes(game.cacheKey);
+	const existingCodes = await getCachedCodes(cacheKey);
 	const codeSet = new Set(existingCodes);
 
 	let hasUpdates = false;
@@ -93,7 +94,7 @@ const appendCodesToCache = async (game, codes) => {
 	}
 
 	await app.Cache.set({
-		key: game.cacheKey,
+		key: cacheKey,
 		value: Array.from(codeSet)
 	});
 };
@@ -165,21 +166,45 @@ const checkAndRedeem = async (codes) => {
 				}
 			}
 
-			await appendCodesToCache(game, pendingCodes);
+			await appendCodesToCache(game.cacheKey, pendingCodes);
 			continue;
 		}
 
 		const { redeemCodes } = require(game.modulePath);
+		const completedByAccount = [];
 
 		for (const account of accounts) {
 			if (account.redeemCode === false) {
 				continue;
 			}
 
+			const accountCacheKey = `${game.cacheKey}:${account.region}:${account.uid}`;
+			const completedCodes = new Set(await getCachedCodes(accountCacheKey));
+			completedByAccount.push(completedCodes);
+
 			for (const code of pendingCodes) {
-				let result = await redeemCodes(account, code);
-				if (!result.success && app.HoyoLab.isExpiredLogin(result.reason) && await app.HoyoLab.refreshStoredCookies(account.cookie)) {
+				const normalized = formatCodeValue(code);
+				if (completedCodes.has(normalized)) {
+					continue;
+				}
+
+				let result;
+				try {
 					result = await redeemCodes(account, code);
+					if (!result.success && app.HoyoLab.isExpiredLogin(result.reason) && await app.HoyoLab.refreshStoredCookies(account.cookie)) {
+						result = await redeemCodes(account, code);
+					}
+				}
+				catch {
+					result = { success: false, reason: "Redemption request failed; will retry on the next run." };
+				}
+
+				if (result.success || FINAL_REDEMPTION_ERRORS.has(result.retcode)) {
+					completedCodes.add(normalized);
+					await app.Cache.set({
+						key: accountCacheKey,
+						value: [...completedCodes]
+					});
 				}
 
 				if (result.success) {
@@ -198,7 +223,10 @@ const checkAndRedeem = async (codes) => {
 			}
 		}
 
-		await appendCodesToCache(game, pendingCodes);
+		if (completedByAccount.length > 0) {
+			const completedCodes = pendingCodes.filter(code => completedByAccount.every(completed => completed.has(formatCodeValue(code))));
+			await appendCodesToCache(game.cacheKey, completedCodes);
+		}
 	}
 
 	return {

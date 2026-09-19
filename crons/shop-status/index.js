@@ -15,10 +15,6 @@ module.exports = {
 				continue;
 			}
 
-			if (account.shop.fired) {
-				continue;
-			}
-
 			const notes = await platform.notes(account);
 			if (notes.success === false) {
 				continue;
@@ -30,6 +26,11 @@ module.exports = {
 			if (shop.state !== "Finished") {
 				account.shop.fired = false;
 				platform.update(account);
+				continue;
+			}
+
+			if (account.shop.fired) {
+				continue;
 			}
 
 			if (shop.state === "Finished") {

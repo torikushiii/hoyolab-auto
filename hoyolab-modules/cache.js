@@ -41,14 +41,15 @@ module.exports = class DataCache {
 
 	async #updateCachedData (cachedData) {
 		const now = Date.now();
+		const lastUpdate = cachedData.lastUpdate ?? cachedData.lastUpdated;
 
 		let secondsSinceLastUpdate;
-		if (cachedData.lastUpdate === undefined) {
+		if (lastUpdate === undefined) {
 			secondsSinceLastUpdate = 0;
 			cachedData.lastUpdate = now;
 		}
 		else {
-			secondsSinceLastUpdate = Math.floor((now - cachedData.lastUpdate) / 1000) + 1;
+			secondsSinceLastUpdate = Math.floor((now - lastUpdate) / 1000) + 1;
 		}
 
 		if (cachedData.stamina) {

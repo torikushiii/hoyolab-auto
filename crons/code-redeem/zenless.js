@@ -84,7 +84,8 @@ const redeemCodes = async (accountData, code) => {
 
 		return {
 			success: false,
-			reason: "Expired or invalid code"
+			reason: "Expired or invalid code",
+			retcode
 		};
 	}
 

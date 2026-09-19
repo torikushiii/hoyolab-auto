@@ -16,10 +16,6 @@ module.exports = {
 				continue;
 			}
 
-			if (realm.fired && !realm.persistent) {
-				continue;
-			}
-
 			const notes = await platform.notes(account);
 			if (notes.success === false) {
 				continue;
@@ -30,6 +26,10 @@ module.exports = {
 			if (coins.currentCoin < coins.maxCoin) {
 				realm.fired = false;
 				platform.update(account);
+				continue;
+			}
+
+			if (realm.fired && !realm.persistent) {
 				continue;
 			}
 

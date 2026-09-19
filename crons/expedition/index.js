@@ -26,14 +26,6 @@ module.exports = {
 					continue;
 				}
 
-				const { fired, persistent } = account.expedition;
-				if (fired && !persistent) {
-					continue;
-				}
-
-				account.expedition.fired = true;
-				platform.update(account);
-
 				const { data } = notes;
 				const expeditions = data.expedition;
 				if (expeditions.completed === false) {
@@ -41,6 +33,14 @@ module.exports = {
 					platform.update(account);
 					continue;
 				}
+
+				const { fired, persistent } = account.expedition;
+				if (fired && !persistent) {
+					continue;
+				}
+
+				account.expedition.fired = true;
+				platform.update(account);
 
 				const platforms = app.Platform.getForAccount(account);
 				const embed = {

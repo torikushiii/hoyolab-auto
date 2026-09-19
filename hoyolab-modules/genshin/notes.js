@@ -107,10 +107,10 @@ module.exports = class RealtimeNotes {
 			recoveryTime: data.home_coin_recovery_time
 		};
 
-		this.#instance.dataCache.set(accountData.uid, {
+		await this.#instance.dataCache.set(accountData.uid, {
 			uid: accountData.uid,
 			nickname: accountData.nickname,
-			lastUpdated: app.Date.now(),
+			lastUpdate: app.Date.now(),
 			expires: app.Date.now(),
 			stamina,
 			dailies,
