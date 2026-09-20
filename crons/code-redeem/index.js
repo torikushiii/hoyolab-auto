@@ -60,16 +60,28 @@ module.exports = {
 			const platforms = app.Platform.getForAccount(data.account);
 			const escapedMessage = app.Utils.escapeCharacters(message.telegram);
 
-			for (const telegram of platforms.filter(p => p.name === "telegram")) {
-				await telegram.send(escapedMessage);
-			}
-			for (const webhook of platforms.filter(p => p.name === "webhook")) {
-				const userId = data.retcode === -2017
-					? null
-					: webhook.createUserMention(data.account.discord);
-				await webhook.send(message.embed, {
-					content: userId
-				});
+			const notified = new Set(await app.Cache.get(data.notificationKey) ?? []);
+			for (const platform of platforms.filter(p => p.name === "telegram" || p.name === "webhook")) {
+				if (notified.has(platform.id)) {
+					continue;
+				}
+				try {
+					if (platform.name === "telegram") {
+						await platform.send(escapedMessage);
+					}
+					else {
+						const userId = data.retcode === -2017 ? null : platform.createUserMention(data.account.discord);
+						await platform.send(message.embed, { content: userId });
+					}
+					notified.add(platform.id);
+					await app.Cache.set({
+						key: data.notificationKey,
+						value: [...notified]
+					});
+				}
+				catch (e) {
+					app.Logger.error("CodeRedeem", `Could not notify ${platform.name} (${platform.id}) for account ${data.account.uid}: ${e.message}`);
+				}
 			}
 		}
 
