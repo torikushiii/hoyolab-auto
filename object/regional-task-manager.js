@@ -39,7 +39,10 @@ module.exports = class RegionalTaskManager {
 						: null;
 
 					if (!lastExecution || !this.isSameDay(lastExecution, now, task.formatter)) {
-						await task.callback(account);
+						const completed = await task.callback(account);
+						if (completed === false) {
+							continue;
+						}
 						account[lastExecutionKey] = now.toISOString();
 
 						const platform = app.HoyoLab.get(account.platform);

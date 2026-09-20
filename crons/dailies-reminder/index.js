@@ -13,7 +13,7 @@ RegionalTaskManager.registerTask("DailiesReminder", reminderHour, reminderMinute
 	const platform = app.HoyoLab.get(account.platform);
 	const notes = await platform.notes(account);
 	if (notes.success === false) {
-		return;
+		return false;
 	}
 
 	const { data } = notes;
