@@ -67,7 +67,7 @@
      const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/...";
      ```
 
-   - **Automatic code redemption (optional):** Set `enableCodeRedemption` to `true` to redeem new codes after checking in. Not supported for Honkai Impact 3rd.
+   - **Automatic code redemption (optional):** Set `enableCodeRedemption` to `true` to redeem new codes on each scheduled run, including when the account has already checked in that day. Not supported for Honkai Impact 3rd.
 
      ```javascript
      const config = {
@@ -78,6 +78,12 @@
      ```
 
      When `DISCORD_WEBHOOK` is set, one summary message is sent per account listing the codes that were redeemed and the rewards they granted. Nothing is sent when there are no new codes. Turn on `notifyOnRedeemFailure` if you also want to hear about codes that failed - this includes a link to redeem them manually. Codes that fail for a temporary reason (expired cookie, redemption cooldown, network errors) are retried on the next run; expired, invalid, and already-used codes are not.
+
+     Authentication failures send a separate Discord alert even when `notifyOnRedeemFailure` is `false`. Check-in and redemption failures are deduplicated per game and HoYoLAB account across runs. A failed delivery is retried; another alert is allowed after the cookie changes or all reported authentication failures recover. After a redemption login error, remaining codes for that account wait until the next run. Other accounts continue normally.
+
+     Check-in and redemption use different tokens, so successful check-in does not prove that redemption credentials are valid. Replace the affected account's cookie when alerted. This Apps Script does not refresh cookies using `stoken`.
+
+     Redeemed codes are now tracked per game account. When updating from a version with shared code history, current codes may be attempted once again for each account because the old history cannot identify which account redeemed them.
 
    - **Save the Project:** Click on the floppy disk icon to save your project.
 

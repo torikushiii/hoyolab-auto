@@ -33,23 +33,23 @@ const config = {
 
 // Function to reset redeemed codes for all games
 function resetAllRedeemedCodes () {
-	const games = ["genshin", "honkai", "starrail", "zenless"];
-	for (const game of games) {
-		PropertiesService.getScriptProperties().deleteProperty(`${game}_redeemed_codes`);
+	const properties = PropertiesService.getScriptProperties();
+	for (const key of Object.keys(properties.getProperties())) {
+		if (key.endsWith("_redeemed_codes")) {
+			properties.deleteProperty(key);
+		}
 	}
-	console.log("Redeemed codes for all games have been reset.");
+	console.log("All stored redeemed codes have been reset.");
 }
 
-// Function to view all stored redeemed codes
 function viewAllRedeemedCodes () {
-	const games = ["genshin", "honkai", "starrail", "zenless"];
 	const allCodes = {};
-
-	for (const game of games) {
-		const redeemedCodes = PropertiesService.getScriptProperties().getProperty(`${game}_redeemed_codes`);
-		allCodes[game] = redeemedCodes ? JSON.parse(redeemedCodes) : [];
+	const properties = PropertiesService.getScriptProperties().getProperties();
+	for (const [key, value] of Object.entries(properties)) {
+		if (key.endsWith("_redeemed_codes")) {
+			allCodes[key] = JSON.parse(value);
+		}
 	}
-
 	console.log("All redeemed codes:", allCodes);
 	return allCodes;
 }
@@ -152,6 +152,51 @@ const RETRYABLE_REDEEM_RETCODES = [
 	-2016 // redemption cooldown
 ];
 
+function isAuthenticationError (data) {
+	return [-100, -10001, -1071].includes(data.retcode)
+		|| /(?:please\s+)?log\s*in|login/i.test(String(data.message ?? ""));
+}
+
+// Store only a cookie fingerprint and alert state, never the cookie itself.
+function updateAuthenticationAlert (game, cookie, operation, failed) {
+	const accountId = cookie.match(/(?:^|;\s*)ltuid(?:_v2)?=([^;]+)/)?.[1];
+	if (!accountId) {
+		return;
+	}
+	const key = `${game.name}_${accountId}_auth_alert`;
+	const properties = PropertiesService.getScriptProperties();
+	const fingerprint = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, cookie)
+		.map(byte => (byte & 255).toString(16).padStart(2, "0")).join("");
+	const saved = JSON.parse(properties.getProperty(key) || "null");
+	const state = saved?.fingerprint === fingerprint ? saved : { fingerprint, operations: [], notified: false };
+	state.operations = state.operations.filter(item => item !== operation);
+	if (failed) {
+		state.operations.push(operation);
+	}
+	if (state.operations.length === 0) {
+		properties.deleteProperty(key);
+		return;
+	}
+	if (failed && !state.notified && DISCORD_WEBHOOK) {
+		try {
+			state.notified = postDiscordPayload({
+				username: game.config.assets.author,
+				avatar_url: game.config.assets.icon,
+				embeds: [{
+					color: 0xED4245,
+					title: `${game.fullName} Authentication Failed`,
+					description: `HoYoLAB account ${accountId}: ${operation} requires a valid cookie. Replace this account's cookie in the script configuration. Check-in and code redemption use different tokens, so one can work while the other fails.`,
+					timestamp: new Date()
+				}]
+			}) === true;
+		}
+		catch (e) {
+			console.error("Could not deliver authentication alert:", e.message);
+		}
+	}
+	properties.setProperty(key, JSON.stringify(state));
+}
+
 class Game {
 	/**
      * @param {string} name - The short name of the game (e.g., "genshin").
@@ -162,6 +207,7 @@ class Game {
 		this.fullName = DEFAULT_CONSTANTS[name].game; // Get full name from constants
 		this.config = { ...DEFAULT_CONSTANTS[name], ...config.config };
 		this.data = config.data || [];
+		this.redemptionAccounts = [];
 
 		if (this.data.length === 0) {
 			console.warn(`No ${this.fullName} accounts provided. Skipping...`);
@@ -185,8 +231,15 @@ class Game {
 					continue;
 				}
 
+				this.redemptionAccounts.push({ ...accountDetails, cookie });
 				const info = await this.getSignInfo(cookie);
 				if (!info.success) {
+					continue;
+				}
+
+				if (info.data.isSigned) {
+					updateAuthenticationAlert(this, cookie, "check-in", false);
+					console.info(`${this.fullName}:CheckIn`, "Already signed in today");
 					continue;
 				}
 
@@ -202,11 +255,6 @@ class Game {
 					isSigned: info.data.isSigned
 				};
 
-				if (data.isSigned) {
-					console.info(`${this.fullName}:CheckIn`, "Already signed in today");
-					continue;
-				}
-
 				const totalSigned = data.total;
 				const awardObject = {
 					name: awards[totalSigned].name,
@@ -219,6 +267,7 @@ class Game {
 					continue;
 				}
 
+				updateAuthenticationAlert(this, cookie, "check-in", false);
 				console.info(
 					`${this.fullName}:CheckIn`,
 					`Today's Reward: ${awardObject.name} x${awardObject.count}`
@@ -251,6 +300,7 @@ class Game {
 		try {
 			const options = {
 				method: "GET",
+				muteHttpExceptions: true,
 				headers: {
 					"User-Agent": this.userAgent,
 					Cookie: cookieData
@@ -260,6 +310,9 @@ class Game {
 			const url = `https://bbs-api-os.hoyolab.com/game_record/card/wapi/getGameRecordCard?uid=${ltuid}`;
 			const response = await UrlFetchApp.fetch(url, options);
 			const data = JSON.parse(response.getContentText());
+			if (isAuthenticationError(data)) {
+				updateAuthenticationAlert(this, cookieData, "check-in", true);
+			}
 
 			if (response.getResponseCode() !== 200 || data.retcode !== 0) {
 				throw new Error(`Failed to login to ${this.fullName} account: ${JSON.stringify(data)}`);
@@ -288,6 +341,7 @@ class Game {
 			const payload = { act_id: this.config.ACT_ID };
 			const options = {
 				method: "POST",
+				muteHttpExceptions: true,
 				contentType: "application/json",
 				headers: {
 					"User-Agent": this.userAgent,
@@ -299,6 +353,9 @@ class Game {
 
 			const response = UrlFetchApp.fetch(this.config.url.sign, options);
 			const data = JSON.parse(response.getContentText());
+			if (isAuthenticationError(data)) {
+				updateAuthenticationAlert(this, cookieData, "check-in", true);
+			}
 
 			if (response.getResponseCode() !== 200 || data.retcode !== 0) {
 				console.error(`${this.fullName}:sign`, "Failed to sign in.", data);
@@ -330,12 +387,16 @@ class Game {
 		try {
 			const url = `${this.config.url.info}?act_id=${this.config.ACT_ID}`;
 			const response = await UrlFetchApp.fetch(url, {
+				muteHttpExceptions: true,
 				headers: {
 					Cookie: cookieData,
 					"x-rpc-signgame": this.getSignGameHeader()
 				}
 			});
 			const data = JSON.parse(response.getContentText());
+			if (isAuthenticationError(data)) {
+				updateAuthenticationAlert(this, cookieData, "check-in", true);
+			}
 
 			if (response.getResponseCode() !== 200 || data.retcode !== 0) {
 				console.error(
@@ -365,12 +426,16 @@ class Game {
 		try {
 			const url = `${this.config.url.home}?act_id=${this.config.ACT_ID}`;
 			const response = await UrlFetchApp.fetch(url, {
+				muteHttpExceptions: true,
 				headers: {
 					Cookie: cookieData,
 					"x-rpc-signgame": this.getSignGameHeader()
 				}
 			});
 			const data = JSON.parse(response.getContentText());
+			if (isAuthenticationError(data)) {
+				updateAuthenticationAlert(this, cookieData, "check-in", true);
+			}
 
 			if (response.getResponseCode() !== 200 || data.retcode !== 0) {
 				console.error(
@@ -430,7 +495,7 @@ class Game {
 
 	async redeemCodes (account) {
 		const codes = await this.fetchCodes();
-		const redeemedCodes = this.getRedeemedCodes();
+		const redeemedCodes = this.getRedeemedCodes(account);
 		const results = [];
 
 		for (const code of codes) {
@@ -443,12 +508,15 @@ class Game {
 			Utilities.sleep(6000);
 
 			results.push(result);
+			if (result.authenticationFailed) {
+				break;
+			}
 
 			// Only stop retrying a code once we know the outcome is final. Transient
 			// failures (bad cookie, cooldown, network errors) are left unsaved so the
 			// next run picks them up again.
 			if (!result.retryable) {
-				this.saveRedeemedCode(code.code);
+				this.saveRedeemedCode(code.code, account);
 			}
 		}
 
@@ -462,8 +530,12 @@ class Game {
 
 		for (const code of codes) {
 			console.log(`Attempting to redeem code ${code.code} for ${this.fullName}`);
-			results.push(await this.redeemCode(account, code));
+			const result = await this.redeemCode(account, code);
+			results.push(result);
 			Utilities.sleep(6000);
+			if (result.authenticationFailed) {
+				break;
+			}
 		}
 
 		console.log(`Completed forced code redemption for ${this.fullName}`);
@@ -520,6 +592,11 @@ class Game {
 
 			const data = JSON.parse(response.getContentText());
 
+			const authenticationFailed = isAuthenticationError(data);
+			if (authenticationFailed || data.retcode === 0 || data.retcode === -2017) {
+				updateAuthenticationAlert(this, account.cookie, "code redemption", authenticationFailed);
+			}
+
 			// Check for authentication errors and other failures
 			if (data.retcode !== 0) {
 				if (data.retcode === -1071) {
@@ -533,7 +610,8 @@ class Game {
 					code,
 					rewards,
 					success: false,
-					retryable: RETRYABLE_REDEEM_RETCODES.includes(data.retcode),
+					authenticationFailed,
+					retryable: authenticationFailed || RETRYABLE_REDEEM_RETCODES.includes(data.retcode),
 					message: REDEEM_ERROR_MESSAGES[data.retcode] || data.message || `Unknown error (retcode ${data.retcode})`
 				};
 			}
@@ -633,15 +711,15 @@ class Game {
 		return REDEMPTION_LINKS[this.name] || null;
 	}
 
-	getRedeemedCodes () {
-		const redeemedCodes = PropertiesService.getScriptProperties().getProperty(`${this.name}_redeemed_codes`);
+	getRedeemedCodes (account) {
+		const redeemedCodes = PropertiesService.getScriptProperties().getProperty(`${this.name}_${account.region}_${account.uid}_redeemed_codes`);
 		return redeemedCodes ? JSON.parse(redeemedCodes) : [];
 	}
 
-	saveRedeemedCode (code) {
-		const redeemedCodes = this.getRedeemedCodes();
+	saveRedeemedCode (code, account) {
+		const redeemedCodes = this.getRedeemedCodes(account);
 		redeemedCodes.push(code);
-		PropertiesService.getScriptProperties().setProperty(`${this.name}_redeemed_codes`, JSON.stringify(redeemedCodes));
+		PropertiesService.getScriptProperties().setProperty(`${this.name}_${account.region}_${account.uid}_redeemed_codes`, JSON.stringify(redeemedCodes));
 	}
 
 	delay (ms) {
@@ -661,21 +739,21 @@ function checkInGame (gameName) {
 
 	return game.checkAndExecute()
 		.then(async (successes) => {
-			console.log(`Successful check-ins for ${gameName}:`, successes);
+			console.log(`Successful check-ins for ${gameName}: ${successes.length}`);
 
 			const redeemReports = [];
 
 			// Only attempt code redemption if enabled in config
 			if (config.enableCodeRedemption) {
-				for (const success of successes) {
+				for (const account of game.redemptionAccounts) {
 					if (gameName === "honkai") {
 						continue;
 					}
 
-					const results = await game.redeemCodes(success.account);
+					const results = await game.redeemCodes(account);
 					redeemReports.push({
-						account: success.account,
-						assets: success.assets,
+						account,
+						assets: game.config.assets,
 						results
 					});
 				}
@@ -911,7 +989,7 @@ function buildCodeRedeemEmbed (game, account, assets, results) {
 	}
 
 	const redeemed = results.filter(result => result.success);
-	const failed = config.notifyOnRedeemFailure ? results.filter(result => !result.success) : [];
+	const failed = config.notifyOnRedeemFailure ? results.filter(result => !result.success && !result.authenticationFailed) : [];
 
 	// Nothing new happened for this account - stay quiet rather than sending an empty report.
 	if (redeemed.length === 0 && failed.length === 0) {
