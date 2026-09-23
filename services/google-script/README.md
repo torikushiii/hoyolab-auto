@@ -110,6 +110,16 @@
 
      ![image](https://github.com/torikushiii/hoyolab-auto/assets/21153445/8378f2b9-2532-4e37-8cf7-394bee0f41c3)
 
+### Optional six-hour cookie keep-alive
+
+Run `setupCookieKeepAlive` once from the Apps Script editor and authorize it if prompted. This creates a separate trigger that runs `keepAliveCookies` every six hours. Running setup again replaces your existing keep-alive trigger. Your daily check-in trigger stays as configured.
+
+Each run reads the check-in status for each configured game/account without checking in or redeeming codes. Successful requests send no Discord messages; authentication failures use the existing deduplicated alerts. A successful keep-alive does not clear a code-redemption authentication failure.
+
+This is experimental: periodic requests have not been verified to extend cookie lifetime or prevent CAPTCHA. It does not refresh tokens using `stoken`, save replacement cookies, or restore expired sessions. Expired cookies still need replacing.
+
+To stop it, run `removeCookieKeepAlive` from the editor. Trigger setup and removal apply to triggers created by your Google account.
+
 ### Important Notes
 
 - **Authorization:** The first time you run the script, it will ask for authorization to access your Google account.

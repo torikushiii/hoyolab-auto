@@ -389,6 +389,7 @@ class Game {
 			const response = await UrlFetchApp.fetch(url, {
 				muteHttpExceptions: true,
 				headers: {
+					"User-Agent": this.userAgent,
 					Cookie: cookieData,
 					"x-rpc-signgame": this.getSignGameHeader()
 				}
@@ -428,6 +429,7 @@ class Game {
 			const response = await UrlFetchApp.fetch(url, {
 				muteHttpExceptions: true,
 				headers: {
+					"User-Agent": this.userAgent,
 					Cookie: cookieData,
 					"x-rpc-signgame": this.getSignGameHeader()
 				}
@@ -490,7 +492,7 @@ class Game {
 	}
 
 	get userAgent () {
-		return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36";
+		return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36";
 	}
 
 	async redeemCodes (account) {
@@ -1039,6 +1041,39 @@ function buildCodeRedeemEmbed (game, account, assets, results) {
 			text: `${assets.game} Code Redemption`
 		}
 	};
+}
+
+// Read-only activity; this does not refresh tokens or guarantee a longer session.
+async function keepAliveCookies () {
+	for (const gameName of ["genshin", "honkai", "starrail", "zenless"]) {
+		const accounts = config[gameName]?.data || [];
+		if (accounts.length === 0) {
+			continue;
+		}
+		const game = new Game(gameName, config[gameName]);
+		for (const cookie of new Set(accounts)) {
+			const result = await game.getSignInfo(cookie);
+			if (result.success) {
+				updateAuthenticationAlert(game, cookie, "check-in", false);
+			}
+		}
+	}
+}
+
+// Run once from the editor to install or replace your keep-alive trigger.
+function setupCookieKeepAlive () {
+	removeCookieKeepAlive();
+	ScriptApp.newTrigger("keepAliveCookies").timeBased().everyHours(6)
+		.create();
+	console.log("Cookie keep-alive scheduled every six hours.");
+}
+
+function removeCookieKeepAlive () {
+	for (const trigger of ScriptApp.getProjectTriggers()) {
+		if (trigger.getHandlerFunction() === "keepAliveCookies") {
+			ScriptApp.deleteTrigger(trigger);
+		}
+	}
 }
 
 function checkInAllGames () {
