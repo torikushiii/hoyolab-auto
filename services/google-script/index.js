@@ -301,6 +301,7 @@ class Game {
 			const options = {
 				method: "GET",
 				muteHttpExceptions: true,
+				validateHttpsCertificates: true,
 				headers: {
 					"User-Agent": this.userAgent,
 					Cookie: cookieData
@@ -342,6 +343,7 @@ class Game {
 			const options = {
 				method: "POST",
 				muteHttpExceptions: true,
+				validateHttpsCertificates: true,
 				contentType: "application/json",
 				headers: {
 					"User-Agent": this.userAgent,
@@ -571,6 +573,7 @@ class Game {
 		const options = {
 			method: this.name === "starrail" ? "POST" : "GET",
 			muteHttpExceptions: true,
+			validateHttpsCertificates: true,
 			headers: {
 				"User-Agent": this.userAgent,
 				Cookie: account.cookie
@@ -894,6 +897,7 @@ function postDiscordPayload (payload) {
 		method: "POST",
 		contentType: "application/json",
 		muteHttpExceptions: true,
+		validateHttpsCertificates: true,
 		payload: JSON.stringify(payload)
 	};
 
