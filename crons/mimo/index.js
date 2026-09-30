@@ -64,9 +64,9 @@ module.exports = {
 								}
 							};
 
-							for (const webhook of platforms.filter(p => p.name === "webhook")) {
-								await webhook.send(embed, {
-									content: webhook.createUserMention(account.discord),
+							for (const destination of app.Platform.getEmbedPlatforms(platforms)) {
+								await destination.send(embed, {
+									content: destination.createUserMention(account.discord),
 									author: account.assets?.author,
 									icon: account.assets?.logo
 								});
@@ -103,9 +103,9 @@ module.exports = {
 
 					const region = app.HoyoLab.getRegion(account.region);
 					const platforms = app.Platform.getForAccount(account);
-					const webhooks = platforms.filter(p => p.name === "webhook");
+					const embedPlatforms = app.Platform.getEmbedPlatforms(platforms);
 					const telegrams = platforms.filter(p => p.name === "telegram");
-					if (webhooks.length > 0) {
+					if (embedPlatforms.length > 0) {
 						const fields = [];
 
 						if (data.tasksClaimed.length > 0) {
@@ -208,12 +208,12 @@ module.exports = {
 								|| data.codesRedeemed.length > 0
 							));
 
-						for (const webhook of webhooks) {
+						for (const destination of embedPlatforms) {
 							const userId = shouldMention
-								? webhook.createUserMention(account.discord)
+								? destination.createUserMention(account.discord)
 								: null;
 
-							await webhook.send(embed, {
+							await destination.send(embed, {
 								...(userId && { content: userId }),
 								author: data.assets.author,
 								icon: data.assets.logo
@@ -249,7 +249,9 @@ module.exports = {
 							}
 						}
 
-						if (data.lotteryDraws?.length > 0) { lines.push(`🎰 Lottery Draws: ${data.lotteryDraws.map(d => d.name).join(", ")}`); }
+						if (data.lotteryDraws?.length > 0) {
+							lines.push(`🎰 Lottery Draws: ${data.lotteryDraws.map(d => d.name).join(", ")}`);
+						}
 
 						if (data.errors?.length > 0) {
 							lines.push(`❌ Errors:`);

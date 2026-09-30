@@ -33,6 +33,14 @@
             type: 'webhook',
             url: '(YOUR_WEBHOOK_URL)', // You can follow this guide to create a webhook: https://github.com/torikushiii/hoyolab-auto/blob/main/setup/DISCORD_WEBHOOK.md
         },
+        {
+            id: 4,
+            active: false, // Set to true to receive Gotify notifications
+            type: 'gotify',
+            url: 'https://gotify.example.com', // Your Gotify server URL, including any reverse proxy path
+            token: '(YOUR_GOTIFY_APP_TOKEN)', // Create an application in the Gotify web UI to get this token
+            priority: 5, // Optional integer priority (default: 5)
+        },
     ],
     crons: {
         whitelist: [], // You can whitelist some crons if you only want to run specific crons
@@ -44,6 +52,7 @@
         dailiesReminderMinute: 0, // 0-59
         dailiesReminderTimeZone: null, // Optional IANA timezone, e.g. 'America/New_York'; null uses game server time
         expedition: '0 */30 * * * *',
+        giftCodeRedeem: '0 */3 * * *',
         mimo: '0 0 */6 * * *',
         mimoJitter: 0, // Random delay in seconds before running Mimo (0-N). Helps avoid rate limits at reset time.
         hilichurl: '0 0 11 * * *', // 11:00 AM local time (adjust for your timezone if event resets at a different time)

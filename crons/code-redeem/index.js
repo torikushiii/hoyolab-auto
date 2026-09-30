@@ -50,8 +50,8 @@ module.exports = {
 			for (const telegram of platforms.filter(p => p.name === "telegram")) {
 				await telegram.send(escapedMessage);
 			}
-			for (const webhook of platforms.filter(p => p.name === "webhook")) {
-				await webhook.send(message.embed);
+			for (const destination of app.Platform.getEmbedPlatforms(platforms)) {
+				await destination.send(message.embed);
 			}
 		}
 
@@ -61,7 +61,7 @@ module.exports = {
 			const escapedMessage = app.Utils.escapeCharacters(message.telegram);
 
 			const notified = new Set(await app.Cache.get(data.notificationKey) ?? []);
-			for (const platform of platforms.filter(p => p.name === "telegram" || p.name === "webhook")) {
+			for (const platform of platforms.filter(p => ["telegram", "webhook", "gotify"].includes(p.name))) {
 				if (notified.has(platform.id)) {
 					continue;
 				}
@@ -93,8 +93,8 @@ module.exports = {
 			for (const telegram of app.Platform.list.filter(p => p.name === "telegram")) {
 				await telegram.send(escapedMessage);
 			}
-			for (const webhook of app.Platform.list.filter(p => p.name === "webhook")) {
-				await webhook.send(message.embed);
+			for (const destination of app.Platform.getEmbedPlatforms()) {
+				await destination.send(message.embed);
 			}
 		}
 	}

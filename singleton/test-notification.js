@@ -59,11 +59,12 @@ async function sendPlatformTestNotification (platform) {
 				app.Logger.info("TestNotification", `Discord bot (ID: ${platform.id}) is connected and ready`);
 				break;
 
+			case "gotify":
 			case "webhook": {
-				// Send a test embed to Discord webhook
+				const platformLabel = platformName === "gotify" ? "Gotify" : "Discord Webhook";
 				const testEmbed = {
 					title: "🔥 HoyoLab Auto - Test Notification",
-					description: "This is a test notification to confirm that the webhook is working properly.",
+					description: `This is a test notification to confirm that ${platformLabel} is working properly.`,
 					color: 3447003,
 					fields: [
 						{
@@ -78,7 +79,7 @@ async function sendPlatformTestNotification (platform) {
 						},
 						{
 							name: "Platform",
-							value: "Discord Webhook",
+							value: platformLabel,
 							inline: true
 						}
 					],
@@ -138,7 +139,9 @@ async function sendManualTestNotification (platform, options = {}) {
 
 		const platformName = platform.name?.toLowerCase() || "unknown";
 		switch (platformName) {
+			case "gotify":
 			case "webhook": {
+				const platformLabel = platformName === "gotify" ? "Gotify" : "Discord Webhook";
 				const testEmbed = {
 					title: "🧪 HoyoLab Auto - Manual Test",
 					description: customMessage,
@@ -156,7 +159,7 @@ async function sendManualTestNotification (platform, options = {}) {
 						},
 						{
 							name: "Platform",
-							value: "Discord Webhook",
+							value: platformLabel,
 							inline: true
 						}
 					],

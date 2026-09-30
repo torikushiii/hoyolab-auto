@@ -48,9 +48,9 @@ RegionalTaskManager.registerTask("DailiesReminder", reminderHour, reminderMinute
 		}
 	};
 
-	for (const webhook of platforms.filter(p => p.name === "webhook")) {
-		const userId = webhook.createUserMention(account.discord);
-		await webhook.send(embed, {
+	for (const destination of app.Platform.getEmbedPlatforms(platforms)) {
+		const userId = destination.createUserMention(account.discord);
+		await destination.send(embed, {
 			content: userId,
 			author: data.assets.author,
 			icon: data.assets.logo

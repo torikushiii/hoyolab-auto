@@ -100,6 +100,11 @@
             padding-left: 10px;
         }
 
+        #gotify-settings input,
+        #gotify-settings select {
+            box-sizing: border-box;
+        }
+
         .description {
             font-size: 0.9em;
             color: #666;
@@ -275,6 +280,29 @@
         <input type="text" id="webhookUrl" placeholder="YOUR_WEBHOOK_URL">
         <div class="small-text">You can follow this guide to create a webhook:
             https://github.com/torikushiii/hoyolab-auto/blob/main/setup/DISCORD_WEBHOOK.md</div>
+    </div>
+
+    <!-- Platform 4: Gotify -->
+    <div class="platform-section" id="gotify-settings">
+        <h3>Gotify</h3>
+        <label for="gotifyActive">Gotify notifications:</label>
+        <select id="gotifyActive">
+            <option value="true">true</option>
+            <option value="false" selected>false</option>
+        </select>
+        <div class="small-text">Enable notifications to your Gotify server.</div>
+
+        <label for="gotifyUrl">Gotify server URL:</label>
+        <input type="url" id="gotifyUrl" placeholder="https://gotify.example.com">
+        <div class="small-text">Include any reverse proxy path, for example https://example.com/gotify.</div>
+
+        <label for="gotifyToken">Application token:</label>
+        <input type="password" id="gotifyToken" autocomplete="off" placeholder="YOUR_GOTIFY_APP_TOKEN">
+        <div class="small-text">Create an application in the Gotify web UI and copy its token.</div>
+
+        <label for="gotifyPriority">Message priority:</label>
+        <input type="number" id="gotifyPriority" step="1" value="5" placeholder="5">
+        <div class="small-text">Default: 5. Your Gotify client uses priority to control notification sounds and visibility.</div>
     </div>
 
     <!-- Cron Settings -->
@@ -788,6 +816,12 @@
             const webhook = platformByType.webhook || {};
             setBooleanSelectValue(document.getElementById('webhookActive'), webhook.active);
             setInputValue(document.getElementById('webhookUrl'), webhook.url);
+
+            const gotify = platformByType.gotify || {};
+            setBooleanSelectValue(document.getElementById('gotifyActive'), gotify.active, false);
+            setInputValue(document.getElementById('gotifyUrl'), gotify.url);
+            setInputValue(document.getElementById('gotifyToken'), gotify.token);
+            setInputValue(document.getElementById('gotifyPriority'), gotify.priority ?? 5);
         }
 
         function applyCronConfig(crons) {
@@ -1123,6 +1157,11 @@
         function generateConfig() {
             const tnEl = document.getElementById('testNotificationEnabled');
             const testNotifyEnabled = tnEl ? (tnEl.value === 'true') : false;
+            const gotifyPriority = Number(document.getElementById('gotifyPriority').value || '5');
+            if (!Number.isSafeInteger(gotifyPriority)) {
+                alert('Gotify priority must be a whole number.');
+                return;
+            }
             const config = {
                 loglevel: 'info',
                 language: document.getElementById('language').value || 'en-us',
@@ -1152,6 +1191,14 @@
                         active: document.getElementById('webhookActive').value === 'true',
                         type: 'webhook',
                         url: document.getElementById('webhookUrl').value || document.getElementById('webhookUrl').placeholder,
+                    },
+                    {
+                        id: 4,
+                        active: document.getElementById('gotifyActive').value === 'true',
+                        type: 'gotify',
+                        url: document.getElementById('gotifyUrl').value || document.getElementById('gotifyUrl').placeholder,
+                        token: document.getElementById('gotifyToken').value || document.getElementById('gotifyToken').placeholder,
+                        priority: gotifyPriority,
                     }
                 ],
                 crons: {

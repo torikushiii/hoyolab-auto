@@ -16,9 +16,9 @@ RegionalTaskManager.registerTask("WeekliesReminder", 21, 0, async (account) => {
 	const weeklies = data.weeklies;
 
 	const platforms = app.Platform.getForAccount(account);
-	const webhooks = platforms.filter(p => p.name === "webhook");
+	const embedPlatforms = app.Platform.getEmbedPlatforms(platforms);
 	const telegrams = platforms.filter(p => p.name === "telegram");
-	if (webhooks.length > 0) {
+	if (embedPlatforms.length > 0) {
 		const embed = {
 			color: data.assets.color,
 			title: "Weeklies Reminder",
@@ -104,9 +104,9 @@ RegionalTaskManager.registerTask("WeekliesReminder", 21, 0, async (account) => {
 			}
 		}
 
-		for (const webhook of webhooks) {
-			const userId = webhook.createUserMention(account.discord);
-			await webhook.send(embed, {
+		for (const destination of embedPlatforms) {
+			const userId = destination.createUserMention(account.discord);
+			await destination.send(embed, {
 				content: userId,
 				author: data.assets.author,
 				icon: data.assets.logo

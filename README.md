@@ -179,6 +179,11 @@ and is only needed for automatic cookie refresh.
 ## Notifications Setup
 For setting up Discord or Telegram notifications, refer to the [setup folder](https://github.com/torikushiii/hoyolab-auto/tree/main/setup).
 
+[Gotify notifications](./setup/GOTIFY.md) are also supported. Configure a `gotify`
+platform with your server URL and application token to receive check-in results,
+reminders, redemption results, and cookie alerts. The setup generator can import
+and export these settings. Per-account `allowedPlatforms` routing applies to Gotify.
+
 ## Running with Docker
 
 This application can be easily managed and run using Docker. We provide a Makefile

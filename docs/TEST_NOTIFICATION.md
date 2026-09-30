@@ -4,7 +4,7 @@ The HoyoLab Auto application now includes a **Test Notification** feature that h
 
 ## Overview
 
-When the application initializes, it will automatically send test notifications to all configured platforms (Discord webhooks, Telegram bots, etc.) to confirm they are working properly. This helps you quickly identify any configuration issues with your notification platforms.
+When the application initializes, it will automatically send test notifications to all configured platforms (Discord webhooks, Telegram bots, Gotify, etc.) to confirm they are working properly. This helps you quickly identify any configuration issues with your notification platforms.
 
 ## Configuration
 
@@ -44,6 +44,13 @@ The test notification feature can be controlled through the `config.json5` file:
 
 - Connection status logged (Discord bots require channel access to send messages)
 
+### Gotify
+
+- Message with application status, local time, and platform information
+- Uses the platform's configured priority (5 by default)
+- Set `testNotification.enabled` to `true` and start the application to verify delivery
+- See the [Gotify setup guide](../setup/GOTIFY.md) for server and token configuration
+
 ## Manual Testing
 
 You can also manually test notifications using the `test-notification` command:
@@ -78,6 +85,11 @@ $test-notification Custom message here
 3. **Discord Bot Issues**
    - Ensure the bot has proper permissions in your server
    - Bot needs `Send Messages` permission in channels where it will post
+
+4. **Gotify Issues**
+   - Use an application token created in the Gotify web UI
+   - Check that the server URL is reachable from the machine or container running HoyoLab Auto
+   - Include any reverse proxy path in the URL, such as `https://example.com/gotify`
 
 ### Logs
 

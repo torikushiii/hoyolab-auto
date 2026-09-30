@@ -65,8 +65,8 @@ module.exports = {
 				}
 			};
 
-			for (const webhook of platforms.filter(p => p.name === "webhook")) {
-				await webhook.send(embed, {
+			for (const destination of app.Platform.getEmbedPlatforms(platforms)) {
+				await destination.send(embed, {
 					author: message.assets.author,
 					icon: message.assets.logo
 				});

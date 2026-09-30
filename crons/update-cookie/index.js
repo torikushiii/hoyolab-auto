@@ -5,7 +5,7 @@ const getDestinations = (accounts) => {
 	const destinations = new Map();
 	for (const account of accounts) {
 		for (const platform of app.Platform.getForAccount(account)) {
-			if (platform.name !== "telegram" && platform.name !== "webhook") {
+			if (!["telegram", "webhook", "gotify"].includes(platform.name)) {
 				continue;
 			}
 			if (!destinations.has(platform.id)) {

@@ -31,7 +31,7 @@ module.exports = class Platform {
 		}
 
 		this.#url = config.url ?? null;
-		if (this.#url && !WEBHOOK_REGEX.test(this.#url)) {
+		if (name === "webhook" && this.#url && !WEBHOOK_REGEX.test(this.#url)) {
 			throw new app.Error({
 				message: "Invalid URL provided for Webhook Platform.",
 				args: {
@@ -141,6 +141,10 @@ module.exports = class Platform {
 		return Platform.list.filter(p => allowed.includes(p.id));
 	}
 
+	static getEmbedPlatforms (platforms = Platform.list) {
+		return platforms.filter(p => p.name === "webhook" || p.name === "gotify");
+	}
+
 	static get (identifier) {
 		if (identifier instanceof Platform) {
 			return identifier;
@@ -170,6 +174,9 @@ module.exports = class Platform {
 				break;
 			case "telegram":
 				InstancePlatform = require("./telegram.js");
+				break;
+			case "gotify":
+				InstancePlatform = require("./gotify.js");
 				break;
 			default:
 				throw new app.Error({

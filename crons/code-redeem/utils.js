@@ -409,5 +409,6 @@ const checkCachedCodes = async (codes) => {
 module.exports = {
 	fetchCodes,
 	checkAndRedeem,
-	buildMessage
+	buildMessage,
+	getRedemptionCookieHash
 };
