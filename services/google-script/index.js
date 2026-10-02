@@ -157,9 +157,26 @@ function isAuthenticationError (data) {
 		|| /(?:please\s+)?log\s*in|login/i.test(String(data.message ?? ""));
 }
 
+function getAccountId (cookie) {
+	return cookie.match(/(?:^|;\s*)ltuid(?:_v2)?=([^;]+)/)?.[1];
+}
+
+function saveAccountDetails (game, cookie, details) {
+	const accountId = getAccountId(cookie);
+	if (!accountId) {
+		return;
+	}
+	const key = `${game.name}_${accountId}_account_details`;
+	const value = JSON.stringify({ uid: details.uid, nickname: details.nickname, region: details.region });
+	const properties = PropertiesService.getScriptProperties();
+	if (properties.getProperty(key) !== value) {
+		properties.setProperty(key, value);
+	}
+}
+
 // Store only a cookie fingerprint and alert state, never the cookie itself.
 function updateAuthenticationAlert (game, cookie, operation, failed) {
-	const accountId = cookie.match(/(?:^|;\s*)ltuid(?:_v2)?=([^;]+)/)?.[1];
+	const accountId = getAccountId(cookie);
 	if (!accountId) {
 		return;
 	}
@@ -178,6 +195,15 @@ function updateAuthenticationAlert (game, cookie, operation, failed) {
 		return;
 	}
 	if (failed && !state.notified && DISCORD_WEBHOOK) {
+		const account = JSON.parse(properties.getProperty(`${game.name}_${accountId}_account_details`) || "null");
+		const fields = [{ name: "HoYoLAB ID", value: accountId, inline: true }];
+		if (account) {
+			fields.push(
+				{ name: "UID", value: String(account.uid), inline: true },
+				{ name: "Nickname", value: account.nickname, inline: true },
+				{ name: "Region", value: account.region, inline: true }
+			);
+		}
 		try {
 			state.notified = postDiscordPayload({
 				username: game.config.assets.author,
@@ -185,7 +211,9 @@ function updateAuthenticationAlert (game, cookie, operation, failed) {
 				embeds: [{
 					color: 0xED4245,
 					title: `${game.fullName} Authentication Failed`,
-					description: `HoYoLAB account ${accountId}: ${operation} requires a valid cookie. Replace this account's cookie in the script configuration. Check-in and code redemption use different tokens, so one can work while the other fails.`,
+					author: account ? { name: `${account.uid} - ${account.nickname}`, icon_url: game.config.assets.icon } : undefined,
+					description: `${operation[0].toUpperCase()}${operation.slice(1)} requires a valid cookie. Replace this account's cookie in the script configuration. Check-in and code redemption use different tokens, so one can work while the other fails.`,
+					fields,
 					timestamp: new Date()
 				}]
 			}) === true;
@@ -323,12 +351,14 @@ class Game {
 				throw new Error(`No ${this.fullName} account found for ltuid: ${ltuid}`);
 			}
 
-			return {
+			const details = {
 				uid: accountData.game_role_id,
 				nickname: accountData.nickname,
 				rank: accountData.level,
 				region: this.fixRegion(accountData.region)
 			};
+			saveAccountDetails(this, cookieData, details);
+			return details;
 		}
 		catch (e) {
 			console.error(`${this.fullName}:login`, `Error: ${e.message}`);
