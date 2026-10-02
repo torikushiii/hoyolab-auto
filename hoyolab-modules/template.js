@@ -3,7 +3,7 @@ const crypto = require("node:crypto");
 const DataCache = require("./cache.js");
 const CustomHoyoError = require("./error-messages.js");
 
-const APP_LOGIN_SALT = "IZPgfb0dRPtBeLuFkdDznSZ6f4wWt6y2";
+const APP_LOGIN_SALT = process.env.APP_LOGIN_SALT || "IZPgfb0dRPtBeLuFkdDznSZ6f4wWt6y2";
 const REFRESH_API = "https://sg-public-api.hoyoverse.com/account/ma-passport/token/getBySToken";
 
 const parseCookie = (cookie, separator = ";") => {
