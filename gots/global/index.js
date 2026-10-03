@@ -1,3 +1,5 @@
+const { t } = require("../../localization/index.js");
+
 const definition = {
 	name: "Global",
 	optionsType: "function",
@@ -45,7 +47,7 @@ const definition = {
 							}
 						});
 
-						app.Logger.error("GotRequest", `Request failed (${method} ${endpoint ?? "UNKNOWN"}) code=${code ?? "N/A"} after ${retryAttempts} retries`);
+						app.Logger.error("GotRequest", t `Request failed (${method} ${endpoint ?? "UNKNOWN"}) code=${code ?? "N/A"} after ${retryAttempts} retries`);
 
 						return err;
 					}

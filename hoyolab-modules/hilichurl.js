@@ -1,3 +1,5 @@
+const { t } = require("../localization/index.js");
+
 /**
  * Hilichurl Machine Workshop - Genshin Impact exclusive web event
  * Handles mission completion, point management, and reward exchange
@@ -83,14 +85,14 @@ module.exports = class HilichurlWorkshop {
 
 			if (isRateLimited) {
 				if (attempt === maxRetries) {
-					app.Logger.warn(`${this.#instance.fullName}:Hilichurl`, `Rate limited after ${maxRetries} attempts, giving up`);
+					app.Logger.warn(`${this.#instance.fullName}:Hilichurl`, t `Rate limited after ${maxRetries} attempts, giving up`);
 					return res;
 				}
 
 				const maxWait = Math.min(baseDelay * (2 ** attempt), maxDelay);
 				const totalDelay = Math.floor(baseDelay + Math.random() * (maxWait - baseDelay));
 
-				app.Logger.info(`${this.#instance.fullName}:Hilichurl`, `Rate limited, retrying in ${totalDelay}ms (attempt ${attempt}/${maxRetries})`);
+				app.Logger.info(`${this.#instance.fullName}:Hilichurl`, t `Rate limited, retrying in ${totalDelay}ms (attempt ${attempt}/${maxRetries})`);
 				await sleep(totalDelay);
 				continue;
 			}
@@ -109,7 +111,7 @@ module.exports = class HilichurlWorkshop {
 
 		if (res.statusCode !== 200 || res.body.retcode !== 0) {
 			app.Logger.log(`${this.#instance.fullName}:Hilichurl`, {
-				message: "Failed to fetch Hilichurl Workshop info",
+				message: t("Failed to fetch Hilichurl Workshop info"),
 				args: { body: res.body }
 			});
 			return { success: false };
@@ -120,7 +122,7 @@ module.exports = class HilichurlWorkshop {
 		const game = gameList.find(g => g.game_id === 2); // Genshin = game_id 2
 
 		if (!game) {
-			return { success: false, message: "Hilichurl Workshop event not active for Genshin Impact" };
+			return { success: false, message: t("Hilichurl Workshop event not active for Genshin Impact") };
 		}
 
 		return {
@@ -151,7 +153,7 @@ module.exports = class HilichurlWorkshop {
 
 		if (res.statusCode !== 200 || res.body.retcode !== 0) {
 			app.Logger.log(`${this.#instance.fullName}:Hilichurl`, {
-				message: "Failed to fetch Hilichurl tasks",
+				message: t("Failed to fetch Hilichurl tasks"),
 				args: { body: res.body }
 			});
 			return { success: false };
@@ -189,7 +191,7 @@ module.exports = class HilichurlWorkshop {
 
 		if (res.statusCode !== 200 || res.body.retcode !== 0) {
 			app.Logger.log(`${this.#instance.fullName}:Hilichurl`, {
-				message: "Failed to finish Hilichurl task",
+				message: t("Failed to finish Hilichurl task"),
 				args: { taskId, body: res.body }
 			});
 			return { success: false, message: res.body?.message };
@@ -215,7 +217,7 @@ module.exports = class HilichurlWorkshop {
 
 		if (res.statusCode !== 200 || res.body.retcode !== 0) {
 			app.Logger.log(`${this.#instance.fullName}:Hilichurl`, {
-				message: "Failed to claim Hilichurl task reward",
+				message: t("Failed to claim Hilichurl task reward"),
 				args: { taskId, body: res.body }
 			});
 			return { success: false, message: res.body?.message };
@@ -238,7 +240,7 @@ module.exports = class HilichurlWorkshop {
 
 		if (res.statusCode !== 200 || res.body.retcode !== 0) {
 			app.Logger.log(`${this.#instance.fullName}:Hilichurl`, {
-				message: "Failed to fetch Hilichurl shop items",
+				message: t("Failed to fetch Hilichurl shop items"),
 				args: { body: res.body }
 			});
 			return { success: false };
@@ -275,7 +277,7 @@ module.exports = class HilichurlWorkshop {
 
 		if (res.statusCode !== 200 || res.body.retcode !== 0) {
 			app.Logger.log(`${this.#instance.fullName}:Hilichurl`, {
-				message: "Failed to exchange Hilichurl item",
+				message: t("Failed to exchange Hilichurl item"),
 				args: { awardId, body: res.body }
 			});
 			return { success: false, message: res.body?.message };
@@ -306,13 +308,13 @@ module.exports = class HilichurlWorkshop {
 
 		const gameInfo = await this.getGameInfo(accountData);
 		if (!gameInfo.success) {
-			return { success: false, message: gameInfo.message || "Failed to get Hilichurl Workshop info" };
+			return { success: false, message: gameInfo.message || t("Failed to get Hilichurl Workshop info") };
 		}
 
 		const { versionId } = gameInfo.data;
 		results.points = gameInfo.data.points;
 
-		app.Logger.info(`${this.#instance.fullName}:Hilichurl`, `(${accountData.uid}) Starting Hilichurl Workshop automation - Current points: ${results.points}`);
+		app.Logger.info(`${this.#instance.fullName}:Hilichurl`, t `(${accountData.uid}) Starting Hilichurl Workshop automation - Current points: ${results.points}`);
 
 		// Process tasks
 		const tasks = await this.getTasks(accountData, versionId);
@@ -324,7 +326,7 @@ module.exports = class HilichurlWorkshop {
 					if (finishResult.success) {
 						results.tasksFinished.push(task.name);
 						task.status = TaskStatus.FINISHED;
-						app.Logger.info(`${this.#instance.fullName}:Hilichurl`, `(${accountData.uid}) Finished task: ${task.name}`);
+						app.Logger.info(`${this.#instance.fullName}:Hilichurl`, t `(${accountData.uid}) Finished task: ${task.name}`);
 					}
 					await sleep(1000);
 				}
@@ -335,7 +337,7 @@ module.exports = class HilichurlWorkshop {
 					if (claimResult.success) {
 						results.tasksClaimed.push({ name: task.name, points: task.point });
 						results.points += task.point;
-						app.Logger.info(`${this.#instance.fullName}:Hilichurl`, `(${accountData.uid}) Claimed ${task.point} points for: ${task.name}`);
+						app.Logger.info(`${this.#instance.fullName}:Hilichurl`, t `(${accountData.uid}) Claimed ${task.point} points for: ${task.name}`);
 					}
 					await sleep(1000);
 				}
@@ -364,7 +366,7 @@ module.exports = class HilichurlWorkshop {
 				const exchangeResult = await this.exchangeItem(accountData, item.id, versionId);
 				if (exchangeResult.success) {
 					results.freeItemsClaimed.push(item.name);
-					app.Logger.info(`${this.#instance.fullName}:Hilichurl`, `(${accountData.uid}) Claimed free item: ${item.name}`);
+					app.Logger.info(`${this.#instance.fullName}:Hilichurl`, t `(${accountData.uid}) Claimed free item: ${item.name}`);
 				}
 				await sleep(1000);
 			}
@@ -388,7 +390,7 @@ module.exports = class HilichurlWorkshop {
 					results.itemsExchanged.push({ name: item.name, cost: item.cost, code });
 					results.points -= item.cost;
 
-					app.Logger.info(`${this.#instance.fullName}:Hilichurl`, `(${accountData.uid}) Exchanged ${item.name}${code ? ` for code: ${code}` : ""}`);
+					app.Logger.info(`${this.#instance.fullName}:Hilichurl`, t `(${accountData.uid}) Exchanged ${item.name}${code ? t ` for code: ${code}` : ""}`);
 
 					// Check if auto-redeem is enabled (hilichurl.redeem defaults to true for backward compatibility)
 					const shouldRedeem = accountData.redeemCode && (accountData.hilichurl?.redeem !== false);
@@ -398,16 +400,16 @@ module.exports = class HilichurlWorkshop {
 						const redeemResult = await this.#instance.redeemCode(accountData, code);
 						if (redeemResult.success) {
 							results.codesRedeemed.push(code);
-							app.Logger.info(`${this.#instance.fullName}:Hilichurl`, `(${accountData.uid}) Redeemed code: ${code}`);
+							app.Logger.info(`${this.#instance.fullName}:Hilichurl`, t `(${accountData.uid}) Redeemed code: ${code}`);
 						}
 						else {
-							results.errors.push(`Failed to redeem code ${code}: ${redeemResult.message}`);
+							results.errors.push(t `Failed to redeem code ${code}: ${redeemResult.message}`);
 						}
 					}
 					else if (code) {
 						// Code obtained but not auto-redeemed
 						results.codesObtained.push(code);
-						app.Logger.info(`${this.#instance.fullName}:Hilichurl`, `(${accountData.uid}) Code obtained (not auto-redeemed): ${code}`);
+						app.Logger.info(`${this.#instance.fullName}:Hilichurl`, t `(${accountData.uid}) Code obtained (not auto-redeemed): ${code}`);
 					}
 				}
 
@@ -441,7 +443,7 @@ module.exports = class HilichurlWorkshop {
 
 		const currencyItem = shopItems.data.find(i => i.name.toLowerCase().includes("primogem"));
 		if (!currencyItem) {
-			return { success: false, message: "No primogem items found" };
+			return { success: false, message: t("No primogem items found") };
 		}
 
 		return {

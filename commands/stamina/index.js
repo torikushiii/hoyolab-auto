@@ -1,3 +1,5 @@
+const { t } = require("../../localization/index.js");
+
 const getStaminaData = async (accounts, game) => {
 	const data = [];
 	for (const account of accounts) {
@@ -29,12 +31,12 @@ const formatStaminaMessage = (data, discord = false) => {
 
 		const description = [
 			discord ? `\n\`\`\`yaml\n${username} (${uid}) - ${fixedRegion}\`\`\`` : `\n${username} (${uid}) - ${fixedRegion}`,
-			`Current: ${Math.floor(currentStamina)}/${maxStamina}`,
-			`Recovery Time: ${delta}`
+			t `Current: ${Math.floor(currentStamina)}/${maxStamina}`,
+			t `Recovery Time: ${delta}`
 		];
 
 		if (reserveStamina !== null && typeof reserveStamina !== "undefined") {
-			description.push(`Reserve Stamina: ${reserveStamina}`);
+			description.push(t `Reserve Stamina: ${reserveStamina}`);
 		}
 
 		text += `${description.join("\n")}\n\n`;
@@ -44,11 +46,11 @@ const formatStaminaMessage = (data, discord = false) => {
 
 module.exports = {
 	name: "stamina",
-	description: "Check your specified game stamina",
+	description: t("Check your specified game stamina"),
 	params: [
 		{
 			name: "game",
-			description: "The game you want to check stamina for.",
+			description: t("The game you want to check stamina for."),
 			type: "string",
 			choices: [
 				{ name: "Genshin Impact", value: "genshin" },
@@ -66,14 +68,14 @@ module.exports = {
 		]});
 
 		if (supportedGames.length === 0) {
-			const message = "There are no accounts available for checking stamina.";
+			const message = t("There are no accounts available for checking stamina.");
 			return interaction
 				? interaction.reply({ content: message, ephemeral: true })
 				: { success: false, reply: message };
 		}
 
 		if (!game) {
-			const message = `Please specify a game. Supported games are: ${supportedGames.join(", ")}`;
+			const message = t `Please specify a game. Supported games are: ${supportedGames.join(", ")}`;
 			return interaction
 				? interaction.reply({ content: message, ephemeral: true })
 				: { success: false, reply: message.replace(/nap/, "zenless") };
@@ -82,7 +84,7 @@ module.exports = {
 		game = game.toLowerCase() === "zenless" || game.toLowerCase() === "zzz" ? "nap" : game.toLowerCase();
 
 		if (!supportedGames.includes(game)) {
-			const message = `Invalid game specified. Supported games are: ${supportedGames.join(", ")}`;
+			const message = t `Invalid game specified. Supported games are: ${supportedGames.join(", ")}`;
 			return interaction
 				? interaction.reply({ content: message, ephemeral: true })
 				: { success: false, reply: message.replace(/nap/, "zenless") };
@@ -90,7 +92,7 @@ module.exports = {
 
 		const accounts = app.HoyoLab.getActiveAccounts({ whitelist: game });
 		if (accounts.length === 0) {
-			const message = "You don't have any accounts for that game.";
+			const message = t("You don't have any accounts for that game.");
 			return interaction
 				? interaction.reply({ content: message, ephemeral: true })
 				: { success: false, reply: message.replace(/nap/, "zenless") };
@@ -99,7 +101,7 @@ module.exports = {
 		const staminaData = await getStaminaData(accounts, game);
 
 		if (staminaData.length === 0) {
-			const message = "No stamina data found for this type of account";
+			const message = t("No stamina data found for this type of account");
 			return interaction
 				? interaction.reply({ content: message, ephemeral: true })
 				: { success: false, reply: message.replace(/nap/, "zenless") };
@@ -108,7 +110,7 @@ module.exports = {
 		if (interaction) {
 			const discordData = {
 				embeds: [{
-					title: "Stamina",
+					title: t("Stamina"),
 					description: formatStaminaMessage(staminaData, true)
 				}]
 			};

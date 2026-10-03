@@ -1,3 +1,5 @@
+const { t } = require("../../localization/index.js");
+
 // Destinations that received a failure alert and still need a recovery alert.
 const failedRefreshes = new Map();
 
@@ -24,10 +26,10 @@ const getDestinations = (accounts) => {
 
 const notify = async (accountId, destination, recovered) => {
 	const { platform, mentions } = destination;
-	const title = recovered ? "HoYoLAB Cookie Refresh Restored" : "HoYoLAB Cookie Refresh Failed";
+	const title = recovered ? t("HoYoLAB Cookie Refresh Restored") : t("HoYoLAB Cookie Refresh Failed");
 	const description = recovered
-		? `Cookie refresh is working again for HoYoLAB account ${accountId}.`
-		: `Could not refresh the cookie for HoYoLAB account ${accountId}. Automatic code redemption may stop when the current cookie is no longer valid.`;
+		? t `Cookie refresh is working again for HoYoLAB account ${accountId}.`
+		: t `Could not refresh the cookie for HoYoLAB account ${accountId}. Automatic code redemption may stop when the current cookie is no longer valid.`;
 
 	if (platform.name === "telegram") {
 		await platform.send(app.Utils.escapeCharacters(`${title}\n\n${description}`));
@@ -47,7 +49,7 @@ const notify = async (accountId, destination, recovered) => {
 module.exports = {
 	name: "update-cookie",
 	expression: "0 */2 * * *",
-	description: "Update cookie for all accounts",
+	description: t("Update cookie for all accounts"),
 	code: (async function updateCookie () {
 		const results = await app.HoyoLab.refreshCookieAccounts();
 		for (const result of results) {
@@ -69,7 +71,7 @@ module.exports = {
 					}
 				}
 				catch (e) {
-					app.Logger.error("Cron:UpdateCookie", `Could not notify ${destination.platform.name} (${id}) for HoYoLAB account ${accountId}: ${e.message}`);
+					app.Logger.error("Cron:UpdateCookie", t `Could not notify ${destination.platform.name} (${id}) for HoYoLAB account ${accountId}: ${e.message}`);
 				}
 			}
 			if (notified.size > 0) {

@@ -1,3 +1,5 @@
+const { setLanguage } = require("../localization/index.js");
+
 module.exports = class Config extends require("./template.js") {
 	#name;
 	#value;
@@ -22,6 +24,7 @@ module.exports = class Config extends require("./template.js") {
 	}
 
 	static async load (data) {
+		setLanguage(data.language);
 		const loaded = new Set();
 
 		for (const [name, value] of Object.entries(data)) {

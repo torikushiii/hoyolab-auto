@@ -1,3 +1,5 @@
+const { t } = require("../localization/index.js");
+
 const nameSymbol = Symbol.for("name");
 
 let gotModule;
@@ -32,7 +34,7 @@ class StaticGot {
 		}
 		else {
 			throw new app.Error({
-				message: "Invalid user identifier type",
+				message: t("Invalid user identifier type"),
 				args: { id: identifier, type: typeof identifier }
 			});
 		}
@@ -41,7 +43,7 @@ class StaticGot {
 	static async importData (definitions) {
 		if (!Array.isArray(definitions)) {
 			throw new app.Error({
-				message: "Definitions must be provided as an array"
+				message: t("Definitions must be provided as an array")
 			});
 		}
 
@@ -50,7 +52,7 @@ class StaticGot {
 		for (const instanceParent of instanceParents) {
 			if (!availableParents.has(instanceParent)) {
 				throw new app.Error({
-					message: "Instance parent is not defined",
+					message: t("Instance parent is not defined"),
 					args: {
 						requested: instanceParent,
 						availableParents: [...availableParents]
@@ -103,7 +105,7 @@ class StaticGot {
 				options = definition.options();
 			}
 			catch (e) {
-				console.warn(`Got instance ${definition.name} init error - skipped`, e);
+				console.warn(t `Got instance ${definition.name} init error - skipped`, e);
 				initError = e;
 			}
 		}
@@ -112,7 +114,7 @@ class StaticGot {
 		if (initError) {
 			instance = () => {
 				throw new app.Error({
-					message: "Instance is not available due to initialization error",
+					message: t("Instance is not available due to initialization error"),
 					args: { definition },
 					cause: initError
 				});
@@ -122,7 +124,7 @@ class StaticGot {
 			const parent = parentDefinitions.find((i) => i[nameSymbol] === definition.parent);
 			if (!parent) {
 				throw new app.Error({
-					message: "Requested parent instance does not exist",
+					message: t("Requested parent instance does not exist"),
 					args: {
 						requested: definition.parent,
 						existing: parentDefinitions.map((i) => i[nameSymbol])

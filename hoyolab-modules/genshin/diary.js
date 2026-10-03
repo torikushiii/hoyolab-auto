@@ -1,3 +1,5 @@
+const { t } = require("../../localization/index.js");
+
 const { setTimeout, setTimeout: sleep } = require("node:timers/promises");
 
 module.exports = class Diary {
@@ -38,7 +40,7 @@ module.exports = class Diary {
 
 		if (primoPromises.status === "rejected" || moraPromises.status === "rejected") {
 			app.Logger.log(`${this.#instance.fullName}:Diary`, {
-				message: "Failed to fetch diary data",
+				message: t("Failed to fetch diary data"),
 				args: {
 					platform: this.#instance.name,
 					uid: accountData.uid,
@@ -162,7 +164,7 @@ module.exports = class Diary {
 
 			if (!response.ok) {
 				app.Logger.log(`${this.#instance.fullName}:Diary`, {
-					message: "Hoyolab API returned non-200 status code",
+					message: t("Hoyolab API returned non-200 status code"),
 					args: {
 						platform: this.#instance.name,
 						uid: accountData.uid,
@@ -173,13 +175,13 @@ module.exports = class Diary {
 
 			if (response.body.retcode !== 0) {
 				if (response.body.retcode === -500001 && retryCount < maxRetries) {
-					app.Logger.debug(`${this.#instance.fullName}:Diary`, `Rate limited, retrying in ${retryDelay / 1000}s... (attempt ${retryCount + 1}/${maxRetries})`);
+					app.Logger.debug(`${this.#instance.fullName}:Diary`, t `Rate limited, retrying in ${retryDelay / 1000}s... (attempt ${retryCount + 1}/${maxRetries})`);
 					await sleep(retryDelay);
 					return fetchPage(type, month, currentPage, retryCount + 1);
 				}
 
 				app.Logger.log(`${this.#instance.fullName}:Diary`, {
-					message: "Hoyolab API returned non-zero retcode",
+					message: t("Hoyolab API returned non-zero retcode"),
 					args: {
 						cause: app.HoyoLab.errorMessage(this.#instance.name, response.body.retcode),
 						platform: this.#instance.name,

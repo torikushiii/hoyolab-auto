@@ -1,3 +1,5 @@
+const { t } = require("../localization/index.js");
+
 class Error extends globalThis.Error {
 	#args;
 	#timestamp;
@@ -5,11 +7,11 @@ class Error extends globalThis.Error {
 
 	constructor (obj = {}) {
 		if (obj.constructor !== Object) {
-			throw new globalThis.Error("obj must be an object to receive as params");
+			throw new globalThis.Error(t("obj must be an object to receive as params"));
 		}
 
 		if (typeof obj.message !== "string") {
-			throw new globalThis.Error("message must be a string");
+			throw new globalThis.Error(t("message must be a string"));
 		}
 
 		const { cause, message } = obj;
@@ -31,11 +33,11 @@ class Error extends globalThis.Error {
 
 				const parts = [message];
 				if (this.#args) {
-					parts.push(`- args: ${JSON.stringify(this.#args)}`);
+					parts.push(t `- args: ${JSON.stringify(this.#args)}`);
 				}
 
 				if (this.cause) {
-					const causeMessage = `cause: ${this.cause.message ?? "(no message)"} ${this.cause.stack ?? "(no stack)"}`;
+					const causeMessage = t `cause: ${this.cause.message ?? t("(no message)")} ${this.cause.stack ?? t("(no stack)")}`;
 					const tabbedCauseMessage = causeMessage
 						.trim()
 						.split("\n")
@@ -85,16 +87,16 @@ class GenericRequestError extends Error {
 class HoyoLabRequestError extends Error {
 	constructor (obj = {}) {
 		const errorMessages = {
-			1009: "The account does not exist",
-			"-100": "The provided cookie is either invalid or expired.",
-			"-10001": "The provided cookie is either invalid or expired.",
-			"-10101": "Cannot get data after more than 30 accounts per cookie per day.",
-			"-1048": "API system is busy, please try again later.",
-			"-1071": "The provided cookie is either invalid or expired.",
-			"-2001": "The code has expired",
-			"-2003": "The code is invalid",
-			"-2016": "Redemption is in cooldown",
-			"-2017": "The code has been used"
+			1009: t("The account does not exist"),
+			"-100": t("The provided cookie is either invalid or expired."),
+			"-10001": t("The provided cookie is either invalid or expired."),
+			"-10101": t("Cannot get data after more than 30 accounts per cookie per day."),
+			"-1048": t("API system is busy, please try again later."),
+			"-1071": t("The provided cookie is either invalid or expired."),
+			"-2001": t("The code has expired"),
+			"-2003": t("The code is invalid"),
+			"-2016": t("Redemption is in cooldown"),
+			"-2017": t("The code has been used")
 		};
 
 		const CaptchaCodes = [
@@ -106,8 +108,8 @@ class HoyoLabRequestError extends Error {
 
 		const isCaptchaCode = CaptchaCodes.includes(obj.retcode);
 		const message = (isCaptchaCode)
-			? "A captcha challenge was requested. Please solve it and try again."
-			: errorMessages[obj.retcode] ?? "Unknown error";
+			? t("A captcha challenge was requested. Please solve it and try again.")
+			: errorMessages[obj.retcode] ?? t("Unknown error");
 
 		super({
 			message,

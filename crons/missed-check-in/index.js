@@ -1,12 +1,14 @@
+const { t } = require("../../localization/index.js");
+
 module.exports = {
 	name: "missed-check-in",
 	expression: "0 0 23 * * *",
 	timeZone: "Asia/Shanghai",
-	description: "This check if all accounts successfully checked in today before daily reset",
+	description: t("This check if all accounts successfully checked in today before daily reset"),
 	code: (async function missedCheckIn () {
 		const accounts = app.HoyoLab.getActiveAccounts();
 		if (accounts.length === 0) {
-			app.Logger.warn("Cron:MissedCheckIn", "No active accounts found for HoyoLab");
+			app.Logger.warn("Cron:MissedCheckIn", t("No active accounts found for HoyoLab"));
 			return;
 		}
 

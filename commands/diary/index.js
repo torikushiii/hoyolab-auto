@@ -1,3 +1,5 @@
+const { t } = require("../../localization/index.js");
+
 const createEmbed = (type, diary, options = {}) => {
 	const account = options.account;
 	const platform = options.platform;
@@ -9,7 +11,7 @@ const createEmbed = (type, diary, options = {}) => {
 	if (type === "genshin") {
 		const embeds = [
 			{
-				title: `**${account.nickname}**'s Diary`,
+				title: t `**${account.nickname}**'s Diary`,
 				color: data.assets.color,
 				author: {
 					name: data.assets.author,
@@ -18,11 +20,11 @@ const createEmbed = (type, diary, options = {}) => {
 				thumbnail: {
 					url: data.assets.logo
 				},
-				description: `Primo income is decreased by ${data.primoIncomeDecreasePercentage}% compared to last month.`,
+				description: t `Primo income is decreased by ${data.primoIncomeDecreasePercentage}% compared to last month.`,
 				fields: [
 					{
-						name: "**Obtained This Month**",
-						value: `Primos: ${currentMonth.primo.totalNum}\nMora: ${currentMonth.mora}`,
+						name: t("**Obtained This Month**"),
+						value: t `Primos: ${currentMonth.primo.totalNum}\nMora: ${currentMonth.mora}`,
 						inline: true
 					},
 					{
@@ -31,13 +33,13 @@ const createEmbed = (type, diary, options = {}) => {
 						inline: true
 					},
 					{
-						name: "**Obtained Last Month**",
-						value: `Primos: ${lastMonth.primo.totalNum}\nMora: ${lastMonth.mora}`,
+						name: t("**Obtained Last Month**"),
+						value: t `Primos: ${lastMonth.primo.totalNum}\nMora: ${lastMonth.mora}`,
 						inline: true
 					},
 					{
-						name: "**Current Month\nBreakdown**",
-						value: currentMonth.primo.actionPercentages.map(item => `${item.category}: ${item.total} (${item.percentage}%)`).join("\n"),
+						name: t("**Current Month\nBreakdown**"),
+						value: currentMonth.primo.actionPercentages.map(item => `${t(item.category)}: ${item.total} (${item.percentage}%)`).join("\n"),
 						inline: true
 					},
 					{
@@ -46,14 +48,14 @@ const createEmbed = (type, diary, options = {}) => {
 						inline: true
 					},
 					{
-						name: "**Last Month\nBreakdown**",
-						value: lastMonth.primo.actionPercentages.map(item => `${item.category}: ${item.total} (${item.percentage}%)`).join("\n"),
+						name: t("**Last Month\nBreakdown**"),
+						value: lastMonth.primo.actionPercentages.map(item => `${t(item.category)}: ${item.total} (${item.percentage}%)`).join("\n"),
 						inline: true
 					}
 				],
 				timestamp: new Date(),
 				footer: {
-					text: `HoyoLab Diary - ${platform.fullName}`,
+					text: t `HoyoLab Diary - ${platform.fullName}`,
 					icon_url: data.assets.logo
 				}
 			}
@@ -64,7 +66,7 @@ const createEmbed = (type, diary, options = {}) => {
 	else if (type === "starrail") {
 		const embeds = [
 			{
-				title: `**${account.nickname}**'s Diary`,
+				title: t `**${account.nickname}**'s Diary`,
 				color: data.assets.color,
 				author: {
 					name: data.assets.author,
@@ -73,11 +75,11 @@ const createEmbed = (type, diary, options = {}) => {
 				thumbnail: {
 					url: data.assets.logo
 				},
-				description: `Jades income is decreased by ${data.jadeIncomeDecreasePercentage}% compared to last month.`,
+				description: t `Jades income is decreased by ${data.jadeIncomeDecreasePercentage}% compared to last month.`,
 				fields: [
 					{
-						name: "**Obtained This Month**",
-						value: `Jades: ${currentMonth.jades.totalNum}\nPass: ${currentMonth.pass}`,
+						name: t("**Obtained This Month**"),
+						value: t `Jades: ${currentMonth.jades.totalNum}\nPass: ${currentMonth.pass}`,
 						inline: true
 					},
 					{
@@ -86,13 +88,13 @@ const createEmbed = (type, diary, options = {}) => {
 						inline: true
 					},
 					{
-						name: "**Obtained Last Month**",
-						value: `Jades: ${lastMonth.jades.totalNum}\nPass: ${lastMonth.pass}`,
+						name: t("**Obtained Last Month**"),
+						value: t `Jades: ${lastMonth.jades.totalNum}\nPass: ${lastMonth.pass}`,
 						inline: true
 					},
 					{
-						name: "**Current Month\nBreakdown**",
-						value: currentMonth.jades.actionPercentages.map(item => `${item.category}: ${item.total} (${item.percentage}%)`).join("\n"),
+						name: t("**Current Month\nBreakdown**"),
+						value: currentMonth.jades.actionPercentages.map(item => `${t(item.category)}: ${item.total} (${item.percentage}%)`).join("\n"),
 						inline: true
 					},
 					{
@@ -101,14 +103,14 @@ const createEmbed = (type, diary, options = {}) => {
 						inline: true
 					},
 					{
-						name: "**Last Month\nBreakdown**",
-						value: lastMonth.jades.actionPercentages.map(item => `${item.category}: ${item.total} (${item.percentage}%)`).join("\n"),
+						name: t("**Last Month\nBreakdown**"),
+						value: lastMonth.jades.actionPercentages.map(item => `${t(item.category)}: ${item.total} (${item.percentage}%)`).join("\n"),
 						inline: true
 					}
 				],
 				timestamp: new Date(),
 				footer: {
-					text: `HoyoLab Diary - ${platform.fullName}`,
+					text: t `HoyoLab Diary - ${platform.fullName}`,
 					icon_url: data.assets.logo
 				}
 			}
@@ -120,11 +122,11 @@ const createEmbed = (type, diary, options = {}) => {
 
 module.exports = {
 	name: "diary",
-	description: "Check your total amount of incoming monthly resources.",
+	description: t("Check your total amount of incoming monthly resources."),
 	params: [
 		{
 			name: "game",
-			description: "The game you want to check diary for.",
+			description: t("The game you want to check diary for."),
 			type: "string",
 			choices: [
 				{ name: "Genshin Impact", value: "genshin" },
@@ -134,7 +136,7 @@ module.exports = {
 		},
 		{
 			name: "account",
-			description: "Select the account you want to check diary for.",
+			description: t("Select the account you want to check diary for."),
 			type: "string",
 			required: true,
 			accounts: true
@@ -145,7 +147,7 @@ module.exports = {
 
 		const account = app.HoyoLab.getAccountById(uid);
 		if (account.platform !== game) {
-			return interaction.reply({ content: "This account does not belong to the selected game.", ephemeral: true });
+			return interaction.reply({ content: t("This account does not belong to the selected game."), ephemeral: true });
 		}
 
 		const platform = app.HoyoLab.get(account.platform);
@@ -154,7 +156,7 @@ module.exports = {
 
 		const diary = await platform.diary(account);
 		if (diary.success === false) {
-			return interaction.editReply({ content: "Something went wrong.", ephemeral: true });
+			return interaction.editReply({ content: t("Something went wrong."), ephemeral: true });
 		}
 
 		const embedData = createEmbed(account.platform, diary, { account, platform });

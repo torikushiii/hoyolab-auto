@@ -1,3 +1,5 @@
+const { t } = require("../../localization/index.js");
+
 const CheckIn = require("./check-in.js");
 const Notes = require("./notes.js");
 const RedeemCode = require("./redeem-code.js");
@@ -34,12 +36,12 @@ module.exports = class ZenlessZoneZero extends require("../template.js") {
 
 		if (!this.id) {
 			throw new app.Error({
-				message: "No game ID provided for ZenlessZoneZero."
+				message: t("No game ID provided for ZenlessZoneZero.")
 			});
 		}
 		if (this.data.length === 0) {
 			throw new app.Error({
-				message: "No ZenlessZoneZero account data provided."
+				message: t("No ZenlessZoneZero account data provided.")
 			});
 		}
 	}
@@ -65,7 +67,7 @@ module.exports = class ZenlessZoneZero extends require("../template.js") {
 
 			if (statusCode !== 200) {
 				throw new app.Error({
-					message: "Failed to login to Zenless Zone Zero account",
+					message: t("Failed to login to Zenless Zone Zero account"),
 					args: {
 						statusCode,
 						body
@@ -76,7 +78,7 @@ module.exports = class ZenlessZoneZero extends require("../template.js") {
 			const res = body;
 			if (res.retcode !== 0) {
 				throw new app.Error({
-					message: "Failed to login to Zenless Zone Zero account",
+					message: t("Failed to login to Zenless Zone Zero account"),
 					args: {
 						retcode: res.retcode,
 						message: res.message,
@@ -87,7 +89,7 @@ module.exports = class ZenlessZoneZero extends require("../template.js") {
 
 			if (typeof res.data !== "object" || !Array.isArray(res.data.list)) {
 				throw new app.Error({
-					message: "Invalid data object received from Zenless Zone Zero account",
+					message: t("Invalid data object received from Zenless Zone Zero account"),
 					args: {
 						data: res.data
 					}
@@ -98,7 +100,7 @@ module.exports = class ZenlessZoneZero extends require("../template.js") {
 			const data = list.find(account => account.game_id === this.gameId);
 			if (!data) {
 				throw new app.Error({
-					message: "No Zenless Zone Zero account can be found with the provided game account",
+					message: t("No Zenless Zone Zero account can be found with the provided game account"),
 					args: {
 						id: this.id,
 						uid: ltuid
@@ -154,7 +156,7 @@ module.exports = class ZenlessZoneZero extends require("../template.js") {
 			});
 
 			const region = app.HoyoLab.getRegion(data.region);
-			app.Logger.info(this.fullName, `Logged into (${data.game_role_id}) ${data.nickname} (${region})`);
+			app.Logger.info(this.fullName, t `Logged into (${data.game_role_id}) ${data.nickname} (${region})`);
 		}
 	}
 

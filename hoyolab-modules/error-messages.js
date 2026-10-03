@@ -1,3 +1,5 @@
+const { t } = require("../localization/index.js");
+
 const errorMessages = {
 	1009: "The account does not exist",
 	"-100": "The provided cookie is either invalid or expired.",
@@ -31,16 +33,12 @@ const BattleRecords = (type) => {
 const errorMessage = (type, code) => {
 	const isCaptcha = CaptchaCodes.includes(code);
 	if (isCaptcha) {
-		const message = app.Utils.tag.trim `
-            Your account is currently encountered with a captcha challenge.
-            Please solve the captcha by visiting the following link to solve the challenge:
-            ${BattleRecords(type)}
-        `;
+		const message = t `Your account is currently encountered with a captcha challenge. Please solve the captcha by visiting the following link to solve the challenge: ${BattleRecords(type)}`;
 
 		return message;
 	}
 
-	return errorMessages[code];
+	return errorMessages[code] === undefined ? undefined : t(errorMessages[code]);
 };
 
 module.exports = errorMessage;

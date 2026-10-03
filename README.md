@@ -122,7 +122,19 @@ language: 'it-it',
 This sets the existing HoYoLAB language headers and locale fields used by diaries,
 Genshin code redemption, Mimo, and Hilichurl. Genshin daily check-in requests
 (`info`, `home`, and `sign`) also use this locale in their `lang` query parameter.
-The setup generator supports importing and exporting this option.
+The same option selects the software language for commands, notifications, logs,
+errors, and the setup generator. An exact regional catalog (such as `it-ch.js`)
+takes precedence over the generic language catalog (`it.js`). English and Italian
+are included; unsupported software locales and missing translations fall back to English without changing
+the configured API locale. For example, `language: 'ja-jp'` still requests Japanese
+from HoYoLAB while the software uses English. Restart the application after changing
+its language. Game names, command names, configuration keys, and API-provided text
+are not translated by the software.
+
+The setup generator switches language when this field changes or a configuration
+is imported, and preserves the locale when exporting. Startup errors before a
+configuration can be read remain in English. See [translation maintenance](localization/README.md)
+for adding or updating a language through one catalog file.
 
 ### Cache File Location
 

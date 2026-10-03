@@ -1,3 +1,5 @@
+const { t } = require("../localization/index.js");
+
 const crypto = require("node:crypto");
 
 const DataCache = require("./cache.js");
@@ -51,19 +53,19 @@ module.exports = class HoyoLab {
 		this.#id = config.id;
 		if (!this.#id) {
 			throw new app.Error({
-				message: "No ID provided for HoyoLab."
+				message: t("No ID provided for HoyoLab.")
 			});
 		}
 		else if (typeof this.#id !== "number") {
 			throw new app.Error({
-				message: "Invalid ID must be a number."
+				message: t("Invalid ID must be a number.")
 			});
 		}
 
 		const accounts = config.data;
 		if (!Array.isArray(accounts)) {
 			throw new app.Error({
-				message: "Invalid data provided for HoyoLab must be an array.",
+				message: t("Invalid data provided for HoyoLab must be an array."),
 				args: {
 					data: accounts,
 					type: typeof accounts
@@ -73,14 +75,14 @@ module.exports = class HoyoLab {
 
 		if (accounts.length === 0) {
 			throw new app.Error({
-				message: `No accounts provided for ${name}, please provide at least one account or disable the platform.`
+				message: t `No accounts provided for ${name}, please provide at least one account or disable the platform.`
 			});
 		}
 
 		for (const account of accounts) {
 			if (typeof account.cookie === "object") {
 				throw new app.Error({
-					message: "This cookie method is deprecated, please follow the new cookie guide again: https://gist.github.com/torikushiii/59eff33fc8ea89dbc0b2e7652db9d3fd"
+					message: t("This cookie method is deprecated, please follow the new cookie guide again: https://gist.github.com/torikushiii/59eff33fc8ea89dbc0b2e7652db9d3fd")
 				});
 			}
 
@@ -103,7 +105,7 @@ module.exports = class HoyoLab {
 			const { redeemCode, shopStatus, dailiesCheck, weekliesCheck, dailyLotteryCheck } = account;
 			if (dailiesCheck && typeof dailiesCheck !== "boolean") {
 				throw new app.Error({
-					message: "Invalid check provided for HoyoLab expected boolean.",
+					message: t("Invalid check provided for HoyoLab expected boolean."),
 					args: {
 						dailiesCheck,
 						type: typeof dailiesCheck
@@ -112,7 +114,7 @@ module.exports = class HoyoLab {
 			}
 			if (weekliesCheck && typeof weekliesCheck !== "boolean") {
 				throw new app.Error({
-					message: "Invalid check provided for HoyoLab expected boolean.",
+					message: t("Invalid check provided for HoyoLab expected boolean."),
 					args: {
 						weekliesCheck,
 						type: typeof weekliesCheck
@@ -121,7 +123,7 @@ module.exports = class HoyoLab {
 			}
 			if (redeemCode && typeof redeemCode !== "boolean") {
 				throw new app.Error({
-					message: "Invalid check provided for HoyoLab expected boolean.",
+					message: t("Invalid check provided for HoyoLab expected boolean."),
 					args: {
 						redeemCode,
 						type: typeof redeemCode
@@ -130,7 +132,7 @@ module.exports = class HoyoLab {
 			}
 			if (shopStatus && typeof shopStatus !== "boolean") {
 				throw new app.Error({
-					message: "Invalid check provided for HoyoLab expected boolean.",
+					message: t("Invalid check provided for HoyoLab expected boolean."),
 					args: {
 						shopStatus,
 						type: typeof shopStatus
@@ -150,7 +152,7 @@ module.exports = class HoyoLab {
 			const { realm } = account;
 			if (realm && typeof realm.check !== "boolean") {
 				throw new app.Error({
-					message: "Invalid realm.check provided for HoyoLab expected boolean.",
+					message: t("Invalid realm.check provided for HoyoLab expected boolean."),
 					args: {
 						realm,
 						type: typeof realm.check
@@ -159,7 +161,7 @@ module.exports = class HoyoLab {
 			}
 			if (realm && typeof realm.persistent !== "boolean") {
 				throw new app.Error({
-					message: "Invalid realm.persistent provided for HoyoLab expected boolean.",
+					message: t("Invalid realm.persistent provided for HoyoLab expected boolean."),
 					args: {
 						realm,
 						type: typeof realm.persistent
@@ -170,7 +172,7 @@ module.exports = class HoyoLab {
 			const { stamina } = account;
 			if (!stamina || typeof stamina.check !== "boolean" || typeof stamina.threshold !== "number" || typeof stamina.persistent !== "boolean") {
 				throw new app.Error({
-					message: "Invalid stamina object provided for HoyoLab.",
+					message: t("Invalid stamina object provided for HoyoLab."),
 					args: {
 						stamina
 					}
@@ -180,7 +182,7 @@ module.exports = class HoyoLab {
 			const maxStamina = defaults.config.maxStamina;
 			if (stamina.threshold > maxStamina) {
 				throw new app.Error({
-					message: `Invalid stamina threshold provided for ${name}. Maximum stamina is ${maxStamina}.`,
+					message: t `Invalid stamina threshold provided for ${name}. Maximum stamina is ${maxStamina}.`,
 					args: {
 						threshold: stamina.threshold
 					}
@@ -190,7 +192,7 @@ module.exports = class HoyoLab {
 			const { expedition } = account;
 			if (expedition && typeof expedition.check !== "boolean") {
 				throw new app.Error({
-					message: "Invalid expedition.check provided for HoyoLab expected boolean.",
+					message: t("Invalid expedition.check provided for HoyoLab expected boolean."),
 					args: {
 						expedition
 					}
@@ -198,7 +200,7 @@ module.exports = class HoyoLab {
 			}
 			if (expedition && typeof expedition.persistent !== "boolean") {
 				throw new app.Error({
-					message: "Invalid expedition.persistent provided for HoyoLab expected boolean.",
+					message: t("Invalid expedition.persistent provided for HoyoLab expected boolean."),
 					args: {
 						expedition
 					}
@@ -275,7 +277,7 @@ module.exports = class HoyoLab {
 
 		if (!ltoken_v2 || !ltuid_v2 || !ltmid_v2) {
 			throw new app.Error({
-				message: "No ltoken_v2, ltuid_v2, or ltmid_v2 found in cookie."
+				message: t("No ltoken_v2, ltuid_v2, or ltmid_v2 found in cookie.")
 			});
 		}
 
@@ -293,7 +295,7 @@ module.exports = class HoyoLab {
 		}
 
 		if (this.name !== "honkai") {
-			app.Logger.warn("HoyoLab", `No cookie_token_v2 or account_mid_v2 found in cookie for ${this.name}. This will disable "redeemCode" functionality.`);
+			app.Logger.warn("HoyoLab", t `No cookie_token_v2 or account_mid_v2 found in cookie for ${this.name}. This will disable "redeemCode" functionality.`);
 		}
 
 		return {
@@ -369,7 +371,7 @@ module.exports = class HoyoLab {
 			try {
 				const result = await platform.updateCookie(account);
 				if (!result.success) {
-					app.Logger.warn("HoyoAuth", `Could not refresh the cookie for account ${account.ltuid}: ${result.reason}`);
+					app.Logger.warn("HoyoAuth", t `Could not refresh the cookie for account ${account.ltuid}: ${result.reason}`);
 					results.push({
 						account: notificationAccount,
 						accounts: notificationAccounts,
@@ -400,7 +402,7 @@ module.exports = class HoyoLab {
 				});
 			}
 			catch (e) {
-				app.Logger.error("HoyoAuth", `Could not refresh the cookie for account ${account.ltuid}: ${e.message}`);
+				app.Logger.error("HoyoAuth", t `Could not refresh the cookie for account ${account.ltuid}: ${e.message}`);
 				results.push({
 					account: notificationAccount,
 					accounts: notificationAccounts,
@@ -425,7 +427,7 @@ module.exports = class HoyoLab {
 		const index = this.accounts.findIndex(i => i.uid === account.uid);
 		if (index === -1) {
 			throw new app.Error({
-				message: "Account not found in platform.",
+				message: t("Account not found in platform."),
 				args: {
 					uid: account.uid
 				}
@@ -439,7 +441,7 @@ module.exports = class HoyoLab {
 		let { whitelist, blacklist } = options;
 		if (whitelist && blacklist) {
 			throw new app.Error({
-				message: "Cannot have both a whitelist and blacklist."
+				message: t("Cannot have both a whitelist and blacklist.")
 			});
 		}
 
@@ -471,7 +473,7 @@ module.exports = class HoyoLab {
 			return {
 				success: false,
 				data: {
-					reason: "No active accounts found for this type of game."
+					reason: t("No active accounts found for this type of game.")
 				}
 			};
 		}
@@ -481,7 +483,7 @@ module.exports = class HoyoLab {
 			return {
 				success: false,
 				data: {
-					reason: "Redeem code functionality is currently disabled for this account."
+					reason: t("Redeem code functionality is currently disabled for this account.")
 				}
 			};
 		}
@@ -512,7 +514,7 @@ module.exports = class HoyoLab {
 
 		if (whitelist && blacklist) {
 			throw new app.Error({
-				message: "Cannot have both a whitelist and blacklist."
+				message: t("Cannot have both a whitelist and blacklist.")
 			});
 		}
 
@@ -555,7 +557,7 @@ module.exports = class HoyoLab {
 	static getAccountById (uid) {
 		if (typeof uid !== "string") {
 			throw new app.Error({
-				message: "Invalid UID provided for getAccountById expected string.",
+				message: t("Invalid UID provided for getAccountById expected string."),
 				args: {
 					uid,
 					type: typeof uid
@@ -588,14 +590,14 @@ module.exports = class HoyoLab {
 			case "prod_official_usa":
 				return "NA";
 			default:
-				return "Unknown";
+				return t("Unknown");
 		}
 	}
 
 	static errorMessage (type, code) {
 		if (!type || !code) {
 			throw new app.Error({
-				message: "Invalid type or code provided for HoyoError.",
+				message: t("Invalid type or code provided for HoyoError."),
 				args: {
 					type,
 					code
@@ -618,7 +620,7 @@ module.exports = class HoyoLab {
 		}
 		else {
 			throw new app.Error({
-				message: "Unrecognized identifier type.",
+				message: t("Unrecognized identifier type."),
 				args: typeof identifier
 			});
 		}
@@ -630,7 +632,7 @@ module.exports = class HoyoLab {
 	// eslint-disable-next-line no-unused-vars
 	async notes (accountData) {
 		throw new app.Error({
-			message: "This method is not implemented by the derived class."
+			message: t("This method is not implemented by the derived class.")
 		});
 	}
 
@@ -639,13 +641,13 @@ module.exports = class HoyoLab {
 	 */
 	async checkIn () {
 		throw new app.Error({
-			message: "This method is not implemented by the derived class."
+			message: t("This method is not implemented by the derived class.")
 		});
 	}
 
 	async updateCookie (accountData) {
 		if (!accountData.refreshCookie) {
-			return { success: false, reason: "No stoken configured" };
+			return { success: false, reason: t("No stoken configured") };
 		}
 
 		const res = await app.Got("HoYoLab", {
@@ -665,7 +667,7 @@ module.exports = class HoyoLab {
 
 		if (res.statusCode !== 200) {
 			app.Logger.log(`${this.fullName}:UpdateCookie`, {
-				message: "Failed to update cookie",
+				message: t("Failed to update cookie"),
 				args: {
 					platform: this.name,
 					uid: accountData.ltuid,
@@ -679,7 +681,7 @@ module.exports = class HoyoLab {
 
 		if (res.body?.retcode !== 0 || !Array.isArray(res.body?.data?.tokens)) {
 			app.Logger.log(`${this.fullName}:UpdateCookie`, {
-				message: "Failed to update cookie",
+				message: t("Failed to update cookie"),
 				args: {
 					platform: this.name,
 					uid: accountData.ltuid,
@@ -689,7 +691,7 @@ module.exports = class HoyoLab {
 				}
 			});
 
-			return { success: false, reason: res.body?.message ?? "Invalid response" };
+			return { success: false, reason: res.body?.message ?? t("Invalid response") };
 		}
 
 		const tokens = {};
@@ -703,7 +705,7 @@ module.exports = class HoyoLab {
 		}
 
 		if (!tokens.ltoken_v2 || !tokens.cookie_token_v2) {
-			return { success: false, reason: "Missing tokens in response" };
+			return { success: false, reason: t("Missing tokens in response") };
 		}
 
 		return {
@@ -718,7 +720,7 @@ module.exports = class HoyoLab {
 			return new InstancePlatform(config);
 		}
 		catch (e) {
-			console.log(`Failed to create platform ${type}.`);
+			console.log(t `Failed to create platform ${type}.`);
 			console.error(e);
 		}
 	}

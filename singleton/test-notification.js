@@ -1,3 +1,5 @@
+const { t, getLocale } = require("../localization/index.js");
+
 /**
  * Test Notification Utility
  * Handles sending test notifications to confirm platform functionality
@@ -9,11 +11,11 @@
  */
 async function sendTestNotifications (platforms) {
 	if (platforms.size === 0) {
-		app.Logger.warn("TestNotification", "No platforms configured for test notifications");
+		app.Logger.warn("TestNotification", t("No platforms configured for test notifications"));
 		return;
 	}
 
-	app.Logger.info("TestNotification", "Sending test notifications to all configured platforms");
+	app.Logger.info("TestNotification", t("Sending test notifications to all configured platforms"));
 
 	const testPromises = [];
 	for (const platform of platforms) {
@@ -31,15 +33,15 @@ async function sendTestNotifications (platforms) {
 
 		if (result.status === "fulfilled") {
 			successCount++;
-			app.Logger.info("TestNotification", `Successfully sent test notification to ${platform.name} (ID: ${platform.id})`);
+			app.Logger.info("TestNotification", t `Successfully sent test notification to ${platform.name} (ID: ${platform.id})`);
 		}
 		else {
 			failureCount++;
-			app.Logger.error("TestNotification", `Failed to send test notification to ${platform.name} (ID: ${platform.id}): ${result.reason.message}`);
+			app.Logger.error("TestNotification", t `Failed to send test notification to ${platform.name} (ID: ${platform.id}): ${result.reason.message}`);
 		}
 	}
 
-	app.Logger.info("TestNotification", `Test notifications completed: ${successCount} successful, ${failureCount} failed`);
+	app.Logger.info("TestNotification", t `Test notifications completed: ${successCount} successful, ${failureCount} failed`);
 }
 
 /**
@@ -49,49 +51,49 @@ async function sendTestNotifications (platforms) {
 async function sendPlatformTestNotification (platform) {
 	try {
 		const timestamp = new Date().toISOString();
-		const localTime = new Date().toLocaleString();
+		const localTime = new Date().toLocaleString(getLocale());
 
 		const platformName = platform.name?.toLowerCase() || "unknown";
 		switch (platformName) {
 			case "discord":
 				// Send a simple message to Discord bot (if it has access to channels)
 				// Note: Discord bots need proper channel access to send messages
-				app.Logger.info("TestNotification", `Discord bot (ID: ${platform.id}) is connected and ready`);
+				app.Logger.info("TestNotification", t `Discord bot (ID: ${platform.id}) is connected and ready`);
 				break;
 
 			case "gotify":
 			case "webhook": {
-				const platformLabel = platformName === "gotify" ? "Gotify" : "Discord Webhook";
+				const platformLabel = platformName === "gotify" ? "Gotify" : t("Discord Webhook");
 				const testEmbed = {
-					title: "🔥 HoyoLab Auto - Test Notification",
-					description: `This is a test notification to confirm that ${platformLabel} is working properly.`,
+					title: t("🔥 HoyoLab Auto - Test Notification"),
+					description: t `This is a test notification to confirm that ${platformLabel} is working properly.`,
 					color: 3447003,
 					fields: [
 						{
-							name: "Status",
-							value: "✅ Connected",
+							name: t("Status"),
+							value: t("✅ Connected"),
 							inline: true
 						},
 						{
-							name: "Local Time",
+							name: t("Local Time"),
 							value: localTime,
 							inline: true
 						},
 						{
-							name: "Platform",
+							name: t("Platform"),
 							value: platformLabel,
 							inline: true
 						}
 					],
 					footer: {
-						text: "HoyoLab Auto Test System",
+						text: t("HoyoLab Auto Test System"),
 						icon_url: "https://i.ibb.co/nRqTkXv/image.png"
 					},
 					timestamp
 				};
 
 				await platform.send(testEmbed, {
-					content: "🚀 **HoyoLab Auto Started Successfully!**",
+					content: t("🚀 **HoyoLab Auto Started Successfully!**"),
 					author: "HoyoLab Auto",
 					icon: "https://i.ibb.co/nRqTkXv/image.png"
 				});
@@ -101,25 +103,25 @@ async function sendPlatformTestNotification (platform) {
 			case "telegram": {
 				// Send a test message to Telegram
 				const escapeMarkdown = (text) => text.replace(/[_*[\]()~`>#+=|{}.!-]/g, "\\$&");
-				const testMessage = `🔥 *HoyoLab Auto \\- Test Notification*\n\n`
-					+ `This is a test notification to confirm that the Telegram bot is working properly\\.\n\n`
-					+ `✅ *Status:* Connected\n`
-					+ `🕒 *Local Time:* ${escapeMarkdown(localTime)}\n`
-					+ `🤖 *Platform:* Telegram Bot\n\n`
-					+ `🚀 *HoyoLab Auto Started Successfully\\!*`;
+				const testMessage = t `🔥 *HoyoLab Auto \\- Test Notification*\n\n`
+					+ t `This is a test notification to confirm that the Telegram bot is working properly\\.\n\n`
+					+ t `✅ *Status:* Connected\n`
+					+ t `🕒 *Local Time:* ${escapeMarkdown(localTime)}\n`
+					+ t `🤖 *Platform:* Telegram Bot\n\n`
+					+ t `🚀 *HoyoLab Auto Started Successfully\\!*`;
 
 				await platform.send(testMessage);
 				break;
 			}
 
 			default:
-				app.Logger.warn("TestNotification", `Unknown platform type: ${platform.name || "undefined"}`);
+				app.Logger.warn("TestNotification", t `Unknown platform type: ${platform.name || "undefined"}`);
 				break;
 		}
 	}
 	catch (e) {
 		throw new app.Error({
-			message: `Failed to send test notification to ${platform.name || "undefined platform"}`,
+			message: t `Failed to send test notification to ${platform.name || t("undefined platform")}`,
 			args: { error: e.message }
 		});
 	}
@@ -131,47 +133,47 @@ async function sendPlatformTestNotification (platform) {
  * @param {Object} options - Additional options for the test message
  */
 async function sendManualTestNotification (platform, options = {}) {
-	const customMessage = options.message || "Manual test notification triggered";
+	const customMessage = options.message || t("Manual test notification triggered");
 
 	try {
 		const timestamp = new Date().toISOString();
-		const localTime = new Date().toLocaleString();
+		const localTime = new Date().toLocaleString(getLocale());
 
 		const platformName = platform.name?.toLowerCase() || "unknown";
 		switch (platformName) {
 			case "gotify":
 			case "webhook": {
-				const platformLabel = platformName === "gotify" ? "Gotify" : "Discord Webhook";
+				const platformLabel = platformName === "gotify" ? "Gotify" : t("Discord Webhook");
 				const testEmbed = {
-					title: "🧪 HoyoLab Auto - Manual Test",
+					title: t("🧪 HoyoLab Auto - Manual Test"),
 					description: customMessage,
 					color: 16776960, // Yellow color for manual tests
 					fields: [
 						{
-							name: "Test Type",
-							value: "Manual",
+							name: t("Test Type"),
+							value: t("Manual"),
 							inline: true
 						},
 						{
-							name: "Triggered At",
+							name: t("Triggered At"),
 							value: localTime,
 							inline: true
 						},
 						{
-							name: "Platform",
+							name: t("Platform"),
 							value: platformLabel,
 							inline: true
 						}
 					],
 					footer: {
-						text: "HoyoLab Auto Manual Test",
+						text: t("HoyoLab Auto Manual Test"),
 						icon_url: "https://i.ibb.co/nRqTkXv/image.png"
 					},
 					timestamp
 				};
 
 				await platform.send(testEmbed, {
-					content: "🧪 **Manual Test Notification**",
+					content: t("🧪 **Manual Test Notification**"),
 					author: "HoyoLab Auto",
 					icon: "https://i.ibb.co/nRqTkXv/image.png"
 				});
@@ -180,11 +182,11 @@ async function sendManualTestNotification (platform, options = {}) {
 
 			case "telegram": {
 				const escapeMarkdown = (text) => text.replace(/[_*[\]()~`>#+=|{}.!-]/g, "\\$&");
-				const testMessage = `🧪 *HoyoLab Auto \\- Manual Test*\n\n`
+				const testMessage = t `🧪 *HoyoLab Auto \\- Manual Test*\n\n`
 					+ `${escapeMarkdown(customMessage)}\n\n`
-					+ `🔧 *Test Type:* Manual\n`
-					+ `🕒 *Triggered At:* ${escapeMarkdown(localTime)}\n`
-					+ `🤖 *Platform:* Telegram Bot`;
+					+ t `🔧 *Test Type:* Manual\n`
+					+ t `🕒 *Triggered At:* ${escapeMarkdown(localTime)}\n`
+					+ t `🤖 *Platform:* Telegram Bot`;
 
 				await platform.send(testMessage);
 				break;
@@ -194,11 +196,11 @@ async function sendManualTestNotification (platform, options = {}) {
 				// For Discord bots, we can't use the simple send method directly from the command
 				// The Discord platform context doesn't have the same send method as webhooks
 				// Instead, we'll return a reply that will be handled by the Discord platform
-				app.Logger.info("TestNotification", `Manual test triggered for Discord bot (ID: ${platform.id}): ${customMessage}`);
+				app.Logger.info("TestNotification", t `Manual test triggered for Discord bot (ID: ${platform.id}): ${customMessage}`);
 				return true;
 
 			default:
-				app.Logger.warn("TestNotification", `Manual test not supported for platform type: ${platform.name || "undefined"}`);
+				app.Logger.warn("TestNotification", t `Manual test not supported for platform type: ${platform.name || "undefined"}`);
 				break;
 		}
 
@@ -206,7 +208,7 @@ async function sendManualTestNotification (platform, options = {}) {
 	}
 	catch (e) {
 		throw new app.Error({
-			message: `Failed to send manual test notification to ${platform.name || "undefined platform"}`,
+			message: t `Failed to send manual test notification to ${platform.name || t("undefined platform")}`,
 			args: { error: e.message }
 		});
 	}

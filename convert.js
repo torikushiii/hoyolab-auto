@@ -1,3 +1,5 @@
+const { t, setLanguage } = require("./localization/index.js");
+
 const fs = require("node:fs");
 const path = require("node:path");
 const JSON5 = require("json5");
@@ -33,13 +35,14 @@ function convertConfig (filePath, outputFilePath) {
 		config = JSON.parse(cleanedContent);
 	}
 	else {
-		throw new Error("Unsupported file format. Only .js and .jsonc files are supported.");
+		throw new Error(t("Unsupported file format. Only .js and .jsonc files are supported."));
 	}
 
+	setLanguage(config.language);
 	kebabToCamelCase(config);
 
 	fs.writeFileSync(outputFilePath, JSON5.stringify(config, null, 4));
-	console.log(`${filePath} converted to ${outputFilePath}`);
+	console.log(t `${filePath} converted to ${outputFilePath}`);
 }
 
 function autoConvert () {
@@ -54,7 +57,7 @@ function autoConvert () {
 		convertConfig(jsoncFilePath, path.join(directoryPath, "config.json5"));
 	}
 	else {
-		console.error("No config.js or config.jsonc file found in the directory.");
+		console.error(t("No config.js or config.jsonc file found in the directory."));
 	}
 }
 

@@ -1,10 +1,12 @@
+const { t } = require("../localization/index.js");
+
 module.exports = class Webhook extends require("./template.js") {
 	constructor (config) {
 		super("webhook", config);
 
 		if (!this.url) {
 			throw new app.Error({
-				message: "No webhook URL provided"
+				message: t("No webhook URL provided")
 			});
 		}
 	}
@@ -14,7 +16,7 @@ module.exports = class Webhook extends require("./template.js") {
 	async send (message, options = {}) {
 		if (typeof message !== "object") {
 			throw new app.Error({
-				message: "Provided message is not an object",
+				message: t("Provided message is not an object"),
 				args: {
 					message: {
 						type: typeof message,
@@ -42,7 +44,7 @@ module.exports = class Webhook extends require("./template.js") {
 
 		if (res.statusCode !== 200) {
 			throw new app.Error({
-				message: "Failed to send webhook message",
+				message: t("Failed to send webhook message"),
 				args: {
 					statusCode: res.statusCode,
 					statusMessage: res.statusMessage

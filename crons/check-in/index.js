@@ -1,11 +1,13 @@
+const { t } = require("../../localization/index.js");
+
 module.exports = {
 	name: "check-in",
 	expression: "0 0 0 * * *",
-	description: "Run daily check-in every day at midnight or your specified time",
+	description: t("Run daily check-in every day at midnight or your specified time"),
 	code: (async function checkIn () {
 		const accounts = app.HoyoLab.getActiveAccounts();
 		if (accounts.length === 0) {
-			app.Logger.warn("Cron:CheckIn", "No active accounts found for HoyoLab");
+			app.Logger.warn("Cron:CheckIn", t("No active accounts found for HoyoLab"));
 			return;
 		}
 
@@ -16,7 +18,7 @@ module.exports = {
 
 			const execution = await platform.checkIn();
 			if (execution.length === 0) {
-				app.Logger.info("Cron:CheckIn", "All accounts either signed in or failed to sign in");
+				app.Logger.info("Cron:CheckIn", t("All accounts either signed in or failed to sign in"));
 				continue;
 			}
 
@@ -24,7 +26,7 @@ module.exports = {
 		}
 
 		if (messages.length === 0) {
-			app.Logger.info("Cron:CheckIn", "No accounts to run check-in for");
+			app.Logger.info("Cron:CheckIn", t("No accounts to run check-in for"));
 			return;
 		}
 
@@ -35,16 +37,16 @@ module.exports = {
 
 			let fields = [
 				{ name: "UID", value: message.uid, inline: true },
-				{ name: "Username", value: message.username, inline: true },
-				{ name: "Region", value: message.region, inline: true },
-				{ name: "Rank", value: message.rank, inline: true },
-				{ name: "Today's Reward", value: `${message.award.name} x${message.award.count}`, inline: true },
-				{ name: "Total Sign-ins", value: message.total, inline: true },
-				{ name: "Result", value: message.result, inline: true }
+				{ name: t("Username"), value: message.username, inline: true },
+				{ name: t("Region"), value: message.region, inline: true },
+				{ name: t("Rank"), value: message.rank, inline: true },
+				{ name: t("Today's Reward"), value: `${message.award.name} x${message.award.count}`, inline: true },
+				{ name: t("Total Sign-ins"), value: message.total, inline: true },
+				{ name: t("Result"), value: message.result, inline: true }
 			];
 
 			if (message.platform === "tot") {
-				fields = fields.filter(i => i.name !== "Username" && i.name !== "Rank");
+				fields = fields.filter(i => i.name !== t("Username") && i.name !== t("Rank"));
 			}
 
 			const embed = {
@@ -60,7 +62,7 @@ module.exports = {
 				fields,
 				timestamp: new Date(),
 				footer: {
-					text: `HoyoLab Auto Check-In (${i + 1}/${messages.length}) Executed`,
+					text: t `HoyoLab Auto Check-In (${i + 1}/${messages.length}) Executed`,
 					icon_url: message.assets.logo
 				}
 			};
@@ -73,13 +75,13 @@ module.exports = {
 			}
 
 			const messageText = [
-				`🎮 **${message.assets.game}** Daily Check-In`,
+				t `🎮 **${message.assets.game}** Daily Check-In`,
 				`🆔 **(${message.uid})** ${message.username}`,
-				`🌍 **Region:** ${message.region}`,
-				`🏆 **Rank:** ${message.rank}`,
-				`🎁 **Today's Reward:** ${message.award.name} x${message.award.count}`,
-				`📅 **Total Sign-ins:** ${message.total}`,
-				`📝 **Result:** ${message.result}`
+				t `🌍 **Region:** ${message.region}`,
+				t `🏆 **Rank:** ${message.rank}`,
+				t `🎁 **Today's Reward:** ${message.award.name} x${message.award.count}`,
+				t `📅 **Total Sign-ins:** ${message.total}`,
+				t `📝 **Result:** ${message.result}`
 			].join("\n");
 
 			const escapedMessage = app.Utils.escapeCharacters(messageText);

@@ -1,3 +1,5 @@
+const { t } = require("../localization/index.js");
+
 const { CronJob } = require("cron");
 
 const CheckIn = require("./check-in/index.js");
@@ -43,7 +45,7 @@ const FixedScheduleCrons = [
 const initCrons = () => {
 	const { blacklist = [], whitelist = []} = config.crons;
 	if (blacklist.length > 0 && whitelist.length > 0) {
-		throw new Error(`Cannot have both a blacklist and a whitelist for crons`);
+		throw new Error(t `Cannot have both a blacklist and a whitelist for crons`);
 	}
 
 	const crons = [];
@@ -73,7 +75,7 @@ const initCrons = () => {
 		crons.push(cron);
 	}
 
-	app.Logger.info("Cron", `Initialized ${crons.length} cron jobs`);
+	app.Logger.info("Cron", t `Initialized ${crons.length} cron jobs`);
 	return crons;
 };
 

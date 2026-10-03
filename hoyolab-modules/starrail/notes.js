@@ -1,3 +1,5 @@
+const { t } = require("../../localization/index.js");
+
 module.exports = class RealtimeNotes {
 	/** @type {import("../template")} */
 	#instance;
@@ -52,7 +54,7 @@ module.exports = class RealtimeNotes {
 
 		if (res.statusCode !== 200) {
 			app.Logger.log(`${this.#instance.fullName}:Notes`, {
-				message: "Failed to fetch data from hoyolab",
+				message: t("Failed to fetch data from hoyolab"),
 				args: {
 					platform: this.#instance.name,
 					uid: accountData.uid,
@@ -66,7 +68,7 @@ module.exports = class RealtimeNotes {
 		if (res.body.retcode !== 0) {
 			if (res.body.retcode !== -501000) {
 				app.Logger.log(`${this.#instance.fullName}:Notes`, {
-					message: "HoyoLab returned non-zero retcode",
+					message: t("HoyoLab returned non-zero retcode"),
 					args: {
 						cause: app.HoyoLab.errorMessage(this.#instance.name, res.body.retcode),
 						platform: this.#instance.name,

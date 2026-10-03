@@ -1,3 +1,5 @@
+const { t } = require("../../localization/index.js");
+
 const { setTimeout: sleep } = require("node:timers/promises");
 
 module.exports = class Diary {
@@ -35,7 +37,7 @@ module.exports = class Diary {
 
 		if (jadesPromise.status === "rejected" || passPromises.status === "rejected") {
 			app.Logger.log(`${this.#instance.fullName}:Diary`, {
-				message: "Failed to fetch diary data",
+				message: t("Failed to fetch diary data"),
 				args: {
 					platform: this.#instance.name,
 					uid: accountData.uid,
@@ -177,13 +179,13 @@ module.exports = class Diary {
 
 				if (res.body.retcode !== 0) {
 					if (res.body.retcode === -500001 && retryCount < maxRetries) {
-						app.Logger.debug(`${this.#instance.fullName}:Diary`, `Rate limited, retrying in ${retryDelay / 1000}s... (attempt ${retryCount + 1}/${maxRetries})`);
+						app.Logger.debug(`${this.#instance.fullName}:Diary`, t `Rate limited, retrying in ${retryDelay / 1000}s... (attempt ${retryCount + 1}/${maxRetries})`);
 						await sleep(retryDelay);
 						return fetchMonthData(month, retryCount + 1);
 					}
 
 					app.Logger.log(`${this.#instance.fullName}:Diary`, {
-						message: "Failed to fetch diary data",
+						message: t("Failed to fetch diary data"),
 						args: {
 							cause: app.HoyoLab.errorMessage(this.#instance.name, res.body.retcode),
 							platform: this.#instance.name,

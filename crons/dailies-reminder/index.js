@@ -1,3 +1,5 @@
+const { t } = require("../../localization/index.js");
+
 const RegionalTaskManager = new app.RegionalTaskManager();
 const config = require("../../config.js");
 
@@ -28,22 +30,22 @@ RegionalTaskManager.registerTask("DailiesReminder", reminderHour, reminderMinute
 	const platforms = app.Platform.getForAccount(account);
 	const embed = {
 		color: data.assets.color,
-		title: "Dailies Reminder",
+		title: t("Dailies Reminder"),
 		author: {
 			name: data.assets.author,
 			icon_url: data.assets.logo
 		},
-		description: "Don't forget to complete your dailies!",
+		description: t("Don't forget to complete your dailies!"),
 		fields: [
 			{ name: "UID", value: account.uid, inline: true },
-			{ name: "Username", value: account.nickname, inline: true },
-			{ name: "Region", value: app.HoyoLab.getRegion(account.region), inline: true },
-			{ name: "Completed Dailies", value: `${data.dailies.task}/${data.dailies.maxTask}`, inline: true },
-			{ name: "Current Stamina", value: `${current}/${max} (${delta})`, inline: true }
+			{ name: t("Username"), value: account.nickname, inline: true },
+			{ name: t("Region"), value: app.HoyoLab.getRegion(account.region), inline: true },
+			{ name: t("Completed Dailies"), value: `${data.dailies.task}/${data.dailies.maxTask}`, inline: true },
+			{ name: t("Current Stamina"), value: `${current}/${max} (${delta})`, inline: true }
 		],
 		timestamp: new Date(),
 		footer: {
-			text: "Dailies Reminder",
+			text: t("Dailies Reminder"),
 			icon_url: data.assets.logo
 		}
 	};
@@ -58,12 +60,12 @@ RegionalTaskManager.registerTask("DailiesReminder", reminderHour, reminderMinute
 	}
 
 	const messageText = [
-		`📢 Dailies Reminder, Don't Forget to Do Your Dailies!`,
-		`🎮 **Game**: ${data.assets.game}`,
-		`🆔 **UID**: ${account.uid} ${account.nickname}`,
-		`🌍 **Region**: ${app.HoyoLab.getRegion(account.region)}`,
-		`📅 **Completed Dailies**: ${data.dailies.task}/${data.dailies.maxTask}`,
-		`🔋 **Current Stamina**: ${current}/${max} (${delta})`
+		t `📢 Dailies Reminder, Don't Forget to Do Your Dailies!`,
+		t `🎮 **Game**: ${data.assets.game}`,
+		t `🆔 **UID**: ${account.uid} ${account.nickname}`,
+		t `🌍 **Region**: ${app.HoyoLab.getRegion(account.region)}`,
+		t `📅 **Completed Dailies**: ${data.dailies.task}/${data.dailies.maxTask}`,
+		t `🔋 **Current Stamina**: ${current}/${max} (${delta})`
 	].join("\n");
 
 	const escapedMessage = app.Utils.escapeCharacters(messageText);
@@ -75,7 +77,7 @@ RegionalTaskManager.registerTask("DailiesReminder", reminderHour, reminderMinute
 module.exports = {
 	name: "dailies-reminder",
 	expression: "* * * * *",
-	description: "Reminds you to complete your dailies.",
+	description: t("Reminds you to complete your dailies."),
 	code: (async function dailiesReminder () {
 		// eslint-disable-next-line object-curly-spacing
 		await RegionalTaskManager.executeTasks({ blacklist: ["honkai", "tot"] });

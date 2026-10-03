@@ -1,3 +1,5 @@
+const { t } = require("../../localization/index.js");
+
 const { setTimeout } = require("node:timers/promises");
 const crypto = require("node:crypto");
 
@@ -36,7 +38,7 @@ const GAME_CONFIG = [
 		accountFilter: "honkai",
 		platform: "honkai",
 		redeemable: false,
-		manualReason: "Redeem this code via the in-game exchange center."
+		manualReason: t("Redeem this code via the in-game exchange center.")
 	},
 	{
 		key: "tot",
@@ -45,7 +47,7 @@ const GAME_CONFIG = [
 		accountFilter: "tot",
 		platform: "tot",
 		redeemable: false,
-		manualReason: "Redeem this code from the in-game Exchange menu."
+		manualReason: t("Redeem this code from the in-game Exchange menu.")
 	}
 ];
 
@@ -56,7 +58,7 @@ const REDEMPTION_LINKS = GAME_CONFIG.reduce((acc, game) => {
 	return acc;
 }, {});
 
-const DEFAULT_MANUAL_REASON = "Redeem this code from within the game client.";
+const DEFAULT_MANUAL_REASON = t("Redeem this code from within the game client.");
 const FINAL_REDEMPTION_ERRORS = new Set([-2001, -2003, -2017]);
 
 const toUpperCase = (value) => String(value).toUpperCase();
@@ -274,7 +276,7 @@ const buildMessage = (status, data) => {
 
 	const gameName = account.game?.name
 		?? data.gameName
-		?? (data.gameKey ? data.gameKey.toUpperCase() : (account.platform ? account.platform.toUpperCase() : "Unknown Game"));
+		?? (data.gameKey ? data.gameKey.toUpperCase() : (account.platform ? account.platform.toUpperCase() : t("Unknown Game")));
 
 	const redeemLinkBase = REDEMPTION_LINKS[data.gameKey ?? data.platform ?? account.platform];
 	const redeemLink = redeemLinkBase && data.code ? `${redeemLinkBase}?code=${data.code.code}` : null;
@@ -283,37 +285,37 @@ const buildMessage = (status, data) => {
 	const detailLines = [];
 	let includeRewards = false;
 	let includeManualLink = false;
-	let manualLinkLabel = "Manually Redeem Here";
+	let manualLinkLabel = t("Manually Redeem Here");
 
 	switch (status) {
 		case "success":
-			messageTitle = "Code Successfully Redeemed!";
+			messageTitle = t("Code Successfully Redeemed!");
 			includeRewards = true;
 			break;
 		case "failed":
-			messageTitle = data.loginExpired ? "Code Redemption Paused - HoYoLAB Login Expired" : `Code Redeem Failed! (${data.reason})`;
+			messageTitle = data.loginExpired ? t("Code Redemption Paused - HoYoLAB Login Expired") : t `Code Redeem Failed! (${data.reason})`;
 			if (data.loginExpired) {
-				detailLines.push("Update your HoYoLAB cookie or restore automatic cookie refresh. Pending codes will be retried after the cookie is renewed.");
+				detailLines.push(t("Update your HoYoLAB cookie or restore automatic cookie refresh. Pending codes will be retried after the cookie is renewed."));
 			}
 			includeManualLink = Boolean(redeemLink);
 			break;
 		case "manual":
-			messageTitle = "Code Found - Manual Redemption Required";
+			messageTitle = t("Code Found - Manual Redemption Required");
 			detailLines.push(data.reason ?? DEFAULT_MANUAL_REASON);
 			includeRewards = true;
 			includeManualLink = Boolean(redeemLink);
-			manualLinkLabel = "Redeem Online";
+			manualLinkLabel = t("Redeem Online");
 			break;
 		default:
 			throw new app.Error({
-				message: "Unknown code redeem status received.",
+				message: t("Unknown code redeem status received."),
 				args: { status }
 			});
 	}
 
 	const headerLine = isManual
 		? `[${gameName}]`
-		: `[${gameName}] (${account.uid ?? "Unknown UID"}) ${account.nickname ?? "Unknown"}`;
+		: `[${gameName}] (${account.uid ?? t("Unknown UID")}) ${account.nickname ?? t("Unknown")}`;
 
 	const messageParts = [
 		headerLine,
@@ -325,7 +327,7 @@ const buildMessage = (status, data) => {
 	}
 
 	if (data.code) {
-		messageParts.push(`\nCode: ${data.code.code}`);
+		messageParts.push(t `\nCode: ${data.code.code}`);
 	}
 
 	if (includeManualLink && redeemLink) {
@@ -333,14 +335,14 @@ const buildMessage = (status, data) => {
 	}
 
 	if (includeRewards && Array.isArray(data.code.rewards) && data.code.rewards.length > 0) {
-		messageParts.push(`\nRewards: ${data.code.rewards.join(", ")}`);
+		messageParts.push(t `\nRewards: ${data.code.rewards.join(", ")}`);
 	}
 
 	const embedDescriptionParts = [
-		isManual ? null : `(${account.uid ?? "Unknown UID"}) ${account.nickname ?? "Unknown"}`,
+		isManual ? null : `(${account.uid ?? t("Unknown UID")}) ${account.nickname ?? t("Unknown")}`,
 		`\n${messageTitle}`,
 		...detailLines.map(line => `\n${line}`),
-		data.code ? `\nCode: ${data.code.code}` : null
+		data.code ? t `\nCode: ${data.code.code}` : null
 	].filter(Boolean);
 
 	if (includeManualLink && redeemLink) {
@@ -348,12 +350,12 @@ const buildMessage = (status, data) => {
 	}
 
 	if (includeRewards && Array.isArray(data.code.rewards) && data.code.rewards.length > 0) {
-		embedDescriptionParts.push(`\nRewards: ${data.code.rewards.join(", ")}`);
+		embedDescriptionParts.push(t `\nRewards: ${data.code.rewards.join(", ")}`);
 	}
 
 	const embed = {
 		color: assets.color ?? 0x5865F2,
-		title: `${gameName} Code Redeem`,
+		title: t `${gameName} Code Redeem`,
 		author: {
 			name: assets.author ?? "HoyoLab Auto",
 			icon_url: assets.logo ?? null

@@ -1,3 +1,5 @@
+const { t } = require("../../localization/index.js");
+
 module.exports = class CheckIn {
 	/** @type {import("../template")} */
 	#instance;
@@ -13,7 +15,7 @@ module.exports = class CheckIn {
 	async checkAndExecute () {
 		const accounts = this.#instance.accounts;
 		if (accounts.length === 0) {
-			app.Logger.warn("No active accounts found for Tears of Themis");
+			app.Logger.warn(t("No active accounts found for Tears of Themis"));
 			return;
 		}
 
@@ -44,7 +46,7 @@ module.exports = class CheckIn {
 			};
 
 			if (data.isSigned) {
-				app.Logger.info(`${this.#instance.fullName}:CheckIn`, `Already signed in today`);
+				app.Logger.info(`${this.#instance.fullName}:CheckIn`, t `Already signed in today`);
 
 				success.push({
 					uid: account.uid,
@@ -69,7 +71,7 @@ module.exports = class CheckIn {
 				continue;
 			}
 
-			app.Logger.info(`${this.#instance.fullName}:CheckIn`, `Today's Reward: ${awardObject.name} x${awardObject.count}`);
+			app.Logger.info(`${this.#instance.fullName}:CheckIn`, t `Today's Reward: ${awardObject.name} x${awardObject.count}`);
 
 			success.push({
 				uid: account.uid,
@@ -106,7 +108,7 @@ module.exports = class CheckIn {
 
 		if (res.statusCode !== 200) {
 			app.Logger.log(`${this.#instance.name}`, {
-				message: "Failed to sign in",
+				message: t("Failed to sign in"),
 				args: {
 					status: res.statusCode,
 					body: res.body
@@ -119,7 +121,7 @@ module.exports = class CheckIn {
 		}
 		if (res.body.retcode !== 0) {
 			app.Logger.log(`${this.#instance.name}`, {
-				message: "Failed to sign in",
+				message: t("Failed to sign in"),
 				args: {
 					status: res.body.retcode,
 					body: res.body
@@ -150,7 +152,7 @@ module.exports = class CheckIn {
 
 		if (res.statusCode !== 200) {
 			app.Logger.log(this.#instance.fullName, {
-				message: "Failed to get sign info",
+				message: t("Failed to get sign info"),
 				args: {
 					status: res.statusCode,
 					body: res.body
@@ -163,7 +165,7 @@ module.exports = class CheckIn {
 		}
 		if (res.body.retcode !== 0) {
 			app.Logger.log(this.#instance.fullName, {
-				message: "Info returned non-zero retcode",
+				message: t("Info returned non-zero retcode"),
 				args: {
 					status: res.body.retcode,
 					body: res.body
@@ -200,7 +202,7 @@ module.exports = class CheckIn {
 
 		if (res.statusCode !== 200) {
 			app.Logger.log(this.#instance.fullName, {
-				message: "Failed to get awards data",
+				message: t("Failed to get awards data"),
 				args: {
 					status: res.statusCode,
 					body: res.body
@@ -213,7 +215,7 @@ module.exports = class CheckIn {
 		}
 		if (res.body.retcode !== 0) {
 			app.Logger.log(this.#instance.fullName, {
-				message: "Failed to get awards data",
+				message: t("Failed to get awards data"),
 				args: {
 					status: res.body.retcode,
 					body: res.body
@@ -228,7 +230,7 @@ module.exports = class CheckIn {
 		const data = res.body.data;
 		if (data.awards.length === 0) {
 			throw new app.Error({
-				message: "No awards data available (?)",
+				message: t("No awards data available (?)"),
 				args: {
 					platform: this.#instance.name,
 					body: res.body
