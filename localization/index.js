@@ -69,7 +69,15 @@
 
 	function setLanguage (value) {
 		language = normalizeLanguage(value);
-		loadNodeCatalog(language);
+		try {
+			loadNodeCatalog(language);
+		}
+		catch (e) {
+			console.warn(`Could not load the "${language}" localization catalog, falling back to English: ${e.message}`);
+			language = "en-us";
+			activeCatalog = null;
+			return;
+		}
 		activeCatalog = getCatalogCandidates(language)
 			.map(candidate => catalogs.get(candidate))
 			.find(Boolean) ?? null;

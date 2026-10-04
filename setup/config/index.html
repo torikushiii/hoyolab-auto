@@ -736,7 +736,8 @@
                     importConfigFromText(event.target.result);
                 }
                 catch (error) {
-                    setImportStatus(error.message || t('Failed to import configuration.'), true);
+                    const { message, values } = error.i18n ?? { message: error.message || 'Failed to import configuration.', values: [] };
+                    setImportStatus(message, true, ...values);
                 }
             };
             reader.onerror = function () {
@@ -745,9 +746,15 @@
             reader.readAsText(fileInput.files[0]);
         }
 
+        function importError(message, ...values) {
+            const error = new Error(t(message, ...values));
+            error.i18n = { message, values };
+            return error;
+        }
+
         function importConfigFromText(text) {
             if (!text) {
-                throw new Error(t('The selected file is empty.'));
+                throw importError('The selected file is empty.');
             }
 
             let parsedConfig;
@@ -755,20 +762,20 @@
                 parsedConfig = JSON5.parse(text);
             }
             catch (error) {
-                throw new Error(t('Failed to parse configuration: {0}', error.message));
+                throw importError('Failed to parse configuration: {0}', error.message);
             }
 
             populateFormFromConfig(parsedConfig);
             setImportStatus('Config imported successfully.', false);
         }
 
-        function setImportStatus(message, isError) {
+        function setImportStatus(message, isError, ...values) {
             const statusElement = document.getElementById('importStatus');
             if (!statusElement) {
                 return;
             }
 
-            setLocalizedText(statusElement, message || '');
+            setLocalizedText(statusElement, message || '', ...values);
             statusElement.classList.remove('status-error', 'status-success');
 
             if (!message) {
@@ -780,7 +787,7 @@
 
         function populateFormFromConfig(config) {
             if (!config || typeof config !== 'object') {
-                throw new Error(t('Invalid configuration file.'));
+                throw importError('Invalid configuration file.');
             }
 
             setInputValue(document.getElementById('language'), config.language || 'en-us');
