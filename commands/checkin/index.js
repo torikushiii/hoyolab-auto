@@ -1,13 +1,15 @@
+const { t } = require("../../localization/index.js");
+
 module.exports = {
 	name: "checkin",
-	description: "Manually run check-in for all games or a specific game.",
+	description: t("Manually run check-in for all games or a specific game."),
 	params: [
 		{
 			name: "game",
-			description: "The game you want to check-in for. Leave empty to check-in for all games.",
+			description: t("The game you want to check-in for. Leave empty to check-in for all games."),
 			type: "string",
 			choices: [
-				{ name: "All Games", value: "all" },
+				{ name: t("All Games"), value: "all" },
 				{ name: "Genshin Impact", value: "genshin" },
 				{ name: "Honkai Impact 3rd", value: "honkai" },
 				{ name: "Honkai: Star Rail", value: "starrail" },
@@ -36,7 +38,7 @@ module.exports = {
 			: app.HoyoLab.getActivePlatform();
 
 		if (activeGameAccounts.length === 0) {
-			const message = "No active game accounts found.";
+			const message = t("No active game accounts found.");
 			return interaction
 				? interaction.reply({ content: message, ephemeral: true })
 				: { success: false, reply: message };
@@ -65,7 +67,7 @@ module.exports = {
 			}
 			catch (e) {
 				app.Logger.error("Command:CheckIn", {
-					message: "Check-in failed",
+					message: t("Check-in failed"),
 					game: name,
 					error: e.message
 				});
@@ -74,7 +76,7 @@ module.exports = {
 		}
 
 		if (results.length === 0 && errors.length === 0) {
-			const message = "All accounts have already checked in today or no accounts found.";
+			const message = t("All accounts have already checked in today or no accounts found.");
 			return interaction
 				? interaction.editReply({ content: message })
 				: { success: true, reply: message };
@@ -84,16 +86,16 @@ module.exports = {
 			const embeds = results.map((message, i) => {
 				let fields = [
 					{ name: "UID", value: message.uid, inline: true },
-					{ name: "Username", value: message.username, inline: true },
-					{ name: "Region", value: message.region, inline: true },
-					{ name: "Rank", value: message.rank, inline: true },
-					{ name: "Today's Reward", value: `${message.award.name} x${message.award.count}`, inline: true },
-					{ name: "Total Sign-ins", value: message.total, inline: true },
-					{ name: "Result", value: message.result, inline: true }
+					{ name: t("Username"), value: message.username, inline: true },
+					{ name: t("Region"), value: message.region, inline: true },
+					{ name: t("Rank"), value: message.rank, inline: true },
+					{ name: t("Today's Reward"), value: `${message.award.name} x${message.award.count}`, inline: true },
+					{ name: t("Total Sign-ins"), value: message.total, inline: true },
+					{ name: t("Result"), value: message.result, inline: true }
 				];
 
 				if (message.platform === "tot") {
-					fields = fields.filter(f => f.name !== "Username" && f.name !== "Rank");
+					fields = fields.filter(f => f.name !== t("Username") && f.name !== t("Rank"));
 				}
 
 				return {
@@ -109,7 +111,7 @@ module.exports = {
 					fields,
 					timestamp: new Date(),
 					footer: {
-						text: `Manual Check-In (${i + 1}/${results.length})`,
+						text: t `Manual Check-In (${i + 1}/${results.length})`,
 						icon_url: message.assets.logo
 					}
 				};
@@ -118,7 +120,7 @@ module.exports = {
 			if (errors.length > 0) {
 				embeds.push({
 					color: 0xFF0000,
-					title: "❌ Check-In Errors",
+					title: t("❌ Check-In Errors"),
 					description: errors.map(e => `**${e.game}**: ${e.error}`).join("\n"),
 					timestamp: new Date()
 				});
@@ -143,13 +145,13 @@ module.exports = {
 			if (telegram) {
 				for (const message of results) {
 					const messageText = [
-						`🎮 **${message.assets.game}** Manual Check-In`,
+						t `🎮 **${message.assets.game}** Manual Check-In`,
 						`🆔 **(${message.uid})** ${message.username}`,
-						`🌍 **Region:** ${message.region}`,
-						`🏆 **Rank:** ${message.rank}`,
-						`🎁 **Today's Reward:** ${message.award.name} x${message.award.count}`,
-						`📅 **Total Sign-ins:** ${message.total}`,
-						`📝 **Result:** ${message.result}`
+						t `🌍 **Region:** ${message.region}`,
+						t `🏆 **Rank:** ${message.rank}`,
+						t `🎁 **Today's Reward:** ${message.award.name} x${message.award.count}`,
+						t `📅 **Total Sign-ins:** ${message.total}`,
+						t `📝 **Result:** ${message.result}`
 					].join("\n");
 
 					const escapedMessage = app.Utils.escapeCharacters(messageText);
@@ -165,13 +167,13 @@ module.exports = {
 		else {
 			const summary = [];
 			if (results.length > 0) {
-				summary.push(`✅ Successfully checked in for ${results.length} account(s):`);
+				summary.push(t `✅ Successfully checked in for ${results.length} account(s):`);
 				for (const r of results) {
 					summary.push(`  • ${r.assets.game}: ${r.username} - ${r.award.name} x${r.award.count}`);
 				}
 			}
 			if (errors.length > 0) {
-				summary.push(`❌ Failed for ${errors.length} game(s):`);
+				summary.push(t `❌ Failed for ${errors.length} game(s):`);
 				for (const e of errors) {
 					summary.push(`  • ${e.game}: ${e.error}`);
 				}

@@ -1,3 +1,5 @@
+const { t } = require("./localization/index.js");
+
 const Command = require("./classes/command.js");
 const Config = require("./classes/config.js");
 const Got = require("./classes/got.js");
@@ -21,7 +23,7 @@ const config = require("./config.js");
 
 	const platformsConfig = config.platforms;
 	if (!platformsConfig || platformsConfig.length === 0) {
-		console.warn("No platforms configured! Exiting.");
+		console.warn(t("No platforms configured! Exiting."));
 		process.exit(0);
 	}
 
@@ -40,9 +42,9 @@ const config = require("./config.js");
 		TestNotification
 	};
 
-	app.Logger.info("Client", "Loading configuration data");
+	app.Logger.info("Client", t("Loading configuration data"));
 	Config.load(config);
-	app.Logger.info("Client", `Loaded ${Config.data.size} configuration entries`);
+	app.Logger.info("Client", t `Loaded ${Config.data.size} configuration entries`);
 
 	const { loadCommands } = require("./commands/index.js");
 	const commands = await loadCommands();
@@ -53,14 +55,14 @@ const config = require("./config.js");
 
 	const accountsConfig = config.accounts;
 	if (!accountsConfig || accountsConfig.length === 0) {
-		app.Logger.warn("Client", "No accounts configured! Exiting.");
+		app.Logger.warn("Client", t("No accounts configured! Exiting."));
 		process.exit(0);
 	}
 
 	const accounts = new Set();
 	for (const definition of accountsConfig) {
 		if (!definition.active) {
-			app.Logger.warn("Client", `Skipping ${definition.type} account (inactive)`);
+			app.Logger.warn("Client", t `Skipping ${definition.type} account (inactive)`);
 			continue;
 		}
 
@@ -87,7 +89,7 @@ const config = require("./config.js");
 	const platforms = new Set();
 	for (const definition of platformsConfig) {
 		if (!definition.active) {
-			app.Logger.warn("Client", `Skipping ${definition.type} platform (inactive)`);
+			app.Logger.warn("Client", t `Skipping ${definition.type} platform (inactive)`);
 			continue;
 		}
 
@@ -107,7 +109,7 @@ const config = require("./config.js");
 	}
 
 	const end = process.hrtime.bigint();
-	app.Logger.info("Client", `Initialize completed (${Number(end - start) / 1e6}ms)`);
+	app.Logger.info("Client", t `Initialize completed (${Number(end - start) / 1e6}ms)`);
 
 	process.on("unhandledRejection", (reason) => {
 		if (!(reason instanceof Error)) {
@@ -115,7 +117,7 @@ const config = require("./config.js");
 		}
 
 		app.Logger.log("Client", {
-			message: "Unhandled promise rejection",
+			message: t("Unhandled promise rejection"),
 			args: { reason }
 		});
 	});

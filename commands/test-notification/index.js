@@ -1,13 +1,15 @@
+const { t, getLocale } = require("../../localization/index.js");
+
 const TestNotification = require("../../singleton/test-notification.js");
 
 module.exports = {
 	name: "test-notification",
-	description: "Send a test notification to verify platform functionality",
+	description: t("Send a test notification to verify platform functionality"),
 	params: [
 		{
 			name: "message",
 			type: "string",
-			description: "Custom message for the test notification",
+			description: t("Custom message for the test notification"),
 			required: false
 		}
 	],
@@ -18,23 +20,23 @@ module.exports = {
 		if (!platform) {
 			return {
 				success: false,
-				reply: "This command can only be used through Discord or Telegram platforms."
+				reply: t("This command can only be used through Discord or Telegram platforms.")
 			};
 		}
 
-		const customMessage = message || "Manual test notification triggered via command";
+		const customMessage = message || t("Manual test notification triggered via command");
 
 		try {
 			// For Discord bot commands, the platform object is just metadata
 			// We handle the response differently based on the platform
 			if (platform.name === "Discord") {
 				// For Discord bot, we just return a reply - no need to call external send methods
-				const timestamp = new Date().toLocaleString();
-				app.Logger.info("TestCommand", `Manual test triggered via Discord bot: ${customMessage}`);
+				const timestamp = new Date().toLocaleString(getLocale());
+				app.Logger.info("TestCommand", t `Manual test triggered via Discord bot: ${customMessage}`);
 
 				return {
 					success: true,
-					reply: `🧪 **Manual Test Notification**\n\n${customMessage}\n\n🔧 **Test Type:** Manual\n🕒 **Triggered At:** ${timestamp}\n🤖 **Platform:** Discord Bot`
+					reply: t `🧪 **Manual Test Notification**\n\n${customMessage}\n\n🔧 **Test Type:** Manual\n🕒 **Triggered At:** ${timestamp}\n🤖 **Platform:** Discord Bot`
 				};
 			}
 			else {
@@ -45,16 +47,16 @@ module.exports = {
 
 				return {
 					success: true,
-					reply: "✅ Test notification sent successfully!"
+					reply: t("✅ Test notification sent successfully!")
 				};
 			}
 		}
 		catch (e) {
-			app.Logger.error("TestCommand", `Failed to send test notification: ${e.message}`);
+			app.Logger.error("TestCommand", t `Failed to send test notification: ${e.message}`);
 
 			return {
 				success: false,
-				reply: `❌ Failed to send test notification: ${e.message}`
+				reply: t `❌ Failed to send test notification: ${e.message}`
 			};
 		}
 	}

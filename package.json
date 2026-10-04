@@ -6,8 +6,13 @@
     "start": "node index.js",
     "watch": "nodemon index.js",
     "migrate": "node convert.js",
+    "localization:index": "node scripts/generate-localization-index.js",
+    "pretest": "npm run localization:index",
+    "test": "node --test tests/*.test.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "presetup:windows": "npm run localization:index",
+    "presetup:linux": "npm run localization:index",
     "setup:windows": "start setup/config/index.html",
     "setup:linux": "xdg-open setup/config/index.html"
   },

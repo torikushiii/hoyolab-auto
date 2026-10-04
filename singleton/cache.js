@@ -1,3 +1,5 @@
+const { t } = require("../localization/index.js");
+
 const Keyv = require("keyv");
 const { KeyvFile } = require("keyv-file");
 
@@ -28,7 +30,7 @@ module.exports = class Cache {
 	async set (data = {}) {
 		if (typeof data.value === "undefined") {
 			throw new app.Error({
-				message: "Provided value must not be undefined"
+				message: t("Provided value must not be undefined")
 			});
 		}
 
@@ -40,7 +42,7 @@ module.exports = class Cache {
 		if (data.expiry) {
 			if (!isValidInteger(data.expiry)) {
 				throw new app.Error({
-					message: "If provided, expiry must be a valid positive integer",
+					message: t("If provided, expiry must be a valid positive integer"),
 					args: { data }
 				});
 			}
@@ -107,7 +109,7 @@ module.exports = class Cache {
 	static resolveKey (value) {
 		if (value === null || typeof value === "undefined") {
 			throw new app.Error({
-				message: "Cannot use null or undefined as key"
+				message: t("Cannot use null or undefined as key")
 			});
 		}
 
@@ -119,7 +121,7 @@ module.exports = class Cache {
 		}
 		else {
 			throw new app.Error({
-				message: "Cannot stringify a non-primitive value",
+				message: t("Cannot stringify a non-primitive value"),
 				args: {
 					value
 				}
@@ -138,13 +140,13 @@ module.exports = class Cache {
 			const value = String(rawValue);
 			if (key.includes(GROUP_DELIMITER) || key.includes(ITEM_DELIMITER)) {
 				throw new app.Error({
-					message: "Cache prefix keys cannot contain reserved characters",
+					message: t("Cache prefix keys cannot contain reserved characters"),
 					args: { key, value }
 				});
 			}
 			else if (value.includes(GROUP_DELIMITER) || value.includes(ITEM_DELIMITER)) {
 				throw new app.Error({
-					message: "Cache prefix vaolues cannot contain reserved characters",
+					message: t("Cache prefix vaolues cannot contain reserved characters"),
 					args: { key, value }
 				});
 			}

@@ -1,3 +1,5 @@
+const { t } = require("../localization/index.js");
+
 const { createLogger, format, transports, addColors } = require("winston");
 const { combine, colorize, timestamp, printf } = format;
 const chalk = require("chalk");
@@ -69,11 +71,11 @@ class Logger {
 		const logLevel = config ?? "info";
 		if (logLevel) {
 			this.winstonLogger.transports[0].level = logLevel;
-			this.winstonLogger.info({ type: "System", text: `Log level set to ${this.winstonLogger.transports[0].level}` });
+			this.winstonLogger.info({ type: "System", text: t `Log level set to ${this.winstonLogger.transports[0].level}` });
 		}
 		else {
 			this.winstonLogger.transports[0].level = "info";
-			this.winstonLogger.info({ type: "System", text: `Log level set to ${this.winstonLogger.transports[0].level}` });
+			this.winstonLogger.info({ type: "System", text: t `Log level set to ${this.winstonLogger.transports[0].level}` });
 		}
 	}
 

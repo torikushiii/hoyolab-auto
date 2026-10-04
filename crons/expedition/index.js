@@ -1,12 +1,14 @@
+const { t } = require("../../localization/index.js");
+
 module.exports = {
 	name: "expedition",
 	expression: "0 */30 * * * *",
-	description: "Check for ongoing expeditions every 30 minutes and send a notification if all expeditions are completed.",
+	description: t("Check for ongoing expeditions every 30 minutes and send a notification if all expeditions are completed."),
 	code: (async function expedition () {
 		// eslint-disable-next-line object-curly-spacing
 		const accountList = app.HoyoLab.getActiveAccounts({ blacklist: ["honkai", "nap", "tot"] });
 		if (accountList.length === 0) {
-			app.Logger.warn("Cron:Expedition", "No active accounts found to run expedition check for.");
+			app.Logger.warn("Cron:Expedition", t("No active accounts found to run expedition check for."));
 			return;
 		}
 
@@ -45,20 +47,20 @@ module.exports = {
 				const platforms = app.Platform.getForAccount(account);
 				const embed = {
 					color: data.assets.color,
-					title: "Expedition Reminder",
+					title: t("Expedition Reminder"),
 					author: {
 						name: data.assets.author,
 						icon_url: data.assets.logo
 					},
-					description: "All expeditions are completed!",
+					description: t("All expeditions are completed!"),
 					fields: [
 						{ name: "UID", value: account.uid, inline: true },
-						{ name: "Username", value: account.nickname, inline: true },
-						{ name: "Region", value: app.HoyoLab.getRegion(account.region), inline: true }
+						{ name: t("Username"), value: account.nickname, inline: true },
+						{ name: t("Region"), value: app.HoyoLab.getRegion(account.region), inline: true }
 					],
 					timestamp: new Date(),
 					footer: {
-						text: "Expedition Reminder",
+						text: t("Expedition Reminder"),
 						icon_url: data.assets.logo
 					}
 				};
@@ -73,9 +75,9 @@ module.exports = {
 				}
 
 				const messageText = [
-					`📢 Expedition Reminder, All Expeditions are Completed!`,
-					`🎮 **Game**: ${data.assets.game}`,
-					`🆔 **UID**: ${account.uid} ${account.nickname}`
+					t `📢 Expedition Reminder, All Expeditions are Completed!`,
+					t `🎮 **Game**: ${data.assets.game}`,
+					t `🆔 **UID**: ${account.uid} ${account.nickname}`
 				].join("\n");
 
 				const escapedMessage = app.Utils.escapeCharacters(messageText);

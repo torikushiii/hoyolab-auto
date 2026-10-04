@@ -1,3 +1,5 @@
+const { t } = require("../localization/index.js");
+
 const crypto = require("node:crypto");
 
 module.exports = class UtilsSingleton {
@@ -38,21 +40,21 @@ module.exports = class UtilsSingleton {
 
 		if (seconds >= UtilsSingleton.timeUnits.d.s) {
 			const days = Math.floor(seconds / UtilsSingleton.timeUnits.d.s);
-			array.push(`${days} days`);
+			array.push(days === 1 ? t("1 day") : t `${days} days`);
 			seconds -= (days * UtilsSingleton.timeUnits.d.s);
 		}
 		if (seconds >= UtilsSingleton.timeUnits.h.s) {
 			const hr = Math.floor(seconds / UtilsSingleton.timeUnits.h.s);
-			array.push(`${hr} hr`);
+			array.push(hr === 1 ? t("1 hr") : t `${hr} hr`);
 			seconds -= (hr * UtilsSingleton.timeUnits.h.s);
 		}
 		if (seconds >= UtilsSingleton.timeUnits.m.s) {
 			const min = Math.floor(seconds / UtilsSingleton.timeUnits.m.s);
-			array.push(`${min} min`);
+			array.push(t `${min} min`);
 			seconds -= (min * UtilsSingleton.timeUnits.m.s);
 		}
 		if (seconds >= 0 || array.length === 0) {
-			array.push(`${this.round(seconds, 3)} sec`);
+			array.push(t `${this.round(seconds, 3)} sec`);
 		}
 
 		return array.join(", ");
@@ -94,7 +96,7 @@ module.exports = class UtilsSingleton {
 	convertCase (text, caseFrom, caseTo) {
 		if (typeof text !== "string") {
 			throw new app.Error({
-				message: "Text must be typeof string",
+				message: t("Text must be typeof string"),
 				args: { text, caseFrom, caseTo }
 			});
 		}

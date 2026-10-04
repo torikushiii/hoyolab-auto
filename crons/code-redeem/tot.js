@@ -1,3 +1,5 @@
+const { t } = require("../../localization/index.js");
+
 let version;
 const ENDPOINT = "https://api.ennead.cc/mihoyo/themis/codes";
 
@@ -34,7 +36,7 @@ const fetchData = async () => {
 	const codes = res.body?.active;
 	if (!Array.isArray(codes)) {
 		app.Logger.debug("TearsOfThemisAPI", {
-			message: "API returned malformed data",
+			message: t("API returned malformed data"),
 			body: res.body
 		});
 

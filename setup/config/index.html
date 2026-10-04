@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <h1>Config.json5 Generator</h1>
+    <h1 data-i18n="Config.json5 Generator">Config.json5 Generator</h1>
     <p class="small-text">
-        created by <a href="https://github.com/Capoouo">Capoouo</a> |
-        source code: <a href="https://github.com/torikushiii/hoyolab-auto/tree/main/setup/config">GitHub</a>
+        <span data-i18n="created by">created by</span> <a href="https://github.com/Capoouo">Capoouo</a> |
+        <span data-i18n="source code:">source code:</span> <a href="https://github.com/torikushiii/hoyolab-auto/tree/main/setup/config">GitHub</a>
     </p>
     <style>
         body {
@@ -169,356 +169,356 @@
 </head>
 
 <body>
-    <button class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()" data-i18n="Toggle Dark Mode">Toggle Dark Mode</button>
 
-    <h1>Config.json5 Generator</h1>
+    <h1 data-i18n="Config.json5 Generator">Config.json5 Generator</h1>
 
     <div class="platform-section">
-        <h3>Import Existing Config</h3>
-        <label for="configFile">Select config.json5 file:</label>
+        <h3 data-i18n="Import Existing Config">Import Existing Config</h3>
+        <label for="configFile" data-i18n="Select config.json5 file:">Select config.json5 file:</label>
         <input type="file" id="configFile" accept=".json5,.json">
-        <button id="importConfigButton">Import Config</button>
+        <button id="importConfigButton" data-i18n="Import Config">Import Config</button>
         <p id="importStatus" class="small-text status-message"></p>
     </div>
 
     <!-- Form Fields 
-    <label for="loglevel">Log Level:</label>
+    <label for="loglevel" data-i18n="Log Level:">Log Level:</label>
     <select id="loglevel">
-        <option value="select">Select log level</option>
-        <option value="info">info</option>
-        <option value="warn">warn</option>
-        <option value="error">error</option>
+        <option value="select" data-i18n="Select log level">Select log level</option>
+        <option value="info" data-i18n="info">info</option>
+        <option value="warn" data-i18n="warn">warn</option>
+        <option value="error" data-i18n="error">error</option>
     </select>
 
-    <label for="userAgent">User Agent:</label>
+    <label for="userAgent" data-i18n="User Agent:">User Agent:</label>
     <input type="text" id="userAgent" placeholder="Custom fork of HoyoLabAuto: github.com/torikushiii/hoyolab-auto">
 
-    <h2>Platforms</h2>
+    <h2 data-i18n="Platforms">Platforms</h2>
 -->
     <div class="platform-section">
-        <h3>Language</h3>
-        <label for="language">HoYoLAB locale:</label>
+        <h3 data-i18n="Language">Language</h3>
+        <label for="language" data-i18n="Application and HoYoLAB language:">Application and HoYoLAB language:</label>
         <input type="text" id="language" value="en-us" placeholder="en-us">
-        <div class="small-text">Use a lowercase locale, such as en-us or it-it.</div>
+        <div class="small-text" data-i18n="Use a lowercase locale, such as en-us or it-it.">Use a lowercase locale, such as en-us or it-it.</div>
     </div>
 
     <!-- Test Notification -->
     <div class="platform-section">
-    <h3>Test Notification</h3>
-    <label for="testNotificationEnabled">Enable test notification on startup:</label>
+    <h3 data-i18n="Test Notification">Test Notification</h3>
+    <label for="testNotificationEnabled" data-i18n="Enable test notification on startup:">Enable test notification on startup:</label>
     <select id="testNotificationEnabled">
-        <option value="select">Select option</option>
-        <option value="true">true</option>
-        <option value="false" selected>false</option>
+        <option value="select" data-i18n="Select option">Select option</option>
+        <option value="true" data-i18n="true">true</option>
+        <option value="false" selected data-i18n="false">false</option>
     </select>
-    <div class="small-text">Set to false if you don't want to receive test notifications on startup</div>
+    <div class="small-text" data-i18n="Set to false if you don't want to receive test notifications on startup">Set to false if you don't want to receive test notifications on startup</div>
     </div>
     
     <!-- Platform 1: Discord Bot -->
     <div class="platform-section">
-        <h3>Discord Bot</h3>
-        <div class="small-text">This platform is optional, only use this if you have want to access commands via Discord
+        <h3 data-i18n="Discord Bot">Discord Bot</h3>
+        <div class="small-text" data-i18n="This platform is optional, only use this if you have want to access commands via Discord bot">This platform is optional, only use this if you have want to access commands via Discord
             bot</div>
-        <label for="discordActive">Discord Bot:</label>
+        <label for="discordActive" data-i18n="Discord Bot:">Discord Bot:</label>
         <select id="discordActive">
-            <option value="select">Select option </option>
-            <option value="true">true</option>
-            <option value="false">false</option>
+            <option value="select" data-i18n="Select option">Select option </option>
+            <option value="true" data-i18n="true">true</option>
+            <option value="false" data-i18n="false">false</option>
         </select>
-        <div class="small-text">false by default</div>
+        <div class="small-text" data-i18n="false by default">false by default</div>
 
-        <label for="discordBotId">Discord Bot ID:</label>
+        <label for="discordBotId" data-i18n="Discord Bot ID:">Discord Bot ID:</label>
         <input type="text" id="discordBotId" placeholder="123">
-        <div class="small-text">Your Discord bot ID</div>
+        <div class="small-text" data-i18n="Your Discord bot ID">Your Discord bot ID</div>
 
-        <label for="discordToken">Discord Bot Token:</label>
+        <label for="discordToken" data-i18n="Discord Bot Token:">Discord Bot Token:</label>
         <input type="text" id="discordToken" placeholder="YOUR_DISCORD_BOT_TOKEN">
     </div>
 
     <!-- Platform 2: Telegram Bot -->
     <div class="platform-section">
-        <h3>Telegram Bot</h3>
-        <label for="telegramActive">Telegram Bot:</label>
+        <h3 data-i18n="Telegram Bot">Telegram Bot</h3>
+        <label for="telegramActive" data-i18n="Telegram Bot:">Telegram Bot:</label>
         <select id="telegramActive">
-            <option value="select">Select option </option>
-            <option value="true">true</option>
-            <option value="false">false</option>
+            <option value="select" data-i18n="Select option">Select option </option>
+            <option value="true" data-i18n="true">true</option>
+            <option value="false" data-i18n="false">false</option>
         </select>
-        <div class="small-text">Set to true if you want to enable Telegram bot (false by default)</div>
+        <div class="small-text" data-i18n="Set to true if you want to enable Telegram bot (false by default)">Set to true if you want to enable Telegram bot (false by default)</div>
 
-        <label for="telegramChatId">Telegram Chat ID:</label>
+        <label for="telegramChatId" data-i18n="Telegram Chat ID:">Telegram Chat ID:</label>
         <input type="text" id="telegramChatId" placeholder="123">
-        <div class="small-text">You can follow this guide to create a bot:
+        <div class="small-text" data-i18n="You can follow this guide to create a bot: https://github.com/torikushiii/hoyolab-auto/blob/main/setup/TELEGRAM.md">You can follow this guide to create a bot:
             https://github.com/torikushiii/hoyolab-auto/blob/main/setup/TELEGRAM.md</div>
 
-        <label for="telegramToken">Telegram Bot Token:</label>
+        <label for="telegramToken" data-i18n="Telegram Bot Token:">Telegram Bot Token:</label>
         <input type="text" id="telegramToken" placeholder="123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11">
 
-        <label for="disableNotification">Disable Telegram Notification:</label>
+        <label for="disableNotification" data-i18n="Disable Telegram Notification:">Disable Telegram Notification:</label>
         <select id="disableNotification">
-            <option value="select">Select option</option>
-            <option value="true">true</option>
-            <option value="false">false</option>
+            <option value="select" data-i18n="Select option">Select option</option>
+            <option value="true" data-i18n="true">true</option>
+            <option value="false" data-i18n="false">false</option>
         </select>
-        <div class="small-text">Set to true if you want to disable notification for Telegram bot (sounds, vibration,
+        <div class="small-text" data-i18n="Set to true if you want to disable notification for Telegram bot (sounds, vibration, etc.)(false by default)">Set to true if you want to disable notification for Telegram bot (sounds, vibration,
             etc.)(false by default)</div>
 
     </div>
 
     <!-- Platform 3: Discord Webhook -->
     <div class="platform-section">
-        <h3>Discord Webhook</h3>
-        <label for="webhookActive">Discord Webhook:</label>
+        <h3 data-i18n="Discord Webhook">Discord Webhook</h3>
+        <label for="webhookActive" data-i18n="Discord Webhook:">Discord Webhook:</label>
         <select id="webhookActive">
-            <option value="select">Select option</option>
-            <option value="true">true</option>
-            <option value="false">false</option>
+            <option value="select" data-i18n="Select option">Select option</option>
+            <option value="true" data-i18n="true">true</option>
+            <option value="false" data-i18n="false">false</option>
         </select>
-        <div class="small-text">Set to true if you want to send notification to Discord webhook(false by default)</div>
+        <div class="small-text" data-i18n="Set to true if you want to send notification to Discord webhook(false by default)">Set to true if you want to send notification to Discord webhook(false by default)</div>
 
-        <label for="webhookUrl">Webhook URL:</label>
+        <label for="webhookUrl" data-i18n="Webhook URL:">Webhook URL:</label>
         <input type="text" id="webhookUrl" placeholder="YOUR_WEBHOOK_URL">
-        <div class="small-text">You can follow this guide to create a webhook:
+        <div class="small-text" data-i18n="You can follow this guide to create a webhook: https://github.com/torikushiii/hoyolab-auto/blob/main/setup/DISCORD_WEBHOOK.md">You can follow this guide to create a webhook:
             https://github.com/torikushiii/hoyolab-auto/blob/main/setup/DISCORD_WEBHOOK.md</div>
     </div>
 
     <!-- Platform 4: Gotify -->
     <div class="platform-section" id="gotify-settings">
         <h3>Gotify</h3>
-        <label for="gotifyActive">Gotify notifications:</label>
+        <label for="gotifyActive" data-i18n="Gotify notifications:">Gotify notifications:</label>
         <select id="gotifyActive">
-            <option value="true">true</option>
-            <option value="false" selected>false</option>
+            <option value="true" data-i18n="true">true</option>
+            <option value="false" selected data-i18n="false">false</option>
         </select>
-        <div class="small-text">Enable notifications to your Gotify server.</div>
+        <div class="small-text" data-i18n="Enable notifications to your Gotify server.">Enable notifications to your Gotify server.</div>
 
-        <label for="gotifyUrl">Gotify server URL:</label>
+        <label for="gotifyUrl" data-i18n="Gotify server URL:">Gotify server URL:</label>
         <input type="url" id="gotifyUrl" placeholder="https://gotify.example.com">
-        <div class="small-text">Include any reverse proxy path, for example https://example.com/gotify.</div>
+        <div class="small-text" data-i18n="Include any reverse proxy path, for example https://example.com/gotify.">Include any reverse proxy path, for example https://example.com/gotify.</div>
 
-        <label for="gotifyToken">Application token:</label>
+        <label for="gotifyToken" data-i18n="Application token:">Application token:</label>
         <input type="password" id="gotifyToken" autocomplete="off" placeholder="YOUR_GOTIFY_APP_TOKEN">
-        <div class="small-text">Create an application in the Gotify web UI and copy its token.</div>
+        <div class="small-text" data-i18n="Create an application in the Gotify web UI and copy its token.">Create an application in the Gotify web UI and copy its token.</div>
 
-        <label for="gotifyPriority">Message priority:</label>
+        <label for="gotifyPriority" data-i18n="Message priority:">Message priority:</label>
         <input type="number" id="gotifyPriority" step="1" value="5" placeholder="5">
-        <div class="small-text">Default: 5. Your Gotify client uses priority to control notification sounds and visibility.</div>
+        <div class="small-text" data-i18n="Default: 5. Your Gotify client uses priority to control notification sounds and visibility.">Default: 5. Your Gotify client uses priority to control notification sounds and visibility.</div>
     </div>
 
     <!-- Cron Settings -->
-    <h2>Crons</h2>
+    <h2 data-i18n="Crons">Crons</h2>
     <div class="platform-section">
-        <label for="whitelist">whitelist:</label>
+        <label for="whitelist" data-i18n="whitelist:">whitelist:</label>
         <input type="text" id="whitelist" placeholder="ex:checkIn,codeRedeem">
-        <div class="small-text">You can whitelist some crons if you only want to run specific crons(empty by default)
+        <div class="small-text" data-i18n="You can whitelist some crons if you only want to run specific crons(empty by default)">You can whitelist some crons if you only want to run specific crons(empty by default)
         </div>
 
-        <label for="blacklist">blacklist:</label>
+        <label for="blacklist" data-i18n="blacklist:">blacklist:</label>
         <input type="text" id="blacklist" placeholder="ex:checkIn,codeRedeem">
-        <div class="small-text">You can blacklist some crons if you don't want to run them (empty by default)</div>
+        <div class="small-text" data-i18n="You can blacklist some crons if you don't want to run them (empty by default)">You can blacklist some crons if you don't want to run them (empty by default)</div>
 
     </div>
 
     <div class="platform-section">
-        <div class="small-text">You can use this site to generate cron expression: https://crontab.guru/</div>
-        <label for="checkIn">checkIn:</label>
+        <div class="small-text" data-i18n="You can use this site to generate cron expression: https://crontab.guru/">You can use this site to generate cron expression: https://crontab.guru/</div>
+        <label for="checkIn" data-i18n="checkIn:">checkIn:</label>
         <input type="text" id="checkInCron" placeholder="0 0 0 * * *">
 
-        <label for="codeRedeem">codeRedeem:</label>
+        <label for="codeRedeem" data-i18n="codeRedeem:">codeRedeem:</label>
         <input type="text" id="codeRedeemCron" placeholder="*/15 * * * *">
 
-        <label for="dailiesReminderHour">Dailies reminder hour:</label>
+        <label for="dailiesReminderHour" data-i18n="Dailies reminder hour:">Dailies reminder hour:</label>
         <input type="number" id="dailiesReminderHour" min="0" max="23" placeholder="21">
 
-        <label for="dailiesReminderMinute">Dailies reminder minute:</label>
+        <label for="dailiesReminderMinute" data-i18n="Dailies reminder minute:">Dailies reminder minute:</label>
         <input type="number" id="dailiesReminderMinute" min="0" max="59" placeholder="0">
 
-        <label for="dailiesReminderTimeZone">Dailies reminder timezone (optional):</label>
+        <label for="dailiesReminderTimeZone" data-i18n="Dailies reminder timezone (optional):">Dailies reminder timezone (optional):</label>
         <input type="text" id="dailiesReminderTimeZone" placeholder="America/New_York">
-        <div class="small-text">Leave blank to use game server time. Use an IANA timezone for daylight-saving changes.</div>
+        <div class="small-text" data-i18n="Leave blank to use game server time. Use an IANA timezone for daylight-saving changes.">Leave blank to use game server time. Use an IANA timezone for daylight-saving changes.</div>
 
-        <label for="expedition">expedition:</label>
+        <label for="expedition" data-i18n="expedition:">expedition:</label>
         <input type="text" id="expeditionCron" placeholder="0 */30 * * * *">
 
-        <label for="missedCheckIn">missedCheckIn:</label>
+        <label for="missedCheckIn" data-i18n="missedCheckIn:">missedCheckIn:</label>
         <input type="text" id="missedCheckInCron" placeholder="0 0 23 * * *">
 
-        <label for="realmCurrency">realmCurrency:</label>
+        <label for="realmCurrency" data-i18n="realmCurrency:">realmCurrency:</label>
         <input type="text" id="realmCurrencyCron" placeholder="0 */1 * * *">
 
-        <label for="shopStatus">shopStatus:</label>
+        <label for="shopStatus" data-i18n="shopStatus:">shopStatus:</label>
         <input type="text" id="shopStatusCron" placeholder="0 */1 * * *">
 
-        <label for="stamina">stamina:</label>
+        <label for="stamina" data-i18n="stamina:">stamina:</label>
         <input type="text" id="staminaCron" placeholder="0 */30 * * * *">
     </div>
 
     <!-- Account Settings -->
-    <h2>Accounts</h2>
+    <h2 data-i18n="Accounts">Accounts</h2>
     <!-- Honkai Impact 3rd -->
-    <button id="copy-settings-honkai">Add Honkai Impact 3rd accounts</button>
+    <button id="copy-settings-honkai" data-i18n="Add Honkai Impact 3rd accounts">Add Honkai Impact 3rd accounts</button>
     <div id="honkaiaccounts">
         <div class="platform-section">
             <div class="account">
-                <h3>Honkai Impact 3rd accounts 1</h3>
-                <label for="honkaiActive">Honkai Impact 3rd Active:</label>
+                <h3 data-i18n="Honkai Impact 3rd accounts {0}" data-i18n-values="[1]">Honkai Impact 3rd accounts 1</h3>
+                <label for="honkaiActive" data-i18n="Honkai Impact 3rd Active:">Honkai Impact 3rd Active:</label>
                 <select id="honkaiActive">
-                    <option value="select">Select option</option>
-                    <option value="true">true</option>
-                    <option value="false">false</option>
+                    <option value="select" data-i18n="Select option">Select option</option>
+                    <option value="true" data-i18n="true">true</option>
+                    <option value="false" data-i18n="false">false</option>
                 </select>
-                <div class="small-text">Set to true if you want to enable Honkai Impact 3rd (false by default)</div>
+                <div class="small-text" data-i18n="Set to true if you want to enable Honkai Impact 3rd (false by default)">Set to true if you want to enable Honkai Impact 3rd (false by default)</div>
 
-                <label for="honkaiCookie">Cookie:</label>
+                <label for="honkaiCookie" data-i18n="Cookie:">Cookie:</label>
                 <input type="text" id="honkaiCookie" placeholder="">
             </div>
         </div>
     </div>
 
     <!-- Tears of Themis -->
-    <button id="copy-settings-tears">Add Tears of Themis accounts</button>
+    <button id="copy-settings-tears" data-i18n="Add Tears of Themis accounts">Add Tears of Themis accounts</button>
     <div id="tearsaccounts">
         <div class="platform-section">
             <div class="account">
-                <h3>Tears of Themis accounts 1</h3>
-                <label for="tearsActive">Tears of Themis Active:</label>
+                <h3 data-i18n="Tears of Themis accounts {0}" data-i18n-values="[1]">Tears of Themis accounts 1</h3>
+                <label for="tearsActive" data-i18n="Tears of Themis Active:">Tears of Themis Active:</label>
                 <select id="tearsActive">
-                    <option value="select">Select option</option>
-                    <option value="true">true</option>
-                    <option value="false">false</option>
+                    <option value="select" data-i18n="Select option">Select option</option>
+                    <option value="true" data-i18n="true">true</option>
+                    <option value="false" data-i18n="false">false</option>
                 </select>
-                <div class="small-text">Set to true if you want to enable Tears of Themis (false by default)</div>
+                <div class="small-text" data-i18n="Set to true if you want to enable Tears of Themis (false by default)">Set to true if you want to enable Tears of Themis (false by default)</div>
 
-                <label for="tearsCookie">Cookie:</label>
+                <label for="tearsCookie" data-i18n="Cookie:">Cookie:</label>
                 <input type="text" id="tearsCookie" placeholder="">
             </div>
         </div>
     </div>
     <!-- Genshin Impact -->
-    <button id="copy-settings">Add Genshin Impact accounts</button>
+    <button id="copy-settings" data-i18n="Add Genshin Impact accounts">Add Genshin Impact accounts</button>
     <div class="platform-section">
         <div id="genshinaccounts">
             <div class='account'>
-                <h3>Genshin Impact accounts 1</h3>
-                <label for="genshinActive">Genshin Impact Active:</label>
+                <h3 data-i18n="Genshin Impact accounts {0}" data-i18n-values="[1]">Genshin Impact accounts 1</h3>
+                <label for="genshinActive" data-i18n="Genshin Impact Active:">Genshin Impact Active:</label>
                 <select id="genshinActive">
-                    <option value="select">Select option</option>
-                    <option value="true">true</option>
-                    <option value="false">false</option>
+                    <option value="select" data-i18n="Select option">Select option</option>
+                    <option value="true" data-i18n="true">true</option>
+                    <option value="false" data-i18n="false">false</option>
                 </select>
-                <div class="small-text">Set to true if you want to enable Genshin Impact (false by default)</div>
+                <div class="small-text" data-i18n="Set to true if you want to enable Genshin Impact (false by default)">Set to true if you want to enable Genshin Impact (false by default)</div>
 
-                <label for="genshinCookie">Genshin Impact Cookie:</label>
+                <label for="genshinCookie" data-i18n="Genshin Impact Cookie:">Genshin Impact Cookie:</label>
                 <input type="text" id="genshinCookie" placeholder="">
 
-                <label for="genshinredeemCode">redeemCode:</label>
-                <div class="small-text">false by default</div>
+                <label for="genshinredeemCode" data-i18n="redeemCode:">redeemCode:</label>
+                <div class="small-text" data-i18n="false by default">false by default</div>
                 <select id="genshinredeemCode">
-                    <option value="select">Select option</option>
-                    <option value="true">true</option>
-                    <option value="false">false</option>
+                    <option value="select" data-i18n="Select option">Select option</option>
+                    <option value="true" data-i18n="true">true</option>
+                    <option value="false" data-i18n="false">false</option>
                 </select>
-                <div class="small-text">Enable this if you want to automatically redeem codes</div>
-                <div class="small-text">Please note that if you have one account with characters in multiple servers
+                <div class="small-text" data-i18n="Enable this if you want to automatically redeem codes">Enable this if you want to automatically redeem codes</div>
+                <div class="small-text" data-i18n="Please note that if you have one account with characters in multiple servers">Please note that if you have one account with characters in multiple servers
                 </div>
-                <div class="small-text">the code will be redeemed but you won't get the reward</div>
-                <div class="small-text">so please be careful when enabling this, and only enable it on the account that
+                <div class="small-text" data-i18n="the code will be redeemed but you won't get the reward">the code will be redeemed but you won't get the reward</div>
+                <div class="small-text" data-i18n="so please be careful when enabling this, and only enable it on the account that you want to redeem the code">so please be careful when enabling this, and only enable it on the account that
                     you want to redeem the code</div>
 
-                <label for="genshindailiesCheck">DailiesCheck:</label>
+                <label for="genshindailiesCheck" data-i18n="DailiesCheck:">DailiesCheck:</label>
                 <select id="genshindailiesCheck">
-                    <option value="select">Select option</option>
-                    <option value="true">true</option>
-                    <option value="false">false</option>
+                    <option value="select" data-i18n="Select option">Select option</option>
+                    <option value="true" data-i18n="true">true</option>
+                    <option value="false" data-i18n="false">false</option>
                 </select>
-                <div class="small-text">Enable this if you want to get reminded to do your daily commissions (false by
+                <div class="small-text" data-i18n="Enable this if you want to get reminded to do your daily commissions (false by default)">Enable this if you want to get reminded to do your daily commissions (false by
                     default)</div>
 
-                <label for="genshinweekliesCheck">weekliesCheck:</label>
+                <label for="genshinweekliesCheck" data-i18n="weekliesCheck:">weekliesCheck:</label>
                 <select id="genshinweekliesCheck">
-                    <option value="select">Select option</option>
-                    <option value="true">true</option>
-                    <option value="false">false</option>
+                    <option value="select" data-i18n="Select option">Select option</option>
+                    <option value="true" data-i18n="true">true</option>
+                    <option value="false" data-i18n="false">false</option>
                 </select>
-                <div class="small-text">Enable this if you want to get reminded to do your weeklies (false by default)
+                <div class="small-text" data-i18n="Enable this if you want to get reminded to do your weeklies (false by default)">Enable this if you want to get reminded to do your weeklies (false by default)
                 </div>
 
                 <div class="platform-section">
-                    <h3><label for="genshinrealm">Realm:</label></h3>
+                    <h3><label for="genshinrealm" data-i18n="Realm:">Realm:</label></h3>
 
-                    <label for="genshinrealmCheck">Check:</label>
+                    <label for="genshinrealmCheck" data-i18n="Check:">Check:</label>
                     <select id="genshinrealmCheck">
-                        <option value="select">Select option</option>
-                        <option value="true">true</option>
-                        <option value="false">false</option>
+                        <option value="select" data-i18n="Select option">Select option</option>
+                        <option value="true" data-i18n="true">true</option>
+                        <option value="false" data-i18n="false">false</option>
                     </select>
-                    <div class="small-text">(false by default)</div>
+                    <div class="small-text" data-i18n="(false by default)">(false by default)</div>
 
-                    <label for="genshinrealmpersistent">persistent:</label>
+                    <label for="genshinrealmpersistent" data-i18n="persistent:">persistent:</label>
                     <select id="genshinrealmpersistent">
-                        <option value="select">Select option</option>
-                        <option value="true">true</option>
-                        <option value="false">false</option>
+                        <option value="select" data-i18n="Select option">Select option</option>
+                        <option value="true" data-i18n="true">true</option>
+                        <option value="false" data-i18n="false">false</option>
                     </select>
-                    <div class="small-text">(false by default)</div>
+                    <div class="small-text" data-i18n="(false by default)">(false by default)</div>
                 </div>
 
                 <div class="platform-section">
-                    <h3><label for="genshinstamina">Stamina:</label></h3>
+                    <h3><label for="genshinstamina" data-i18n="Stamina:">Stamina:</label></h3>
 
-                    <label for="genshinstaminaCheck">Check:</label>
+                    <label for="genshinstaminaCheck" data-i18n="Check:">Check:</label>
                     <select id="genshinstaminaCheck">
-                        <option value="select">Select option</option>
-                        <option value="true">true</option>
-                        <option value="false">false</option>
+                        <option value="select" data-i18n="Select option">Select option</option>
+                        <option value="true" data-i18n="true">true</option>
+                        <option value="false" data-i18n="false">false</option>
                     </select>
-                    <div class="small-text">Enable this if you want to get notified when your stamina is above the
+                    <div class="small-text" data-i18n="Enable this if you want to get notified when your stamina is above the threshold (false by default)">Enable this if you want to get notified when your stamina is above the
                         threshold (false by default)</div>
 
-                    <label for="genshinthreshold">threshold:</label>
+                    <label for="genshinthreshold" data-i18n="threshold:">threshold:</label>
                     <input type="text" id="genshinthreshold" placeholder="150">
-                    <div class="small-text">Your stamina threshold, only fires notification when your stamina is above
+                    <div class="small-text" data-i18n="Your stamina threshold, only fires notification when your stamina is above this value (150 by default)">Your stamina threshold, only fires notification when your stamina is above
                         this value (150 by default)</div>
 
-                    <label for="genshinstaminapersistent">persistent:</label>
+                    <label for="genshinstaminapersistent" data-i18n="persistent:">persistent:</label>
                     <select id="genshinstaminapersistent">
-                        <option value="select">Select option</option>
-                        <option value="true">true</option>
-                        <option value="false">false</option>
+                        <option value="select" data-i18n="Select option">Select option</option>
+                        <option value="true" data-i18n="true">true</option>
+                        <option value="false" data-i18n="false">false</option>
                     </select>
-                    <div class="small-text">Set to true if you want to get notified every time your stamina is above the
+                    <div class="small-text" data-i18n="Set to true if you want to get notified every time your stamina is above the threshold (false by default)">Set to true if you want to get notified every time your stamina is above the
                         threshold (false by default)</div>
                 </div>
 
                 <div class="platform-section">
-                    <h3><label for="genshinexpedition">Expedition:</label></h3>
+                    <h3><label for="genshinexpedition" data-i18n="Expedition:">Expedition:</label></h3>
 
-                    <label for="genshinexpeditionCheck">Check:</label>
+                    <label for="genshinexpeditionCheck" data-i18n="Check:">Check:</label>
                     <select id="genshinexpeditionCheck">
-                        <option value="select">Select option</option>
-                        <option value="true">true</option>
-                        <option value="false">false</option>
+                        <option value="select" data-i18n="Select option">Select option</option>
+                        <option value="true" data-i18n="true">true</option>
+                        <option value="false" data-i18n="false">false</option>
                     </select>
-                    <div class="small-text">Enable this if you want to get notified when your expedition is done (false
+                    <div class="small-text" data-i18n="Enable this if you want to get notified when your expedition is done (false by default)">Enable this if you want to get notified when your expedition is done (false
                         by default)</div>
 
-                    <label for="genshinexpeditionpersistent">persistent:</label>
+                    <label for="genshinexpeditionpersistent" data-i18n="persistent:">persistent:</label>
                     <select id="genshinexpeditionpersistent">
-                        <option value="select">Select option</option>
-                        <option value="true">true</option>
-                        <option value="false">false</option>
+                        <option value="select" data-i18n="Select option">Select option</option>
+                        <option value="true" data-i18n="true">true</option>
+                        <option value="false" data-i18n="false">false</option>
                     </select>
-                    <div class="small-text">Set to true if you want to get notified every time your expedition is done
+                    <div class="small-text" data-i18n="Set to true if you want to get notified every time your expedition is done (false by default)">Set to true if you want to get notified every time your expedition is done
                         (false by default)</div>
                 </div>
                 <div class="platform-section">
-                    <h3><label for="genshindiscord">Discord:</label></h3>
-                    <label for="genshinuserId">userId:</label>
+                    <h3><label for="genshindiscord" data-i18n="Discord:">Discord:</label></h3>
+                    <label for="genshinuserId" data-i18n="userId:">userId:</label>
                     <input type="text" id="genshinuserId" placeholder="null">
-                    <div class="small-text">Your Discord user ID to ping you when to do your dailies/weeklies</div>
-                    <div class="small-text">or when your stamina is above the threshold and your expedition is done
+                    <div class="small-text" data-i18n="Your Discord user ID to ping you when to do your dailies/weeklies">Your Discord user ID to ping you when to do your dailies/weeklies</div>
+                    <div class="small-text" data-i18n="or when your stamina is above the threshold and your expedition is done">or when your stamina is above the threshold and your expedition is done
                     </div>
-                    <div class="small-text">this is optional, you can leave it as null if you don't want to get pinged
+                    <div class="small-text" data-i18n="this is optional, you can leave it as null if you don't want to get pinged">this is optional, you can leave it as null if you don't want to get pinged
                     </div>
                 </div>
             </div>
@@ -526,107 +526,107 @@
     </div>
 
     <!-- Honkai: Star Rail -->
-    <button id="copy-settings-starrail">Add Honkai: Star Rail accounts</button>
+    <button id="copy-settings-starrail" data-i18n="Add Honkai: Star Rail accounts">Add Honkai: Star Rail accounts</button>
 
     <div id="starrailaccounts">
         <div class="platform-section">
             <div class="account">
-                <h3>Honkai: Star Rail accounts 1</h3>
-                <label for="starrailActive">Honkai: Star Rail Active:</label>
+                <h3 data-i18n="Honkai: Star Rail accounts {0}" data-i18n-values="[1]">Honkai: Star Rail accounts 1</h3>
+                <label for="starrailActive" data-i18n="Honkai: Star Rail Active:">Honkai: Star Rail Active:</label>
                 <select id="starrailActive">
-                    <option value="select">Select option</option>
-                    <option value="true">true</option>
-                    <option value="false">false</option>
+                    <option value="select" data-i18n="Select option">Select option</option>
+                    <option value="true" data-i18n="true">true</option>
+                    <option value="false" data-i18n="false">false</option>
                 </select>
-                <div class="small-text">Set to true if you want to enable Honkai: Star Rail (false by default)</div>
+                <div class="small-text" data-i18n="Set to true if you want to enable Honkai: Star Rail (false by default)">Set to true if you want to enable Honkai: Star Rail (false by default)</div>
 
-                <label for="starrailCookie">Honkai: Star Rail Cookie:</label>
+                <label for="starrailCookie" data-i18n="Honkai: Star Rail Cookie:">Honkai: Star Rail Cookie:</label>
                 <input type="text" id="starrailCookie" placeholder="">
-                <div class="small-text">If you have same account for both genshin and starrail</div>
-                <div class="small-text">You can copy the cookie values from the genshin account</div>
-                <div class="small-text">Same goes for any other game that will be supported in the future</div>
-                <div class="small-text">Support multi-account for every type of game</div>
-                <div class="small-text">Just add another object inside the data array</div>
-                <label for="starrailredeemCode">redeemCode:</label>
+                <div class="small-text" data-i18n="If you have same account for both genshin and starrail">If you have same account for both genshin and starrail</div>
+                <div class="small-text" data-i18n="You can copy the cookie values from the genshin account">You can copy the cookie values from the genshin account</div>
+                <div class="small-text" data-i18n="Same goes for any other game that will be supported in the future">Same goes for any other game that will be supported in the future</div>
+                <div class="small-text" data-i18n="Support multi-account for every type of game">Support multi-account for every type of game</div>
+                <div class="small-text" data-i18n="Just add another object inside the data array">Just add another object inside the data array</div>
+                <label for="starrailredeemCode" data-i18n="redeemCode:">redeemCode:</label>
                 <select id="starrailredeemCode">
-                    <option value="select">Select option</option>
-                    <option value="true">true</option>
-                    <option value="false">false</option>
+                    <option value="select" data-i18n="Select option">Select option</option>
+                    <option value="true" data-i18n="true">true</option>
+                    <option value="false" data-i18n="false">false</option>
                 </select>
 
-                <label for="starraildailiesCheck">DailiesCheck:</label>
+                <label for="starraildailiesCheck" data-i18n="DailiesCheck:">DailiesCheck:</label>
                 <select id="starraildailiesCheck">
-                    <option value="select">Select option</option>
-                    <option value="true">true</option>
-                    <option value="false">false</option>
+                    <option value="select" data-i18n="Select option">Select option</option>
+                    <option value="true" data-i18n="true">true</option>
+                    <option value="false" data-i18n="false">false</option>
                 </select>
-                <div class="small-text">Enable this if you want to get reminded to do your daily tasks (false by
+                <div class="small-text" data-i18n="Enable this if you want to get reminded to do your daily tasks (false by default)">Enable this if you want to get reminded to do your daily tasks (false by
                     default)</div>
 
-                <label for="starrailweekliesCheck">weekliesCheck:</label>
+                <label for="starrailweekliesCheck" data-i18n="weekliesCheck:">weekliesCheck:</label>
                 <select id="starrailweekliesCheck">
-                    <option value="select">Select option</option>
-                    <option value="true">true</option>
-                    <option value="false">false</option>
+                    <option value="select" data-i18n="Select option">Select option</option>
+                    <option value="true" data-i18n="true">true</option>
+                    <option value="false" data-i18n="false">false</option>
                 </select>
-                <div class="small-text">Enable this if you want to get reminded to do your weekly tasks (false by
+                <div class="small-text" data-i18n="Enable this if you want to get reminded to do your weekly tasks (false by default)">Enable this if you want to get reminded to do your weekly tasks (false by
                     default)</div>
 
                 <div class="platform-section">
-                    <h3><label for="starrailstamina">Stamina:</label></h3>
+                    <h3><label for="starrailstamina" data-i18n="Stamina:">Stamina:</label></h3>
 
-                    <label for="starrailstaminaCheck">Check:</label>
+                    <label for="starrailstaminaCheck" data-i18n="Check:">Check:</label>
                     <select id="starrailstaminaCheck">
-                        <option value="select">Select option</option>
-                        <option value="true">true</option>
-                        <option value="false">false</option>
+                        <option value="select" data-i18n="Select option">Select option</option>
+                        <option value="true" data-i18n="true">true</option>
+                        <option value="false" data-i18n="false">false</option>
                     </select>
-                    <div class="small-text">Enable this if you want to get notified when your stamina is above the
+                    <div class="small-text" data-i18n="Enable this if you want to get notified when your stamina is above the threshold (false by default)">Enable this if you want to get notified when your stamina is above the
                         threshold (false by default)</div>
 
-                    <label for="starrailthreshold">Threshold:</label>
+                    <label for="starrailthreshold" data-i18n="Threshold:">Threshold:</label>
                     <input type="text" id="starrailthreshold" placeholder="150">
-                    <div class="small-text">Your stamina threshold, only fires notification when your stamina is above
+                    <div class="small-text" data-i18n="Your stamina threshold, only fires notification when your stamina is above this value (150 by default)">Your stamina threshold, only fires notification when your stamina is above
                         this value (150 by default)</div>
 
-                    <label for="starrailstaminapersistent">Persistent:</label>
+                    <label for="starrailstaminapersistent" data-i18n="Persistent:">Persistent:</label>
                     <select id="starrailstaminapersistent">
-                        <option value="select">Select option</option>
-                        <option value="true">true</option>
-                        <option value="false">false</option>
+                        <option value="select" data-i18n="Select option">Select option</option>
+                        <option value="true" data-i18n="true">true</option>
+                        <option value="false" data-i18n="false">false</option>
                     </select>
-                    <div class="small-text">Set to true if you want to get notified every time your stamina is above the
+                    <div class="small-text" data-i18n="Set to true if you want to get notified every time your stamina is above the threshold (false by default)">Set to true if you want to get notified every time your stamina is above the
                         threshold (false by default)</div>
                 </div>
 
                 <div class="platform-section">
-                    <h3><label for="starrailexpedition">Expedition:</label></h3>
+                    <h3><label for="starrailexpedition" data-i18n="Expedition:">Expedition:</label></h3>
 
-                    <label for="starrailexpeditionCheck">Check:</label>
+                    <label for="starrailexpeditionCheck" data-i18n="Check:">Check:</label>
                     <select id="starrailexpeditionCheck">
-                        <option value="select">Select option</option>
-                        <option value="true">true</option>
-                        <option value="false">false</option>
+                        <option value="select" data-i18n="Select option">Select option</option>
+                        <option value="true" data-i18n="true">true</option>
+                        <option value="false" data-i18n="false">false</option>
                     </select>
-                    <div class="small-text">Enable this if you want to get notified when your expedition is done (false
+                    <div class="small-text" data-i18n="Enable this if you want to get notified when your expedition is done (false by default)">Enable this if you want to get notified when your expedition is done (false
                         by default)</div>
 
-                    <label for="starrailexpeditionpersistent">Persistent:</label>
+                    <label for="starrailexpeditionpersistent" data-i18n="Persistent:">Persistent:</label>
                     <select id="starrailexpeditionpersistent">
-                        <option value="select">Select option</option>
-                        <option value="true">true</option>
-                        <option value="false">false</option>
+                        <option value="select" data-i18n="Select option">Select option</option>
+                        <option value="true" data-i18n="true">true</option>
+                        <option value="false" data-i18n="false">false</option>
                     </select>
-                    <div class="small-text">Set to true if you want to get notified every time your expedition is done
+                    <div class="small-text" data-i18n="Set to true if you want to get notified every time your expedition is done (false by default)">Set to true if you want to get notified every time your expedition is done
                         (false by default)</div>
                 </div>
 
                 <div class="platform-section">
-                    <h3><label for="starraildiscord">Discord:</label></h3>
+                    <h3><label for="starraildiscord" data-i18n="Discord:">Discord:</label></h3>
 
-                    <label for="starrailuserId">User ID:</label>
+                    <label for="starrailuserId" data-i18n="User ID:">User ID:</label>
                     <input type="text" id="starrailuserId" placeholder="null">
-                    <div class="small-text">Your Discord user ID to ping you when to do your dailies/weeklies or when
+                    <div class="small-text" data-i18n="Your Discord user ID to ping you when to do your dailies/weeklies or when your stamina is above the threshold and your expedition is done. This is optional, you can leave it as null if you don't want to get pinged.">Your Discord user ID to ping you when to do your dailies/weeklies or when
                         your stamina is above the threshold and your expedition is done. This is optional, you can leave
                         it as null if you don't want to get pinged.</div>
                 </div>
@@ -634,77 +634,82 @@
         </div>
     </div>
     <!-- Zenless Zone Zero -->
-    <button id="copy-settings-zenless">Add Zenless Zone Zero accounts</button>
+    <button id="copy-settings-zenless" data-i18n="Add Zenless Zone Zero accounts">Add Zenless Zone Zero accounts</button>
     <div id="zenlessaccounts">
         <div class="platform-section">
             <div class="account">
-                <h3>Zenless Zone Zero accounts 1</h3>
-                <label for="zenlessActive">Zenless Zone Zero Active:</label>
+                <h3 data-i18n="Zenless Zone Zero accounts {0}" data-i18n-values="[1]">Zenless Zone Zero accounts 1</h3>
+                <label for="zenlessActive" data-i18n="Zenless Zone Zero Active:">Zenless Zone Zero Active:</label>
                 <select id="zenlessActive">
-                    <option value="select">Select option</option>
-                    <option value="true">true</option>
-                    <option value="false">false</option>
+                    <option value="select" data-i18n="Select option">Select option</option>
+                    <option value="true" data-i18n="true">true</option>
+                    <option value="false" data-i18n="false">false</option>
                 </select>
-                <div class="small-text">Set to true if you want to enable Zenless Zone Zero (false by default)</div>
+                <div class="small-text" data-i18n="Set to true if you want to enable Zenless Zone Zero (false by default)">Set to true if you want to enable Zenless Zone Zero (false by default)</div>
 
-                <label for="zenlessCookie">Zenless Zone Zero Cookie:</label>
+                <label for="zenlessCookie" data-i18n="Zenless Zone Zero Cookie:">Zenless Zone Zero Cookie:</label>
                 <input type="text" id="zenlessCookie" placeholder="">
 
-                <label for="zenlessredeemCode">redeemCode:</label>
+                <label for="zenlessredeemCode" data-i18n="redeemCode:">redeemCode:</label>
                 <select id="zenlessredeemCode">
-                    <option value="select">Select option</option>
-                    <option value="true">true</option>
-                    <option value="false">false</option>
+                    <option value="select" data-i18n="Select option">Select option</option>
+                    <option value="true" data-i18n="true">true</option>
+                    <option value="false" data-i18n="false">false</option>
                 </select>
-                <div class="small-text">(false by default)</div>
+                <div class="small-text" data-i18n="(false by default)">(false by default)</div>
 
-                <label for="zenlessshopStatus">shopStatus:</label>
+                <label for="zenlessshopStatus" data-i18n="shopStatus:">shopStatus:</label>
                 <select id="zenlessshopStatus">
-                    <option value="select">Select option</option>
-                    <option value="true">true</option>
-                    <option value="false">false</option>
+                    <option value="select" data-i18n="Select option">Select option</option>
+                    <option value="true" data-i18n="true">true</option>
+                    <option value="false" data-i18n="false">false</option>
                 </select>
-                <div class="small-text">This will check if your shop has finished selling videos (false by default)
+                <div class="small-text" data-i18n="This will check if your shop has finished selling videos (false by default)">This will check if your shop has finished selling videos (false by default)
                 </div>
-                <label for="zenlessdailiesCheck">DailiesCheck:</label>
+                <label for="zenlessdailiesCheck" data-i18n="DailiesCheck:">DailiesCheck:</label>
                 <select id="zenlessdailiesCheck">
-                    <option value="select">Select option</option>
-                    <option value="true">true</option>
-                    <option value="false">false</option>
+                    <option value="select" data-i18n="Select option">Select option</option>
+                    <option value="true" data-i18n="true">true</option>
+                    <option value="false" data-i18n="false">false</option>
                 </select>
-                <div class="small-text">(false by default)</div>
+                <div class="small-text" data-i18n="(false by default)">(false by default)</div>
 
-                <label for="zenlessstaminaCheck">Stamina Check:</label>
+                <label for="zenlessstaminaCheck" data-i18n="Stamina Check:">Stamina Check:</label>
                 <select id="zenlessstaminaCheck">
-                    <option value="select">Select option</option>
-                    <option value="true">true</option>
-                    <option value="false">false</option>
+                    <option value="select" data-i18n="Select option">Select option</option>
+                    <option value="true" data-i18n="true">true</option>
+                    <option value="false" data-i18n="false">false</option>
                 </select>
-                <div class="small-text">(false by default)</div>
+                <div class="small-text" data-i18n="(false by default)">(false by default)</div>
 
-                <label for="zenlessthreshold">Stamina Threshold:</label>
+                <label for="zenlessthreshold" data-i18n="Stamina Threshold:">Stamina Threshold:</label>
                 <input type="text" id="zenlessthreshold" placeholder="200">
 
-                <label for="zenlessstaminapersistent">Stamina Persistent:</label>
+                <label for="zenlessstaminapersistent" data-i18n="Stamina Persistent:">Stamina Persistent:</label>
                 <select id="zenlessstaminapersistent">
-                    <option value="select">Select option</option>
-                    <option value="true">true</option>
-                    <option value="false">false</option>
+                    <option value="select" data-i18n="Select option">Select option</option>
+                    <option value="true" data-i18n="true">true</option>
+                    <option value="false" data-i18n="false">false</option>
                 </select>
-                <div class="small-text">(false by default)</div>
+                <div class="small-text" data-i18n="(false by default)">(false by default)</div>
 
-                <label for="zenlessuserId">Discord User ID:</label>
+                <label for="zenlessuserId" data-i18n="Discord User ID:">Discord User ID:</label>
                 <input type="text" id="zenlessuserId" placeholder="null">
             </div>
         </div>
     </div>
 
     <!-- Generate and Download Config Button -->
-    <button onclick="generateConfig()">Generate and Download config.json5</button>
+    <button onclick="generateConfig()" data-i18n="Generate and Download config.json5">Generate and Download config.json5</button>
 
     <!-- JavaScript -->
+    <script src="../../localization/index.js"></script>
+    <script src="catalogs.js"></script>
+    <script src="localization.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/json5@2.2.1/dist/index.min.js"></script>
     <script>
+        const { t } = HoyoLabI18n;
+
         let genshinAccountCount = 1;
         let starrailAccountCount = 1;
         let honkaiAccountCount = 1;
@@ -731,7 +736,7 @@
                     importConfigFromText(event.target.result);
                 }
                 catch (error) {
-                    setImportStatus(error.message || 'Failed to import configuration.', true);
+                    setImportStatus(error.message || t('Failed to import configuration.'), true);
                 }
             };
             reader.onerror = function () {
@@ -742,7 +747,7 @@
 
         function importConfigFromText(text) {
             if (!text) {
-                throw new Error('The selected file is empty.');
+                throw new Error(t('The selected file is empty.'));
             }
 
             let parsedConfig;
@@ -750,7 +755,7 @@
                 parsedConfig = JSON5.parse(text);
             }
             catch (error) {
-                throw new Error('Failed to parse configuration: ' + error.message);
+                throw new Error(t('Failed to parse configuration: {0}', error.message));
             }
 
             populateFormFromConfig(parsedConfig);
@@ -763,7 +768,7 @@
                 return;
             }
 
-            statusElement.textContent = message || '';
+            setLocalizedText(statusElement, message || '');
             statusElement.classList.remove('status-error', 'status-success');
 
             if (!message) {
@@ -775,10 +780,11 @@
 
         function populateFormFromConfig(config) {
             if (!config || typeof config !== 'object') {
-                throw new Error('Invalid configuration file.');
+                throw new Error(t('Invalid configuration file.'));
             }
 
             setInputValue(document.getElementById('language'), config.language || 'en-us');
+            updateLanguage();
             applyTestNotificationConfig(config.testNotification);
             applyPlatformConfig(config.platforms);
             applyCronConfig(config.crons);
@@ -1060,16 +1066,14 @@
             newAccount.innerHTML = originalAccount.innerHTML;
 
             zenlessAccountCount += 1;
-            const newTitle = `Zenless Zone Zero accounts ${zenlessAccountCount}`;
-
-            newAccount.querySelector('h3').textContent = newTitle;
+            setLocalizedText(newAccount.querySelector('h3'), 'Zenless Zone Zero accounts {0}', zenlessAccountCount);
 
             const activeElements = newAccount.querySelectorAll('#zenlessActive, label[for="zenlessActive"], .small-text');
             activeElements.forEach(element => element.remove());
 
             // Add delete button to the new account
             const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Delete';
+            setLocalizedText(deleteButton, 'Delete');
             deleteButton.classList.add('delete-account');
             deleteButton.onclick = function () {
                 deleteAccount(deleteButton);
@@ -1079,6 +1083,7 @@
 
             newAccountContainer.appendChild(newAccount);
             document.getElementById('zenlessaccounts').appendChild(newAccountContainer);
+            localizeForm(newAccountContainer);
             recalculateAccountNumbers(); // Recalculate after addition
         };
 
@@ -1086,35 +1091,35 @@
             // Recalculate Genshin Impact accounts
             const genshinAccounts = document.querySelectorAll('#genshinaccounts .account');
             genshinAccounts.forEach((account, index) => {
-                account.querySelector('h3').textContent = `Genshin Impact accounts ${index + 1}`;
+                setLocalizedText(account.querySelector('h3'), 'Genshin Impact accounts {0}', index + 1);
             });
             genshinAccountCount = genshinAccounts.length;
 
             // Recalculate Honkai Impact 3rd accounts
             const honkaiAccounts = document.querySelectorAll('#honkaiaccounts .account');
             honkaiAccounts.forEach((account, index) => {
-                account.querySelector('h3').textContent = `Honkai Impact 3rd accounts ${index + 1}`;
+                setLocalizedText(account.querySelector('h3'), 'Honkai Impact 3rd accounts {0}', index + 1);
             });
             honkaiAccountCount = honkaiAccounts.length;
 
             // Recalculate Honkai: Star Rail accounts
             const starrailAccounts = document.querySelectorAll('#starrailaccounts .account');
             starrailAccounts.forEach((account, index) => {
-                account.querySelector('h3').textContent = `Honkai: Star Rail accounts ${index + 1}`;
+                setLocalizedText(account.querySelector('h3'), 'Honkai: Star Rail accounts {0}', index + 1);
             });
             starrailAccountCount = starrailAccounts.length;
 
             // Recalculate Tears of Themis accounts
             const tearsAccounts = document.querySelectorAll('#tearsaccounts .account');
             tearsAccounts.forEach((account, index) => {
-                account.querySelector('h3').textContent = `Tears of Themis accounts ${index + 1}`;
+                setLocalizedText(account.querySelector('h3'), 'Tears of Themis accounts {0}', index + 1);
             });
             tearsAccountCount = tearsAccounts.length;
 
             // Recalculate Zenless Zone Zero accounts
             const zenlessAccounts = document.querySelectorAll('#zenlessaccounts .account');
             zenlessAccounts.forEach((account, index) => {
-                account.querySelector('h3').textContent = `Zenless Zone Zero accounts ${index + 1}`;
+                setLocalizedText(account.querySelector('h3'), 'Zenless Zone Zero accounts {0}', index + 1);
             });
             zenlessAccountCount = zenlessAccounts.length;
         }
@@ -1131,8 +1136,7 @@
 
             // Update the account number and title
             tearsAccountCount += 1;
-            const newTitle = `Tears of Themis accounts ${tearsAccountCount}`;
-            newAccount.querySelector('h3').textContent = newTitle;
+            setLocalizedText(newAccount.querySelector('h3'), 'Tears of Themis accounts {0}', tearsAccountCount);
 
             // Remove the 'active' dropdown from the copied account
             const activeElements = newAccount.querySelectorAll('#tearsActive, label[for="tearsActive"], .small-text');
@@ -1140,7 +1144,7 @@
 
             // Add delete button to the new account
             const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Delete';
+            setLocalizedText(deleteButton, 'Delete');
             deleteButton.classList.add('delete-account');
             deleteButton.onclick = function () {
                 deleteAccount(deleteButton);
@@ -1151,6 +1155,7 @@
             // Append the new account section
             newAccountContainer.appendChild(newAccount);
             document.getElementById('tearsaccounts').appendChild(newAccountContainer);
+            localizeForm(newAccountContainer);
             recalculateAccountNumbers(); // Recalculate after addition
         };
 
@@ -1159,7 +1164,7 @@
             const testNotifyEnabled = tnEl ? (tnEl.value === 'true') : false;
             const gotifyPriority = Number(document.getElementById('gotifyPriority').value || '5');
             if (!Number.isSafeInteger(gotifyPriority)) {
-                alert('Gotify priority must be a whole number.');
+                alert(t('Gotify priority must be a whole number.'));
                 return;
             }
             const config = {
@@ -1392,16 +1397,14 @@
             newAccount.innerHTML = originalAccount.innerHTML;
 
             genshinAccountCount += 1;
-            const newTitle = `Genshin Impact accounts ${genshinAccountCount}`;
-
-            newAccount.querySelector('h3').textContent = newTitle;
+            setLocalizedText(newAccount.querySelector('h3'), 'Genshin Impact accounts {0}', genshinAccountCount);
 
             const activeElements = newAccount.querySelectorAll('#genshinActive, label[for="genshinActive"], .small-text');
             activeElements.forEach(element => element.remove());
 
             // Add delete button to the new account
             const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Delete';
+            setLocalizedText(deleteButton, 'Delete');
             deleteButton.classList.add('delete-account');
             deleteButton.onclick = function () {
                 deleteAccount(deleteButton);
@@ -1411,6 +1414,7 @@
 
             newAccountContainer.appendChild(newAccount);
             document.getElementById('genshinaccounts').appendChild(newAccountContainer);
+            localizeForm(newAccountContainer);
             recalculateAccountNumbers(); // Recalculate after addition
         };
 
@@ -1426,16 +1430,14 @@
             newAccount.innerHTML = originalAccount.innerHTML;
 
             starrailAccountCount += 1;
-            const newTitle = `Honkai: Star Rail accounts ${starrailAccountCount}`;
-
-            newAccount.querySelector('h3').textContent = newTitle;
+            setLocalizedText(newAccount.querySelector('h3'), 'Honkai: Star Rail accounts {0}', starrailAccountCount);
 
             const activeElements = newAccount.querySelectorAll('#starrailActive, label[for="starrailActive"], .small-text');
             activeElements.forEach(element => element.remove());
 
             // Add delete button to the new account
             const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Delete';
+            setLocalizedText(deleteButton, 'Delete');
             deleteButton.classList.add('delete-account');
             deleteButton.onclick = function () {
                 deleteAccount(deleteButton);
@@ -1446,6 +1448,7 @@
 
             newAccountContainer.appendChild(newAccount);
             document.getElementById('starrailaccounts').appendChild(newAccountContainer);
+            localizeForm(newAccountContainer);
             recalculateAccountNumbers(); // Recalculate after addition
         };
 
@@ -1465,15 +1468,14 @@
             newAccount.innerHTML = originalAccount.innerHTML;
 
             honkaiAccountCount += 1;
-            const newTitle = `Honkai Impact 3rd accounts ${honkaiAccountCount}`;
-            newAccount.querySelector('h3').textContent = newTitle;
+            setLocalizedText(newAccount.querySelector('h3'), 'Honkai Impact 3rd accounts {0}', honkaiAccountCount);
 
             const activeElements = newAccount.querySelectorAll('#honkaiActive, label[for="honkaiActive"], .small-text');
             activeElements.forEach(element => element.remove());
 
             // Add delete button to the new account
             const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Delete';
+            setLocalizedText(deleteButton, 'Delete');
             deleteButton.classList.add('delete-account');
             deleteButton.onclick = function () {
                 deleteAccount(deleteButton);
@@ -1482,6 +1484,7 @@
 
             newAccountContainer.appendChild(newAccount);
             document.getElementById('honkaiaccounts').appendChild(newAccountContainer);
+            localizeForm(newAccountContainer);
         };
 
         function deleteAccount(button) {
@@ -1489,6 +1492,8 @@
             accountDiv.remove();
             recalculateAccountNumbers(); // Recalculate after deletion
         }
+        document.getElementById('language').addEventListener('input', updateLanguage);
+        updateLanguage();
     </script>
 </body>
 </html>

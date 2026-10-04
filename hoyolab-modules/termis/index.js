@@ -1,9 +1,11 @@
+const { t } = require("../../localization/index.js");
+
 const CheckIn = require("./check-in.js");
 
 const DEFAULT_CONSTANTS = {
 	ACT_ID: "e202202281857121",
-	successMessage: "Successfully signed in",
-	signedMessage: "Already signed in today",
+	successMessage: t("Successfully signed in"),
+	signedMessage: t("Already signed in today"),
 	assets: {
 		author: "Luke",
 		game: "Tears of Themis"
@@ -27,12 +29,12 @@ module.exports = class TearsOfThemis extends require("../template.js") {
 
 		if (!this.id) {
 			throw new app.Error({
-				message: "No HoyoLab ID provided for TearsOfThemis controller"
+				message: t("No HoyoLab ID provided for TearsOfThemis controller")
 			});
 		}
 		if (this.data.length === 0) {
 			throw new app.Error({
-				message: "No TearsOfThemis accounts provided"
+				message: t("No TearsOfThemis accounts provided")
 			});
 		}
 	}
@@ -70,7 +72,7 @@ module.exports = class TearsOfThemis extends require("../template.js") {
 			});
 
 			accountList++;
-			app.Logger.info(this.fullName, `Logged into account ${accountList} [${ltuid}] (Tears of Themis)`);
+			app.Logger.info(this.fullName, t `Logged into account ${accountList} [${ltuid}] (Tears of Themis)`);
 		}
 	}
 

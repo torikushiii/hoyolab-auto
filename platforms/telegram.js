@@ -1,3 +1,5 @@
+const { t } = require("../localization/index.js");
+
 module.exports = class Telegram extends require("./template.js") {
 	lastUpdatedId = 0;
 	firstRun = true;
@@ -18,12 +20,12 @@ module.exports = class Telegram extends require("./template.js") {
 
 		if (!this.chatId) {
 			throw new app.Error({
-				message: "No chat ID provided for Telegram controller"
+				message: t("No chat ID provided for Telegram controller")
 			});
 		}
 		else if (!this.token) {
 			throw new app.Error({
-				message: "Telegram token has not been configured for the bot"
+				message: t("Telegram token has not been configured for the bot")
 			});
 		}
 
@@ -45,7 +47,7 @@ module.exports = class Telegram extends require("./template.js") {
 
 		if (res.body.ok !== true) {
 			throw new app.Error({
-				message: "Failed to get telegram updates",
+				message: t("Failed to get telegram updates"),
 				args: {
 					statusCode: res.statusCode,
 					statusMessage: res.statusMessage,
@@ -70,7 +72,7 @@ module.exports = class Telegram extends require("./template.js") {
 	async send (message, options = {}) {
 		if (typeof message !== "string") {
 			throw new app.Error({
-				message: "Provided message is not a string",
+				message: t("Provided message is not a string"),
 				args: {
 					message: {
 						type: typeof message,
@@ -96,7 +98,7 @@ module.exports = class Telegram extends require("./template.js") {
 
 		if (res.body.ok !== true) {
 			throw new app.Error({
-				message: "Failed to send telegram message",
+				message: t("Failed to send telegram message"),
 				args: {
 					statusCode: res.statusCode,
 					statusMessage: res.statusMessage,
@@ -115,7 +117,7 @@ module.exports = class Telegram extends require("./template.js") {
 			// eslint-disable-next-line object-curly-spacing
 			const accounts = app.HoyoLab.getActiveAccounts({ blacklist: ["honkai", "tot"] });
 			if (accounts.length === 0) {
-				await this.send("There are no accounts available for redeeming codes.");
+				await this.send(t("There are no accounts available for redeeming codes."));
 				return;
 			}
 
@@ -134,7 +136,7 @@ module.exports = class Telegram extends require("./template.js") {
 			}
 
 			await this.send(
-				"Please select the account you want to redeem the code for:",
+				t("Please select the account you want to redeem the code for:"),
 				{
 					reply_markup: {
 						inline_keyboard: keyboard
@@ -181,7 +183,7 @@ module.exports = class Telegram extends require("./template.js") {
 					let game = parts[1];
 					const uid = parts[2];
 
-					await this.send("Please enter the code you want to redeem:");
+					await this.send(t("Please enter the code you want to redeem:"));
 
 					const code = await this.waitForUserInput(
 						messageData.callback_query.from.id,
@@ -202,10 +204,10 @@ module.exports = class Telegram extends require("./template.js") {
 						const res = await app.HoyoLab.redeemCode(game, uid, code);
 						if (!res.success) {
 							const reason = this.prepareMessage(res.data.reason);
-							await this.send(`Failed to redeem code: ${reason}`);
+							await this.send(t `Failed to redeem code: ${reason}`);
 						}
 						else {
-							await this.send(`Successfully redeemed code: ${code}`);
+							await this.send(t `Successfully redeemed code: ${code}`);
 						}
 					}
 					return;

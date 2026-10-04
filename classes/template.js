@@ -1,6 +1,8 @@
+const { t } = require("../localization/index.js");
+
 module.exports = class ClassTemplate {
 	destroy () {
-		throw new Error("destroy() is not implemented");
+		throw new Error(t("destroy() is not implemented"));
 	}
 
 	static data = [];
@@ -12,7 +14,7 @@ module.exports = class ClassTemplate {
 
 	static async loadData () {
 		throw new app.Error({
-			message: "loadData() must be implemented in the child class",
+			message: t("loadData() must be implemented in the child class"),
 			args: {
 				name: this.name
 			}

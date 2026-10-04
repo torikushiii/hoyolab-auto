@@ -1,3 +1,5 @@
+const { t } = require("../localization/index.js");
+
 const { SlashCommandBuilder, Message } = require("discord.js");
 
 module.exports = class Command extends require("./template.js") {
@@ -13,7 +15,7 @@ module.exports = class Command extends require("./template.js") {
 
 		this.name = data.name;
 		if (typeof this.name !== "string" || this.name.length === 0) {
-			console.error("Command name must be a string and not empty", this.name);
+			console.error(t("Command name must be a string and not empty"), this.name);
 			this.name = "";
 		}
 
@@ -28,7 +30,7 @@ module.exports = class Command extends require("./template.js") {
 				catch (e) {
 					this.params = null;
 					app.Logger.log("Command", {
-						message: "Command parameters are not valid JSON",
+						message: t("Command parameters are not valid JSON"),
 						data: {
 							name: this.name,
 							error: e
@@ -48,10 +50,10 @@ module.exports = class Command extends require("./template.js") {
 				this.code = eval(data.run);
 			}
 			catch (e) {
-				console.error(`Failed to compile code for ${this.name}`, e);
+				console.error(t `Failed to compile code for ${this.name}`, e);
 				this.code = () => ({
 					success: false,
-					reply: "Failed to compile code"
+					reply: t("Failed to compile code")
 				});
 			}
 		}
@@ -70,12 +72,12 @@ module.exports = class Command extends require("./template.js") {
 		if (!this.params || this.params.length === 0) {
 			return new SlashCommandBuilder()
 				.setName(this.name)
-				.setDescription(this.description ?? "No description provided");
+				.setDescription(this.description ?? t("No description provided"));
 		}
 
 		const builder = new SlashCommandBuilder()
 			.setName(this.name)
-			.setDescription(this.description ?? "No description provided");
+			.setDescription(this.description ?? t("No description provided"));
 
 		for (const param of this.params) {
 			let option;
@@ -126,7 +128,7 @@ module.exports = class Command extends require("./template.js") {
 					);
 					break;
 				default:
-					console.warn(`Unsupported parameter type: ${param.type} for ${this.name}`);
+					console.warn(t `Unsupported parameter type: ${param.type} for ${this.name}`);
 					continue;
 			}
 			/* eslint-enable implicit-arrow-linebreak */
@@ -146,17 +148,17 @@ module.exports = class Command extends require("./template.js") {
 
 	static async validate () {
 		if (Command.data.length === 0) {
-			app.Logger.warn("Command", "No commands loaded");
+			app.Logger.warn("Command", t("No commands loaded"));
 		}
 
 		if (!app.Config) {
-			app.Logger.warn("Command", "No configuration data found");
+			app.Logger.warn("Command", t("No configuration data found"));
 		}
 
 		const names = Command.data.flatMap(i => i.name);
 		const duplicates = names.filter((i, index) => names.indexOf(i) !== index);
 		if (duplicates.length > 0) {
-			console.warn("Duplicate command name found", duplicates);
+			console.warn(t("Duplicate command name found"), duplicates);
 		}
 	}
 
@@ -169,7 +171,7 @@ module.exports = class Command extends require("./template.js") {
 		}
 		else {
 			throw new app.Error({
-				message: "Invalid command name",
+				message: t("Invalid command name"),
 				args: {
 					type: typeof name,
 					name
@@ -182,19 +184,19 @@ module.exports = class Command extends require("./template.js") {
 		if (!identifier) {
 			return {
 				success: false,
-				reply: "No command name specified"
+				reply: t("No command name specified")
 			};
 		}
 
 		if (!Array.isArray(argumentArray)) {
-			throw new app.Error({ message: "Invalid argument array" });
+			throw new app.Error({ message: t("Invalid argument array") });
 		}
 
 		const command = Command.get(identifier);
 		if (!command) {
 			return {
 				success: false,
-				reply: "Command not found"
+				reply: t("Command not found")
 			};
 		}
 
@@ -227,7 +229,7 @@ module.exports = class Command extends require("./template.js") {
 		}
 		catch (e) {
 			const logObject = {
-				message: "Command execution failed",
+				message: t("Command execution failed"),
 				data: {
 					command: command.name,
 					invocation: identifier,
@@ -241,7 +243,7 @@ module.exports = class Command extends require("./template.js") {
 
 			execution = {
 				success: false,
-				reply: "An error occurred while executing the command"
+				reply: t("An error occurred while executing the command")
 			};
 		}
 
@@ -252,7 +254,7 @@ module.exports = class Command extends require("./template.js") {
 		execution.reply = String(execution.reply).trim();
 
 		if (execution.reply.length === 0) {
-			execution.reply = "(empty response)";
+			execution.reply = t("(empty response)");
 		}
 
 		return execution;

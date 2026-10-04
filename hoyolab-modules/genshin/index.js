@@ -1,3 +1,5 @@
+const { t } = require("../../localization/index.js");
+
 const CheckIn = require("./check-in.js");
 const Diary = require("./diary.js");
 const Notes = require("./notes.js");
@@ -37,12 +39,12 @@ module.exports = class Genshin extends require("../template.js") {
 
 		if (!this.id) {
 			throw new app.Error({
-				message: "No HoyoLab ID provided for Genshin controller"
+				message: t("No HoyoLab ID provided for Genshin controller")
 			});
 		}
 		if (this.data.length === 0) {
 			throw new app.Error({
-				message: "No Genshin accounts provided"
+				message: t("No Genshin accounts provided")
 			});
 		}
 	}
@@ -68,7 +70,7 @@ module.exports = class Genshin extends require("../template.js") {
 
 			if (statusCode !== 200) {
 				throw new app.Error({
-					message: "Failed to login to Genshin account",
+					message: t("Failed to login to Genshin account"),
 					args: {
 						statusCode,
 						body
@@ -79,7 +81,7 @@ module.exports = class Genshin extends require("../template.js") {
 			const res = body;
 			if (res.retcode !== 0) {
 				throw new app.Error({
-					message: "Failed to login to Genshin account",
+					message: t("Failed to login to Genshin account"),
 					args: {
 						retcode: res.retcode,
 						message: res.message,
@@ -90,7 +92,7 @@ module.exports = class Genshin extends require("../template.js") {
 
 			if (typeof res.data !== "object" || !Array.isArray(res.data.list)) {
 				throw new app.Error({
-					message: "Invalid data object received from Genshin account",
+					message: t("Invalid data object received from Genshin account"),
 					args: {
 						data: res.data
 					}
@@ -101,7 +103,7 @@ module.exports = class Genshin extends require("../template.js") {
 			const data = list.find(account => account.game_id === this.gameId);
 			if (!data) {
 				throw new app.Error({
-					message: "No Genshin account can be found with the provided game account",
+					message: t("No Genshin account can be found with the provided game account"),
 					args: {
 						id: this.id,
 						uid: ltuid
@@ -162,7 +164,7 @@ module.exports = class Genshin extends require("../template.js") {
 			});
 
 			const region = app.HoyoLab.getRegion(data.region);
-			app.Logger.info(this.fullName, `Logged into (${data.game_role_id}) ${data.nickname} (${region})`);
+			app.Logger.info(this.fullName, t `Logged into (${data.game_role_id}) ${data.nickname} (${region})`);
 		}
 	}
 

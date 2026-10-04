@@ -1,3 +1,5 @@
+const { t } = require("../localization/index.js");
+
 module.exports = class RegionalTaskManager {
 	constructor () {
 		this.tasks = new Map();
@@ -48,7 +50,7 @@ module.exports = class RegionalTaskManager {
 						const platform = app.HoyoLab.get(account.platform);
 						platform.update(account);
 
-						app.Logger.debug(`RegionalTaskManager:${taskName}`, `Executed for account ${account.uid} in region ${account.region}`);
+						app.Logger.debug(`RegionalTaskManager:${taskName}`, t `Executed for account ${account.uid} in region ${account.region}`);
 					}
 				}
 			}

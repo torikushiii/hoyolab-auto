@@ -1,3 +1,5 @@
+const { t } = require("../localization/index.js");
+
 module.exports = class DataCache {
 	static keyvCacheExpiration = 3_600_000;
 
@@ -20,19 +22,19 @@ module.exports = class DataCache {
 			if (app.Cache) {
 				const cachedData = await app.Cache.get(key);
 				if (cachedData) {
-					app.Logger.debug("Cache", `Cache hit for key: ${key} (keyv)`);
+					app.Logger.debug("Cache", t `Cache hit for key: ${key} (keyv)`);
 
 					const updatedData = await this.#updateCachedData(cachedData);
 					return updatedData;
 				}
 			}
 
-			app.Logger.debug("Cache", `Cache miss for key: ${key}`);
+			app.Logger.debug("Cache", t `Cache miss for key: ${key}`);
 			return null;
 		}
 		catch (e) {
 			console.error({
-				message: "An error while getting the key",
+				message: t("An error while getting the key"),
 				e
 			});
 			return null;
@@ -134,10 +136,10 @@ module.exports = class DataCache {
 			if (app.Cache) {
 				await app.Cache.delete(key);
 			}
-			app.Logger.debug("Cache", `Invalidated cache for key: ${key}`);
+			app.Logger.debug("Cache", t `Invalidated cache for key: ${key}`);
 		}
 		catch (e) {
-			app.Logger.error("Cache", `Error invalidating cache for key ${key}: ${e.message}`);
+			app.Logger.error("Cache", t `Error invalidating cache for key ${key}: ${e.message}`);
 		}
 	}
 

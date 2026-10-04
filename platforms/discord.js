@@ -1,3 +1,5 @@
+const { t } = require("../localization/index.js");
+
 const {
 	ChannelType,
 	Client,
@@ -22,12 +24,12 @@ module.exports = class DiscordController extends require("./template.js") {
 
 		if (!this.botId) {
 			throw new app.Error({
-				message: "No bot ID provided for Discord controller"
+				message: t("No bot ID provided for Discord controller")
 			});
 		}
 		else if (!this.token) {
 			throw new app.Error({
-				message: "Discord token has not been configured for the bot"
+				message: t("Discord token has not been configured for the bot")
 			});
 		}
 	}
@@ -133,7 +135,7 @@ module.exports = class DiscordController extends require("./template.js") {
 		}
 		else {
 			throw new app.Error({
-				message: "Invalid Discord message provided",
+				message: t("Invalid Discord message provided"),
 				args: {
 					message,
 					type: typeof message
@@ -156,7 +158,7 @@ module.exports = class DiscordController extends require("./template.js") {
 			}
 			else {
 				throw new app.Error({
-					message: "Failed to send message to Discord channel",
+					message: t("Failed to send message to Discord channel"),
 					args: {
 						message: sendTarget,
 						channelID: channelData.id,
@@ -229,25 +231,25 @@ module.exports = class DiscordController extends require("./template.js") {
 			const commandsToAdd = localCommandNames.filter(name => !existingCommandNames.includes(name));
 
 			if (commandsToRemove.length > 0) {
-				app.Logger.info("Discord", `Cleaning up ${commandsToRemove.length} stale command(s): ${commandsToRemove.join(", ")}`);
+				app.Logger.info("Discord", t `Cleaning up ${commandsToRemove.length} stale command(s): ${commandsToRemove.join(", ")}`);
 			}
 
 			if (commandsToAdd.length > 0) {
-				app.Logger.info("Discord", `Adding ${commandsToAdd.length} new command(s): ${commandsToAdd.join(", ")}`);
+				app.Logger.info("Discord", t `Adding ${commandsToAdd.length} new command(s): ${commandsToAdd.join(", ")}`);
 			}
 
-			app.Logger.info("Discord", `Syncing ${commands.length} application command(s)...`);
+			app.Logger.info("Discord", t `Syncing ${commands.length} application command(s)...`);
 
 			await rest.put(
 				Routes.applicationCommands(this.botId),
 				{ body: commands }
 			);
 
-			app.Logger.info("Discord", `Successfully registered ${commands.length} application command(s).`);
+			app.Logger.info("Discord", t `Successfully registered ${commands.length} application command(s).`);
 		}
 		catch (e) {
 			app.Logger.error("Discord", {
-				message: "Failed to register application commands",
+				message: t("Failed to register application commands"),
 				error: e.message
 			});
 			console.error(e);

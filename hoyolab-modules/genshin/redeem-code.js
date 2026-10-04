@@ -1,3 +1,5 @@
+const { t } = require("../../localization/index.js");
+
 module.exports = class RedeemCode {
 	/** @type {import("../template")} */
 	#instance;
@@ -36,7 +38,7 @@ module.exports = class RedeemCode {
 
 		if (res.statusCode !== 200) {
 			app.Logger.log(`${this.#instance.fullName}:RedeemCode`, {
-				message: "Request threw non-200 status code",
+				message: t("Request threw non-200 status code"),
 				args: {
 					code,
 					status: res.statusCode,
@@ -50,7 +52,7 @@ module.exports = class RedeemCode {
 		}
 		if (res.body.retcode !== 0) {
 			app.Logger.log(`${this.#instance.fullName}:RedeemCode`, {
-				message: "Failed to redeem code",
+				message: t("Failed to redeem code"),
 				args: {
 					cause: app.HoyoLab.errorMessage(this.#instance.name, res.body.retcode),
 					code,
@@ -65,11 +67,11 @@ module.exports = class RedeemCode {
 			};
 		}
 
-		app.Logger.info(`${this.#instance.fullName}:RedeemCode`, `(${accountData.uid}) ${accountData.nickname} redeemed code: ${code}`);
+		app.Logger.info(`${this.#instance.fullName}:RedeemCode`, t `(${accountData.uid}) ${accountData.nickname} redeemed code: ${code}`);
 
 		return {
 			success: true,
-			message: "Code redeemed successfully!"
+			message: t("Code redeemed successfully!")
 		};
 	}
 };

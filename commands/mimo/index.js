@@ -1,3 +1,5 @@
+const { t } = require("../../localization/index.js");
+
 const createEmbed = (result) => {
 	const gameColors = {
 		starrail: 0xBB0BB5,
@@ -14,28 +16,28 @@ const createEmbed = (result) => {
 	if (result.tasksClaimed.length > 0) {
 		const totalPoints = result.tasksClaimed.reduce((sum, t) => sum + t.points, 0);
 		fields.push({
-			name: "🎯 Tasks Claimed",
-			value: result.tasksClaimed.map(t => `• ${t.name} (+${t.points})`).join("\n").slice(0, 1024) || "None",
+			name: t("🎯 Tasks Claimed"),
+			value: result.tasksClaimed.map(t => `• ${t.name} (+${t.points})`).join("\n").slice(0, 1024) || t("None"),
 			inline: false
 		});
 		fields.push({
-			name: "💰 Points Earned",
-			value: `+${totalPoints} pts`,
+			name: t("💰 Points Earned"),
+			value: t `+${totalPoints} pts`,
 			inline: true
 		});
 	}
 
 	if (result.itemsExchanged.length > 0) {
 		fields.push({
-			name: "🎁 Items Exchanged",
-			value: result.itemsExchanged.map(i => `• ${i.name} (-${i.cost} pts)`).join("\n").slice(0, 1024),
+			name: t("🎁 Items Exchanged"),
+			value: result.itemsExchanged.map(i => t `• ${i.name} (-${i.cost} pts)`).join("\n").slice(0, 1024),
 			inline: false
 		});
 	}
 
 	if (result.codesRedeemed.length > 0) {
 		fields.push({
-			name: "✅ Codes Redeemed",
+			name: t("✅ Codes Redeemed"),
 			value: result.codesRedeemed.map(c => `\`${c}\``).join(", ").slice(0, 1024),
 			inline: false
 		});
@@ -43,7 +45,7 @@ const createEmbed = (result) => {
 
 	if (result.codesObtained?.length > 0) {
 		fields.push({
-			name: "🎫 Codes Obtained",
+			name: t("🎫 Codes Obtained"),
 			value: result.codesObtained.map(c => `\`${c}\``).join("\n").slice(0, 1024),
 			inline: false
 		});
@@ -51,15 +53,15 @@ const createEmbed = (result) => {
 
 	if (result.lotteryDraws?.length > 0) {
 		fields.push({
-			name: "🎰 Lottery Draws",
+			name: t("🎰 Lottery Draws"),
 			value: result.lotteryDraws.map(d => `• ${d.name}`).join("\n").slice(0, 1024),
 			inline: false
 		});
 	}
 
 	fields.push({
-		name: "💎 Current Points",
-		value: `${result.points} pts`,
+		name: t("💎 Current Points"),
+		value: t `${result.points} pts`,
 		inline: true
 	});
 
@@ -70,14 +72,14 @@ const createEmbed = (result) => {
 
 	return {
 		color: gameColors[result.game] || 0x5865F2,
-		title: `🐾 Traveling Mimo`,
+		title: t `🐾 Traveling Mimo`,
 		author: {
 			name: `${result.nickname} (${result.uid})`,
 			icon_url: result.assets?.logo
 		},
 		description: hasActivity
-			? `Successfully ran Mimo automation for ${gameNames[result.game] || result.game}!`
-			: `No new activity for ${gameNames[result.game] || result.game}.`,
+			? t `Successfully ran Mimo automation for ${gameNames[result.game] || result.game}!`
+			: t `No new activity for ${gameNames[result.game] || result.game}.`,
 		fields,
 		thumbnail: {
 			url: result.assets?.logo
@@ -92,14 +94,14 @@ const createEmbed = (result) => {
 
 module.exports = {
 	name: "mimo",
-	description: "Manually run Traveling Mimo automation for all games or a specific game.",
+	description: t("Manually run Traveling Mimo automation for all games or a specific game."),
 	params: [
 		{
 			name: "game",
-			description: "The game you want to run Mimo for. Leave empty for all games.",
+			description: t("The game you want to run Mimo for. Leave empty for all games."),
 			type: "string",
 			choices: [
-				{ name: "All Games", value: "all" },
+				{ name: t("All Games"), value: "all" },
 				{ name: "Honkai: Star Rail", value: "starrail" },
 				{ name: "Zenless Zone Zero", value: "nap" }
 			],
@@ -125,7 +127,7 @@ module.exports = {
 			: supportedGames;
 
 		if (gamesToRun.length === 0) {
-			const message = "Invalid game specified. Supported games are: Star Rail, ZZZ";
+			const message = t("Invalid game specified. Supported games are: Star Rail, ZZZ");
 			return interaction
 				? interaction.reply({ content: message, ephemeral: true })
 				: { success: false, reply: message };
@@ -146,20 +148,20 @@ module.exports = {
 
 			const gamePlatform = app.HoyoLab.get(gameName);
 			if (!gamePlatform || typeof gamePlatform.mimo !== "function") {
-				errors.push({ game: gameName, error: "Mimo not supported" });
+				errors.push({ game: gameName, error: t("Mimo not supported") });
 				continue;
 			}
 
 			for (const account of accounts) {
 				try {
-					app.Logger.info("Command:Mimo", `Running Mimo for ${gameName} - ${account.uid}`);
+					app.Logger.info("Command:Mimo", t `Running Mimo for ${gameName} - ${account.uid}`);
 
 					const result = await gamePlatform.mimo(account);
 					if (!result.success) {
 						errors.push({
 							game: gameName,
 							uid: account.uid,
-							error: result.message || "Unknown error"
+							error: result.message || t("Unknown error")
 						});
 						continue;
 					}
@@ -173,7 +175,7 @@ module.exports = {
 				}
 				catch (e) {
 					app.Logger.error("Command:Mimo", {
-						message: "Mimo automation failed",
+						message: t("Mimo automation failed"),
 						game: gameName,
 						uid: account.uid,
 						error: e.message
@@ -188,7 +190,7 @@ module.exports = {
 		}
 
 		if (results.length === 0 && errors.length === 0) {
-			const message = "No accounts found with Mimo enabled.";
+			const message = t("No accounts found with Mimo enabled.");
 			return interaction
 				? interaction.editReply({ content: message })
 				: { success: false, reply: message };
@@ -199,7 +201,7 @@ module.exports = {
 		if (errors.length > 0) {
 			embeds.push({
 				color: 0xFF0000,
-				title: "❌ Errors",
+				title: t("❌ Errors"),
 				description: errors.map(e => `• **${e.game}** ${e.uid ? `(${e.uid})` : ""}: ${e.error}`).join("\n").slice(0, 4096)
 			});
 		}
@@ -211,7 +213,7 @@ module.exports = {
 
 		const summaryLines = results.map(r => {
 			const gameShort = { starrail: "HSR", nap: "ZZZ" }[r.game] || r.game;
-			return `${gameShort} - ${r.nickname}: ${r.points} pts`;
+			return t `${gameShort} - ${r.nickname}: ${r.points} pts`;
 		});
 
 		return { success: true, reply: summaryLines.join("\n") };

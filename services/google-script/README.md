@@ -28,11 +28,13 @@
    - Create a new project by clicking "+ New Project".
 
 2. **Paste the Code:**
+   - For localized messages, add two script files to the same project: paste [the desired language catalog](../../localization/README.md) into a new `.gs` file and [the shared formatter](../../localization/index.js) into `Localization.gs`.
    - Replace any existing code in the script editor with the provided Apps Script code. It should look like this:
 
      ![image](https://github.com/torikushiii/hoyolab-auto/assets/21153445/4a0a5a30-c990-41f2-802e-1ba6f45c0c43)
 
 3. **Configuration:**
+   - Set `config.language` to a locale matching the catalog, such as `"it-it"` for Italian, or leave `"en-us"` for English. Missing catalogs and messages fall back to English. This Apps Script setting only localizes software messages; its API requests remain unchanged.
    - **Paste your `cookie`:** In the config object, add the following (replace placeholders with your actual data):
 
      ```javascript

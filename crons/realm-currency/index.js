@@ -1,11 +1,13 @@
+const { t } = require("../../localization/index.js");
+
 module.exports = {
 	name: "realm-currency",
 	expression: "0 */1 * * *",
-	description: "This cron will check your Tea Pot Realm currency and notify you if it's full",
+	description: t("This cron will check your Tea Pot Realm currency and notify you if it's full"),
 	code: (async function realmCurrency () {
 		const accountList = app.HoyoLab.getActiveAccounts({ whitelist: "genshin" });
 		if (accountList.length === 0) {
-			app.Logger.warn("Cron:RealmCurrency", "No active accounts to run the cron");
+			app.Logger.warn("Cron:RealmCurrency", t("No active accounts to run the cron"));
 			return;
 		}
 
@@ -41,15 +43,15 @@ module.exports = {
 				const region = app.HoyoLab.getRegion(account.region);
 				const embed = {
 					color: data.assets.color,
-					title: "Realm Currency",
+					title: t("Realm Currency"),
 					author: {
-						name: `${region} Server - ${account.nickname}`,
+						name: t `${region} Server - ${account.nickname}`,
 						icon_url: data.assets.logo
 					},
-					description: "Your realm currency is full!",
+					description: t("Your realm currency is full!"),
 					fields: [
 						{
-							name: "Current Realm Currency",
+							name: t("Current Realm Currency"),
 							value: `${coins.currentCoin}/${coins.maxCoin}`,
 							inline: true
 						}
@@ -59,7 +61,7 @@ module.exports = {
 					},
 					timestamp: new Date(),
 					footer: {
-						text: "Realm Currency",
+						text: t("Realm Currency"),
 						icon_url: data.assets.logo
 					}
 				};
@@ -74,9 +76,9 @@ module.exports = {
 				}
 
 				const messageText = [
-					`💰 Realm Currency`,
-					`UID: ${account.uid} ${account.nickname}`,
-					`Your realm currency is full!`
+					t `💰 Realm Currency`,
+					t `UID: ${account.uid} ${account.nickname}`,
+					t `Your realm currency is full!`
 				].join("\n");
 
 				const escapedMessage = app.Utils.escapeCharacters(messageText);

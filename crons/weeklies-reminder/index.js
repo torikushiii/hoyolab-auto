@@ -1,3 +1,5 @@
+const { t } = require("../../localization/index.js");
+
 const RegionalTaskManager = new app.RegionalTaskManager();
 
 RegionalTaskManager.registerTask("WeekliesReminder", 21, 0, async (account) => {
@@ -21,20 +23,20 @@ RegionalTaskManager.registerTask("WeekliesReminder", 21, 0, async (account) => {
 	if (embedPlatforms.length > 0) {
 		const embed = {
 			color: data.assets.color,
-			title: "Weeklies Reminder",
+			title: t("Weeklies Reminder"),
 			author: {
 				name: data.assets.author,
 				icon_url: data.assets.logo
 			},
-			description: "Don't forget to complete your weeklies!",
+			description: t("Don't forget to complete your weeklies!"),
 			fields: [
 				{ name: "UID", value: account.uid, inline: true },
-				{ name: "Username", value: account.nickname, inline: true },
-				{ name: "Region", value: app.HoyoLab.getRegion(account.region), inline: true }
+				{ name: t("Username"), value: account.nickname, inline: true },
+				{ name: t("Region"), value: app.HoyoLab.getRegion(account.region), inline: true }
 			],
 			timestamp: new Date(),
 			footer: {
-				text: "Weeklies Reminder",
+				text: t("Weeklies Reminder"),
 				icon_url: data.assets.logo
 			}
 		};
@@ -45,8 +47,8 @@ RegionalTaskManager.registerTask("WeekliesReminder", 21, 0, async (account) => {
 
 			if (resin !== 0) {
 				embed.fields.push({
-					name: "Resin Discount",
-					value: `${resin}/${limit} Available`,
+					name: t("Resin Discount"),
+					value: t `${resin}/${limit} Available`,
 					inline: true
 				});
 			}
@@ -61,21 +63,21 @@ RegionalTaskManager.registerTask("WeekliesReminder", 21, 0, async (account) => {
 
 			if (!bossCompleted) {
 				embed.fields.push({
-					name: "Weekly Boss",
-					value: `${weeklies.weeklyBoss}/${weeklies.weeklyBossLimit} Completed`,
+					name: t("Weekly Boss"),
+					value: t `${weeklies.weeklyBoss}/${weeklies.weeklyBossLimit} Completed`,
 					inline: true
 				});
 			}
 			if (!simCompleted) {
 				embed.fields.push({
-					name: "Simulated Universe",
+					name: t("Simulated Universe"),
 					value: `${weeklies.rogueScore}/${weeklies.maxScore}`,
 					inline: true
 				});
 			}
 			if (!divergent) {
 				embed.fields.push({
-					name: "Divergent Universe",
+					name: t("Divergent Universe"),
 					value: `${weeklies.tournScore}/${weeklies.tournMaxScore}`,
 					inline: true
 				});
@@ -90,14 +92,14 @@ RegionalTaskManager.registerTask("WeekliesReminder", 21, 0, async (account) => {
 
 			if (!bountiesCompleted) {
 				embed.fields.push({
-					name: "Bounty Commission",
+					name: t("Bounty Commission"),
 					value: `${weeklies.bounty}/${weeklies.bountyTotal}`,
 					inline: true
 				});
 			}
 			if (!surveyCompleted) {
 				embed.fields.push({
-					name: "Survey Points",
+					name: t("Survey Points"),
 					value: `${weeklies.surveyPoints}/${weeklies.surveyPointsTotal}`,
 					inline: true
 				});
@@ -116,14 +118,14 @@ RegionalTaskManager.registerTask("WeekliesReminder", 21, 0, async (account) => {
 
 	if (telegrams.length > 0) {
 		const message = [
-			"📅 **Weeklies Reminder**",
+			t("📅 **Weeklies Reminder**"),
 			"",
-			"👤 **Account**",
-			`- **UID**: ${account.uid}`,
-			`- **Username**: ${account.nickname}`,
-			`- **Region**: ${app.HoyoLab.getRegion(account.region)}`,
+			t("👤 **Account**"),
+			t `- **UID**: ${account.uid}`,
+			t `- **Username**: ${account.nickname}`,
+			t `- **Region**: ${app.HoyoLab.getRegion(account.region)}`,
 			"",
-			"📊 **Progress**"
+			t("📊 **Progress**")
 		];
 
 		if (platform.type === "genshin") {
@@ -131,7 +133,7 @@ RegionalTaskManager.registerTask("WeekliesReminder", 21, 0, async (account) => {
 			const limit = weeklies.resinDiscountLimit;
 
 			if (resin !== 0) {
-				message.push(`- **Resin Discount**: ${resin}/${limit} Available`);
+				message.push(t `- **Resin Discount**: ${resin}/${limit} Available`);
 			}
 		}
 		if (platform.type === "starrail") {
@@ -143,13 +145,13 @@ RegionalTaskManager.registerTask("WeekliesReminder", 21, 0, async (account) => {
 			}
 
 			if (!bossCompleted) {
-				message.push(`- **Weekly Boss**: ${weeklies.weeklyBoss}/${weeklies.weeklyBossLimit} Completed`);
+				message.push(t `- **Weekly Boss**: ${weeklies.weeklyBoss}/${weeklies.weeklyBossLimit} Completed`);
 			}
 			if (!simCompleted) {
-				message.push(`- **Simulated Universe**: ${weeklies.rogueScore}/${weeklies.maxScore}`);
+				message.push(t `- **Simulated Universe**: ${weeklies.rogueScore}/${weeklies.maxScore}`);
 			}
 			if (!divergent) {
-				message.push(`- **Divergent Universe**: ${weeklies.tournScore}/${weeklies.tournMaxScore}`);
+				message.push(t `- **Divergent Universe**: ${weeklies.tournScore}/${weeklies.tournMaxScore}`);
 			}
 		}
 		if (platform.type === "nap") {
@@ -160,10 +162,10 @@ RegionalTaskManager.registerTask("WeekliesReminder", 21, 0, async (account) => {
 			}
 
 			if (!bountiesCompleted) {
-				message.push(`- **Bounty Commission**: ${weeklies.bounty}/${weeklies.bountyTotal}`);
+				message.push(t `- **Bounty Commission**: ${weeklies.bounty}/${weeklies.bountyTotal}`);
 			}
 			if (!surveyCompleted) {
-				message.push(`- **Survey Points**: ${weeklies.surveyPoints}/${weeklies.surveyPointsTotal}`);
+				message.push(t `- **Survey Points**: ${weeklies.surveyPoints}/${weeklies.surveyPointsTotal}`);
 			}
 		}
 
@@ -177,7 +179,7 @@ RegionalTaskManager.registerTask("WeekliesReminder", 21, 0, async (account) => {
 module.exports = {
 	name: "weeklies-reminder",
 	expression: "*/5 * * * 0",
-	description: "Reminds you to complete your weeklies.",
+	description: t("Reminds you to complete your weeklies."),
 	code: (async function weekliesReminder () {
 		// eslint-disable-next-line object-curly-spacing
 		await RegionalTaskManager.executeTasks();

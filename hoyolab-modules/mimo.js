@@ -1,3 +1,5 @@
+const { t } = require("../localization/index.js");
+
 /**
  * Traveling Mimo - Shared module for all supported games
  * Handles mission completion, point management, and reward exchange
@@ -92,14 +94,14 @@ module.exports = class TravelingMimo {
 
 			if (isRateLimited) {
 				if (attempt === maxRetries) {
-					app.Logger.warn(`${this.#instance.fullName}:Mimo`, `Rate limited after ${maxRetries} attempts, giving up`);
+					app.Logger.warn(`${this.#instance.fullName}:Mimo`, t `Rate limited after ${maxRetries} attempts, giving up`);
 					return res;
 				}
 
 				const maxWait = Math.min(baseDelay * Math.pow(2, attempt), maxDelay);
 				const totalDelay = Math.floor(baseDelay + Math.random() * (maxWait - baseDelay));
 
-				app.Logger.info(`${this.#instance.fullName}:Mimo`, `Rate limited, retrying in ${totalDelay}ms (attempt ${attempt}/${maxRetries})`);
+				app.Logger.info(`${this.#instance.fullName}:Mimo`, t `Rate limited, retrying in ${totalDelay}ms (attempt ${attempt}/${maxRetries})`);
 				await sleep(totalDelay);
 				continue;
 			}
@@ -118,12 +120,12 @@ module.exports = class TravelingMimo {
 
 		if (res.statusCode !== 200 || res.body.retcode !== 0) {
 			app.Logger.log(`${this.#instance.fullName}:Mimo`, {
-				message: "Failed to fetch Mimo game info",
+				message: t("Failed to fetch Mimo game info"),
 				args: { body: res.body }
 			});
 			return {
 				success: false,
-				message: app.HoyoLab.errorMessage(this.#instance.name, res.body.retcode) || res.body.message || "Failed to fetch Mimo game info"
+				message: app.HoyoLab.errorMessage(this.#instance.name, res.body.retcode) || res.body.message || t("Failed to fetch Mimo game info")
 			};
 		}
 
@@ -138,7 +140,7 @@ module.exports = class TravelingMimo {
 
 		const game = gameList?.find(g => g.game_id === this.#gameId);
 		if (!game) {
-			return { success: false, message: `${this.#instance.fullName} Mimo event not active` };
+			return { success: false, message: t `${this.#instance.fullName} Mimo event not active` };
 		}
 
 		return {
@@ -167,12 +169,12 @@ module.exports = class TravelingMimo {
 
 		if (res.statusCode !== 200 || res.body.retcode !== 0) {
 			app.Logger.log(`${this.#instance.fullName}:Mimo`, {
-				message: "Failed to fetch Mimo tasks",
+				message: t("Failed to fetch Mimo tasks"),
 				args: { body: res.body }
 			});
 			return {
 				success: false,
-				message: app.HoyoLab.errorMessage(this.#instance.name, res.body.retcode) || res.body.message || "Failed to fetch Mimo tasks"
+				message: app.HoyoLab.errorMessage(this.#instance.name, res.body.retcode) || res.body.message || t("Failed to fetch Mimo tasks")
 			};
 		}
 
@@ -209,7 +211,7 @@ module.exports = class TravelingMimo {
 
 		if (res.statusCode !== 200 || res.body.retcode !== 0) {
 			app.Logger.log(`${this.#instance.fullName}:Mimo`, {
-				message: "Failed to finish Mimo task",
+				message: t("Failed to finish Mimo task"),
 				args: { taskId, body: res.body }
 			});
 			return { success: false, message: res.body?.message };
@@ -238,7 +240,7 @@ module.exports = class TravelingMimo {
 
 		if (res.statusCode !== 200 || res.body.retcode !== 0) {
 			app.Logger.log(`${this.#instance.fullName}:Mimo`, {
-				message: "Failed to claim Mimo task reward",
+				message: t("Failed to claim Mimo task reward"),
 				args: { taskId, body: res.body }
 			});
 			return { success: false, message: res.body?.message };
@@ -261,12 +263,12 @@ module.exports = class TravelingMimo {
 
 		if (res.statusCode !== 200 || res.body.retcode !== 0) {
 			app.Logger.log(`${this.#instance.fullName}:Mimo`, {
-				message: "Failed to fetch Mimo shop items",
+				message: t("Failed to fetch Mimo shop items"),
 				args: { body: res.body }
 			});
 			return {
 				success: false,
-				message: app.HoyoLab.errorMessage(this.#instance.name, res.body.retcode) || res.body.message || "Failed to fetch Mimo shop items"
+				message: app.HoyoLab.errorMessage(this.#instance.name, res.body.retcode) || res.body.message || t("Failed to fetch Mimo shop items")
 			};
 		}
 
@@ -302,7 +304,7 @@ module.exports = class TravelingMimo {
 
 		if (res.statusCode !== 200 || res.body.retcode !== 0) {
 			app.Logger.log(`${this.#instance.fullName}:Mimo`, {
-				message: "Failed to exchange Mimo item",
+				message: t("Failed to exchange Mimo item"),
 				args: { awardId, body: res.body }
 			});
 			return { success: false, message: res.body?.message };
@@ -331,7 +333,7 @@ module.exports = class TravelingMimo {
 		if (res.statusCode !== 200 || res.body.retcode !== 0) {
 			return {
 				success: false,
-				message: app.HoyoLab.errorMessage(this.#instance.name, res.body.retcode) || res.body.message || "Failed to fetch Mimo lottery info"
+				message: app.HoyoLab.errorMessage(this.#instance.name, res.body.retcode) || res.body.message || t("Failed to fetch Mimo lottery info")
 			};
 		}
 
@@ -362,7 +364,7 @@ module.exports = class TravelingMimo {
 
 		if (res.statusCode !== 200 || res.body.retcode !== 0) {
 			app.Logger.log(`${this.#instance.fullName}:Mimo`, {
-				message: "Failed to draw lottery",
+				message: t("Failed to draw lottery"),
 				args: { body: res.body }
 			});
 			return { success: false, message: res.body?.message };
@@ -402,13 +404,13 @@ module.exports = class TravelingMimo {
 
 		const gameInfo = await this.getGameInfo(accountData);
 		if (!gameInfo.success) {
-			return { success: false, message: gameInfo.message || "Failed to get Mimo game info" };
+			return { success: false, message: gameInfo.message || t("Failed to get Mimo game info") };
 		}
 
 		const { versionId } = gameInfo.data;
 		results.points = gameInfo.data.points;
 
-		app.Logger.info(`${this.#instance.fullName}:Mimo`, `(${accountData.uid}) Starting Mimo automation - Current points: ${results.points}`);
+		app.Logger.info(`${this.#instance.fullName}:Mimo`, t `(${accountData.uid}) Starting Mimo automation - Current points: ${results.points}`);
 
 		const tasks = await this.getTasks(accountData, versionId);
 		if (tasks.success) {
@@ -418,7 +420,7 @@ module.exports = class TravelingMimo {
 					if (finishResult.success) {
 						results.tasksFinished.push(task.name);
 						task.status = MimoTaskStatus.FINISHED;
-						app.Logger.info(`${this.#instance.fullName}:Mimo`, `(${accountData.uid}) Finished task: ${task.name}`);
+						app.Logger.info(`${this.#instance.fullName}:Mimo`, t `(${accountData.uid}) Finished task: ${task.name}`);
 					}
 					await sleep(1000);
 				}
@@ -427,7 +429,7 @@ module.exports = class TravelingMimo {
 					if (claimResult.success) {
 						results.tasksClaimed.push({ name: task.name, points: task.point });
 						results.points += task.point;
-						app.Logger.info(`${this.#instance.fullName}:Mimo`, `(${accountData.uid}) Claimed ${task.point} points for: ${task.name}`);
+						app.Logger.info(`${this.#instance.fullName}:Mimo`, t `(${accountData.uid}) Claimed ${task.point} points for: ${task.name}`);
 					}
 					await sleep(1000);
 				}
@@ -470,7 +472,7 @@ module.exports = class TravelingMimo {
 					results.itemsExchanged.push({ name: item.name, cost: item.cost, code });
 					results.points -= item.cost;
 
-					app.Logger.info(`${this.#instance.fullName}:Mimo`, `(${accountData.uid}) Exchanged ${item.name} for code: ${code}`);
+					app.Logger.info(`${this.#instance.fullName}:Mimo`, t `(${accountData.uid}) Exchanged ${item.name} for code: ${code}`);
 
 					// Check if auto-redeem is enabled (mimo.redeem defaults to true for backward compatibility)
 					const shouldRedeem = accountData.redeemCode && (accountData.mimo?.redeem !== false);
@@ -480,16 +482,16 @@ module.exports = class TravelingMimo {
 						const redeemResult = await this.#instance.redeemCode(accountData, code);
 						if (redeemResult.success) {
 							results.codesRedeemed.push(code);
-							app.Logger.info(`${this.#instance.fullName}:Mimo`, `(${accountData.uid}) Redeemed code: ${code}`);
+							app.Logger.info(`${this.#instance.fullName}:Mimo`, t `(${accountData.uid}) Redeemed code: ${code}`);
 						}
 						else {
-							results.errors.push(`Failed to redeem code ${code}: ${redeemResult.message}`);
+							results.errors.push(t `Failed to redeem code ${code}: ${redeemResult.message}`);
 						}
 					}
 					else {
 						// Code obtained but not auto-redeemed
 						results.codesObtained.push(code);
-						app.Logger.info(`${this.#instance.fullName}:Mimo`, `(${accountData.uid}) Code obtained (not auto-redeemed): ${code}`);
+						app.Logger.info(`${this.#instance.fullName}:Mimo`, t `(${accountData.uid}) Code obtained (not auto-redeemed): ${code}`);
 					}
 				}
 
@@ -523,7 +525,7 @@ module.exports = class TravelingMimo {
 					}
 					drawsRemaining--;
 
-					app.Logger.info(`${this.#instance.fullName}:Mimo`, `(${accountData.uid}) Lottery draw: ${drawResult.data.name}`);
+					app.Logger.info(`${this.#instance.fullName}:Mimo`, t `(${accountData.uid}) Lottery draw: ${drawResult.data.name}`);
 
 					if (drawResult.data.code) {
 						const shouldRedeemDraw = accountData.redeemCode && (accountData.mimo?.redeemDraw !== false);
@@ -532,10 +534,10 @@ module.exports = class TravelingMimo {
 							const redeemResult = await this.#instance.redeemCode(accountData, drawResult.data.code);
 							if (redeemResult.success) {
 								results.codesRedeemed.push(drawResult.data.code);
-								app.Logger.info(`${this.#instance.fullName}:Mimo`, `(${accountData.uid}) Redeemed lottery code: ${drawResult.data.code}`);
+								app.Logger.info(`${this.#instance.fullName}:Mimo`, t `(${accountData.uid}) Redeemed lottery code: ${drawResult.data.code}`);
 							}
 							else {
-								results.errors.push(`Failed to redeem lottery code ${drawResult.data.code}: ${redeemResult.message}`);
+								results.errors.push(t `Failed to redeem lottery code ${drawResult.data.code}: ${redeemResult.message}`);
 							}
 						}
 						else {
@@ -564,18 +566,18 @@ module.exports = class TravelingMimo {
 	async getNextRestockTime (accountData) {
 		const gameInfo = await this.getGameInfo(accountData);
 		if (!gameInfo.success) {
-			return { success: false, message: gameInfo.message || "Failed to get Mimo game info" };
+			return { success: false, message: gameInfo.message || t("Failed to get Mimo game info") };
 		}
 
 		const shopItems = await this.getShopItems(accountData, gameInfo.data.versionId);
 		if (!shopItems.success) {
-			return { success: false, message: shopItems.message || "Failed to fetch Mimo shop items" };
+			return { success: false, message: shopItems.message || t("Failed to fetch Mimo shop items") };
 		}
 
 		const currencyName = this.#getPremiumCurrencyName();
 		const currencyItem = shopItems.data.find(i => i.name.toLowerCase().includes(currencyName));
 		if (!currencyItem) {
-			return { success: false, message: `No ${currencyName} items found` };
+			return { success: false, message: t `No ${currencyName} items found` };
 		}
 
 		return {

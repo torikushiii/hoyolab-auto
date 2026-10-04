@@ -1,3 +1,5 @@
+const { t } = require("../localization/index.js");
+
 module.exports = class HoyoDate extends Date {
 	static REGION_OFFSETS = {
 		SEA: 480, // GMT+8
@@ -19,16 +21,16 @@ module.exports = class HoyoDate extends Date {
 		if (typeof offset === "string") {
 			offset = HoyoDate.REGION_OFFSETS[offset.toUpperCase()];
 			if (offset === undefined) {
-				throw new Error("Invalid region. Use 'ASIA', 'EU', or 'AMERICA'");
+				throw new Error(t("Invalid region. Use 'ASIA', 'EU', or 'AMERICA'"));
 			}
 		}
 		else {
 			offset = Number(offset);
 			if (Number.isNaN(offset)) {
-				throw new Error("Invalid offset");
+				throw new Error(t("Invalid offset"));
 			}
 			else if (offset % 15 !== 0) {
-				throw new Error("Unrecognized offset - make sure to use offset in minutes");
+				throw new Error(t("Unrecognized offset - make sure to use offset in minutes"));
 			}
 		}
 
@@ -52,7 +54,7 @@ module.exports = class HoyoDate extends Date {
 					this.setMilliseconds(0);
 					break;
 				default:
-					throw new Error(`Unrecognized time unit ${unit}`);
+					throw new Error(t `Unrecognized time unit ${unit}`);
 			}
 		}
 		return this;
