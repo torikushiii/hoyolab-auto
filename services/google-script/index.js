@@ -639,7 +639,7 @@ class Game {
 			const data = JSON.parse(response.getContentText());
 
 			const authenticationFailed = isAuthenticationError(data);
-			if (authenticationFailed || data.retcode === 0 || data.retcode === -2017) {
+			if (authenticationFailed || [0, -2006, -2017].includes(data.retcode)) {
 				updateAuthenticationAlert(this, account.cookie, "code redemption", authenticationFailed);
 			}
 

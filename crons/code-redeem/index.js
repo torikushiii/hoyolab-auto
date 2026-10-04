@@ -72,7 +72,7 @@ module.exports = {
 						await platform.send(escapedMessage);
 					}
 					else {
-						const userId = data.retcode === -2017 ? null : platform.createUserMention(data.account.discord);
+						const userId = [-2006, -2017].includes(data.retcode) ? null : platform.createUserMention(data.account.discord);
 						await platform.send(message.embed, { content: userId });
 					}
 					notified.add(platform.id);

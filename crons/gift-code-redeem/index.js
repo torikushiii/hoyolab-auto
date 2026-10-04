@@ -87,7 +87,7 @@ module.exports = {
 					await app.Cache.set({ key: loginCacheKey, value: cookieHash });
 					await notifyExpiredLogin(account, `${loginCacheKey}:${cookieHash}`);
 				}
-				else if (result.success || result.retcode === -2017) {
+				else if (result.success || [-2006, -2017].includes(result.retcode)) {
 					// Successful or already-used codes confirm authentication; other failures do not.
 					await app.Cache.delete(loginCacheKey);
 				}

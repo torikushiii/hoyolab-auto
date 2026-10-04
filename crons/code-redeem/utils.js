@@ -59,7 +59,7 @@ const REDEMPTION_LINKS = GAME_CONFIG.reduce((acc, game) => {
 }, {});
 
 const DEFAULT_MANUAL_REASON = t("Redeem this code from within the game client.");
-const FINAL_REDEMPTION_ERRORS = new Set([-2001, -2003, -2017]);
+const FINAL_REDEMPTION_ERRORS = new Set([-2001, -2003, -2006, -2017]);
 
 const toUpperCase = (value) => String(value).toUpperCase();
 const formatCodeValue = (code) => String(code?.code ?? "").toUpperCase();
