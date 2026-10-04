@@ -1,4 +1,5 @@
 const { t } = require("../../localization/index.js");
+const DataCache = require("../../hoyolab-modules/cache.js");
 
 module.exports = {
 	name: "shop-status",
@@ -17,6 +18,7 @@ module.exports = {
 				continue;
 			}
 
+			await DataCache.invalidateCache(account.uid);
 			const notes = await platform.notes(account);
 			if (notes.success === false) {
 				continue;
