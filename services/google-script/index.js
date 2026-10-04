@@ -176,6 +176,11 @@ function saveAccountDetails (game, cookie, details) {
 	}
 }
 
+function getCookieFingerprint (cookie) {
+	return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, cookie)
+		.map(byte => (byte & 255).toString(16).padStart(2, "0")).join("");
+}
+
 // Store only a cookie fingerprint and alert state, never the cookie itself.
 function updateAuthenticationAlert (game, cookie, operation, failed) {
 	const accountId = getAccountId(cookie);
@@ -184,8 +189,7 @@ function updateAuthenticationAlert (game, cookie, operation, failed) {
 	}
 	const key = `${game.name}_${accountId}_auth_alert`;
 	const properties = PropertiesService.getScriptProperties();
-	const fingerprint = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, cookie)
-		.map(byte => (byte & 255).toString(16).padStart(2, "0")).join("");
+	const fingerprint = getCookieFingerprint(cookie);
 	const saved = JSON.parse(properties.getProperty(key) || "null");
 	const state = saved?.fingerprint === fingerprint ? saved : { fingerprint, operations: [], notified: false };
 	state.operations = state.operations.filter(item => item !== operation);
@@ -532,7 +536,7 @@ class Game {
 		const redeemedCodes = this.getRedeemedCodes(account);
 		const results = [];
 
-		for (const code of codes) {
+		for (const [index, code] of codes.entries()) {
 			if (redeemedCodes.includes(code.code)) {
 				console.log(t `Code ${code.code} already redeemed for ${this.fullName}`);
 				continue;
@@ -543,7 +547,15 @@ class Game {
 
 			results.push(result);
 			if (result.authenticationFailed) {
+				const pending = codes.slice(index).filter(entry => !redeemedCodes.includes(entry.code));
+				for (const entry of this.takeUnnotifiedPausedCodes(account, pending)) {
+					results.push({ code: entry.code, rewards: Array.isArray(entry.rewards) ? entry.rewards : [], success: false, paused: true });
+				}
 				break;
+			}
+
+			if (result.success || !result.retryable) {
+				PropertiesService.getScriptProperties().deleteProperty(this.getPausedCodesKey(account));
 			}
 
 			// Only stop retrying a code once we know the outcome is final. Transient
@@ -743,6 +755,24 @@ class Game {
 
 	getRedemptionLink () {
 		return REDEMPTION_LINKS[this.name] || null;
+	}
+
+	getPausedCodesKey (account) {
+		return `${this.name}_${account.region}_${account.uid}_paused_codes`;
+	}
+
+	takeUnnotifiedPausedCodes (account, codes) {
+		const properties = PropertiesService.getScriptProperties();
+		const key = this.getPausedCodesKey(account);
+		const fingerprint = getCookieFingerprint(account.cookie);
+		const saved = JSON.parse(properties.getProperty(key) || "null");
+		const notified = saved?.fingerprint === fingerprint ? saved.codes : [];
+		const fresh = codes.filter(entry => !notified.includes(entry.code));
+		if (fresh.length > 0) {
+			const codesToSave = [...notified, ...fresh.map(entry => entry.code)];
+			properties.setProperty(key, JSON.stringify({ fingerprint, codes: codesToSave }));
+		}
+		return fresh;
 	}
 
 	getRedeemedCodes (account) {
@@ -1023,10 +1053,11 @@ function buildCodeRedeemEmbed (game, account, assets, results) {
 	}
 
 	const redeemed = results.filter(result => result.success);
-	const failed = config.notifyOnRedeemFailure ? results.filter(result => !result.success && !result.authenticationFailed) : [];
+	const failed = config.notifyOnRedeemFailure ? results.filter(result => !result.success && !result.authenticationFailed && !result.paused) : [];
+	const paused = results.filter(result => result.paused);
 
 	// Nothing new happened for this account - stay quiet rather than sending an empty report.
-	if (redeemed.length === 0 && failed.length === 0) {
+	if (redeemed.length === 0 && failed.length === 0 && paused.length === 0) {
 		return null;
 	}
 
@@ -1043,21 +1074,30 @@ function buildCodeRedeemEmbed (game, account, assets, results) {
 	}
 
 	if (failed.length > 0) {
-		const redeemLink = game.getRedemptionLink();
-
 		fields.push({
 			name: t `Failed (${failed.length})`,
 			value: formatCodeLines(failed, result => `\`${result.code}\` — ${truncate(result.message, 150)}`),
 			inline: false
 		});
+	}
 
-		if (redeemLink) {
-			fields.push({
-				name: t("Manually Redeem Here"),
-				value: redeemLink,
-				inline: false
-			});
-		}
+	if (paused.length > 0) {
+		fields.push({
+			name: t("Code Redemption Paused - HoYoLAB Login Expired"),
+			value: formatCodeLines(paused, (result) => (result.rewards.length > 0
+				? `\`${result.code}\` — ${truncate(result.rewards.join(", "), 200)}`
+				: `\`${result.code}\``)),
+			inline: false
+		});
+	}
+
+	const redeemLink = game.getRedemptionLink();
+	if (redeemLink && (failed.length > 0 || paused.length > 0)) {
+		fields.push({
+			name: t("Manually Redeem Here"),
+			value: redeemLink,
+			inline: false
+		});
 	}
 
 	return {

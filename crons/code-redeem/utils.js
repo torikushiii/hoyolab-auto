@@ -133,6 +133,13 @@ const fetchCodes = async () => {
 	}, {});
 };
 
+const getPausedEntries = (account, notificationKey, codes, completedCodes) => [
+	{ account, loginExpired: true, notificationKey },
+	...codes
+		.filter(code => !completedCodes.has(formatCodeValue(code)))
+		.map(code => ({ account, code, loginExpired: true, notificationKey: `${notificationKey}:${formatCodeValue(code)}` }))
+];
+
 const checkAndRedeem = async (codes) => {
 	const newCodes = await checkCachedCodes(codes);
 
@@ -197,7 +204,7 @@ const checkAndRedeem = async (codes) => {
 			const pausedCookieHash = await app.Cache.get(loginCacheKey);
 			if (pausedCookieHash) {
 				if (pausedCookieHash === getRedemptionCookieHash(account)) {
-					failed.push({ account, loginExpired: true, notificationKey: `${loginCacheKey}:${pausedCookieHash}` });
+					failed.push(...getPausedEntries(account, `${loginCacheKey}:${pausedCookieHash}`, pendingCodes, completedCodes));
 					continue;
 				}
 				await app.Cache.delete(loginCacheKey);
@@ -226,7 +233,7 @@ const checkAndRedeem = async (codes) => {
 				if (!result.success && app.HoyoLab.isExpiredLogin(result.reason)) {
 					const cookieHash = getRedemptionCookieHash(account);
 					await app.Cache.set({ key: loginCacheKey, value: cookieHash });
-					failed.push({ account, loginExpired: true, notificationKey: `${loginCacheKey}:${cookieHash}` });
+					failed.push(...getPausedEntries(account, `${loginCacheKey}:${cookieHash}`, pendingCodes, completedCodes));
 					await setTimeout(6000);
 					break;
 				}
