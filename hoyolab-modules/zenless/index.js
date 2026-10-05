@@ -144,6 +144,7 @@ module.exports = class ZenlessZoneZero extends require("../template.js") {
 				},
 				mimo: {
 					check: account.mimo?.check ?? false,
+					shopPolicy: account.mimo?.shopPolicy ?? null,
 					redeem: account.mimo?.redeem ?? true,
 					redeemDraw: account.mimo?.redeemDraw ?? true,
 					mentionOnSuccess: account.mimo?.mentionOnSuccess ?? true,

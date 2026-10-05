@@ -70,6 +70,10 @@ const initCrons = () => {
 			: config.crons[name] || definition.expression;
 		const job = new CronJob(expression, () => cron.code(cron), null, false, definition.timeZone);
 		job.start();
+		for (const schedule of definition.additionalSchedules || []) {
+			const additionalJob = new CronJob(schedule.expression, () => cron.code({ ...cron, ...schedule }), null, false, schedule.timeZone);
+			additionalJob.start();
+		}
 
 		crons.job = job;
 		crons.push(cron);
