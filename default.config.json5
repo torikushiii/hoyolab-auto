@@ -54,6 +54,7 @@
         expedition: '0 */30 * * * *',
         giftCodeRedeem: '0 */3 * * *',
         mimo: '0 0 */6 * * *',
+        mimoRestock: true, // Also run at 19:00 and 19:01 UTC+8 on Monday (Star Rail) / Wednesday (ZZZ).
         mimoJitter: 0, // Random delay in seconds before running Mimo (0-N). Helps avoid rate limits at reset time.
         hilichurl: '0 0 11 * * *', // 11:00 AM local time (adjust for your timezone if event resets at a different time)
         hilichurlJitter: 0, // Random delay in seconds before running Hilichurl Workshop (0-N).
@@ -160,10 +161,18 @@
                     },
                     mimo: {
                         check: false,
+                        // All shop rewards are once per season; weekly restocks replenish shared stock.
+                        // always: exchange as soon as affordable; conditional: exchange without spending the always reserve.
+                        // Both modes reserve points before lottery draws; never: skip. Array order sets category priority.
+                        shopPolicy: [
+                            { category: 'premiumCurrency', mode: 'always' },
+                            { category: 'gameMaterials', mode: 'conditional' },
+                            { category: 'hoyolabCosmetics', mode: 'never' },
+                        ],
                         redeem: true,
                         mentionOnSuccess: true, // Ping Discord after a successful Mimo exchange or code redemption
-                        lottery: false,
-                        reservePoints: 0,
+                        lottery: false, // Use each day's available draws to spend points above the remaining shop budget.
+                        reservePoints: 0, // Minimum points kept from lottery spending; guaranteed exchanges can use them.
                         redeemDraw: true,
                     },
                     discord: {
@@ -197,10 +206,15 @@
                     },
                     mimo: {
                         check: false,
+                        shopPolicy: [
+                            { category: 'premiumCurrency', mode: 'always' },
+                            { category: 'gameMaterials', mode: 'conditional' },
+                            { category: 'hoyolabCosmetics', mode: 'never' },
+                        ],
                         redeem: true,
                         mentionOnSuccess: true, // Ping Discord after a successful Mimo exchange or code redemption
                         lottery: false,
-                        reservePoints: 0,
+                        reservePoints: 0, // Minimum points kept from lottery spending; guaranteed exchanges can use them.
                         redeemDraw: true,
                     },
                     discord: {
@@ -227,10 +241,15 @@
                     dailyLotteryCheck: true, // Set to false to disable the ZZZ daily lottery reminder
                     mimo: {
                         check: false,
+                        shopPolicy: [
+                            { category: 'premiumCurrency', mode: 'always' },
+                            { category: 'gameMaterials', mode: 'conditional' },
+                            { category: 'hoyolabCosmetics', mode: 'never' },
+                        ],
                         redeem: true,
                         mentionOnSuccess: true, // Ping Discord after a successful Mimo exchange or code redemption
                         lottery: false,
-                        reservePoints: 0,
+                        reservePoints: 0, // Minimum points kept from lottery spending; guaranteed exchanges can use them.
                         redeemDraw: true,
                     },
                     stamina: {

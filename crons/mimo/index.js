@@ -6,8 +6,14 @@ const config = require("../../config.js");
 module.exports = {
 	name: "mimo",
 	expression: "0 0 */6 * * *",
+	additionalSchedules: config.crons?.mimoRestock !== false
+		? [
+			{ expression: "1 0,1 11 * * 1", timeZone: "UTC", gameName: "starrail" },
+			{ expression: "1 0,1 11 * * 3", timeZone: "UTC", gameName: "nap" }
+		]
+		: [],
 	description: t("This will run the Traveling Mimo automation for supported games (Star Rail, ZZZ) - completing tasks, claiming rewards, and exchanging for premium currency."),
-	code: (async function mimo () {
+	code: (async function mimo (options = {}) {
 		const jitterSeconds = config.crons?.mimoJitter ?? 0;
 		if (jitterSeconds > 0) {
 			const jitterMs = Math.floor(Math.random() * jitterSeconds * 1000);
@@ -16,7 +22,7 @@ module.exports = {
 		}
 
 		// Note: Genshin uses a different API structure (/qiuqiu/) and is not supported yet
-		const supportedGames = ["starrail", "nap"];
+		const supportedGames = ["starrail", "nap"].filter(gameName => !options.gameName || options.gameName === gameName);
 
 		for (const gameName of supportedGames) {
 			const accounts = app.HoyoLab.getActiveAccounts({ whitelist: gameName });
