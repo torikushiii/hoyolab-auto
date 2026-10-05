@@ -783,7 +783,7 @@ module.exports = class TravelingMimo {
 	async run (accountData) {
 		const runKey = `${this.#gameId}:${accountData.uid}`;
 		if (RunningAccounts.has(runKey)) {
-			return { success: false, message: t("Mimo automation is already running for this account") };
+			return { success: false, alreadyRunning: true, message: t("Mimo automation is already running for this account") };
 		}
 
 		RunningAccounts.add(runKey);

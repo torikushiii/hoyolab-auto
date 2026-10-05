@@ -42,6 +42,15 @@ module.exports = {
 
 				try {
 					const result = await platform.mimo(account);
+					if (result.alreadyRunning) {
+						app.Logger.debug("Cron:Mimo", {
+							message: result.message,
+							game: gameName,
+							uid: account.uid
+						});
+						continue;
+					}
+
 					if (!result.success) {
 						app.Logger.warn("Cron:Mimo", {
 							message: t("Mimo automation failed"),
