@@ -20,7 +20,8 @@ const TaskStatus = {
 };
 
 // Task types that can be auto-completed via API
-const FinishableTaskTypes = [1, 2]; // FINISHABLE, VISIT
+const FinishableTaskTypes = [1, 2, 4, 10, 101, 102];
+const TimedTaskTypes = [101, 102];
 
 // Shop item status
 const ShopItemStatus = {
@@ -171,7 +172,8 @@ module.exports = class HilichurlWorkshop {
 				status: task.status,
 				taskType: task.task_type,
 				jumpUrl: task.jump_url,
-				afUrl: task.af_url
+				afUrl: task.af_url,
+				readSeconds: task.read_seconds ?? 0
 			}))
 		};
 	}
@@ -322,6 +324,10 @@ module.exports = class HilichurlWorkshop {
 			for (const task of tasks.data) {
 				// Try to auto-complete finishable tasks
 				if (task.status === TaskStatus.ONGOING && FinishableTaskTypes.includes(task.taskType)) {
+					if (TimedTaskTypes.includes(task.taskType) && task.readSeconds > 0) {
+						await sleep((task.readSeconds + 1) * 1000);
+					}
+
 					const finishResult = await this.finishTask(accountData, task.id, versionId);
 					if (finishResult.success) {
 						results.tasksFinished.push(task.name);
