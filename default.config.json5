@@ -63,6 +63,11 @@
         shopStatus: '0 */1 * * *',
         stamina: '0 */30 * * * *'
     },
+    // Optional: define a cookie once and reuse it in any account entry below with cookieKey: 'main'.
+    // A cookie set directly on an entry always takes priority over its cookieKey.
+    // cookies: {
+    //     main: '',
+    // },
     accounts: [
         {
             id: 1,

@@ -188,6 +188,34 @@ The optional [HoYoLAB cookie helper](https://github.com/Smexhy/hoyolab-cookie-he
 can obtain it locally on Windows, macOS, or Linux. It is a third-party helper
 and is only needed for automatic cookie refresh.
 
+### Sharing one cookie across games
+
+If several games use the same HoYoLAB login, you can define the cookie once in
+a top-level `cookies` list and point each account entry at it with `cookieKey`:
+
+```json5
+cookies: {
+    main: 'your cookie here',
+},
+accounts: [
+    {
+        id: 3,
+        active: true,
+        type: 'genshin',
+        data: [
+            {
+                cookieKey: 'main',
+                // ...other options
+            },
+        ],
+    },
+],
+```
+
+A `cookie` set directly on an entry always takes priority over `cookieKey`, so
+existing configs keep working unchanged. If `cookieKey` does not match any entry
+in `cookies`, a warning is logged and that account is skipped.
+
 ## Notifications Setup
 For setting up Discord or Telegram notifications, refer to the [setup folder](https://github.com/torikushiii/hoyolab-auto/tree/main/setup).
 

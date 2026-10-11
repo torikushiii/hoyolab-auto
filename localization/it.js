@@ -366,6 +366,7 @@
 			"No ID provided for HoyoLab.": "Nessun ID fornito per HoYoLAB.",
 			"Invalid data provided for HoyoLab must be an array.": "I dati forniti per HoYoLAB non sono validi: devono essere un array.",
 			"No accounts provided for {0}, please provide at least one account or disable the platform.": "Nessun account fornito per {0}: specifica almeno un account oppure disabilita la piattaforma.",
+			"Cookie key \"{0}\" for {1} was not found in the cookies list. Skipping this account.": "La chiave cookie \"{0}\" per {1} non è stata trovata nell'elenco dei cookie. Questo account verrà saltato.",
 			"This cookie method is deprecated, please follow the new cookie guide again: https://gist.github.com/torikushiii/59eff33fc8ea89dbc0b2e7652db9d3fd": "Questo metodo per i cookie è obsoleto. Segui la nuova guida: https://gist.github.com/torikushiii/59eff33fc8ea89dbc0b2e7652db9d3fd",
 			"Invalid check provided for HoyoLab expected boolean.": "Il valore check fornito per HoYoLAB non è valido: atteso un booleano.",
 			"Invalid realm.check provided for HoyoLab expected boolean.": "Il valore realm.check fornito per HoYoLAB non è valido: atteso un booleano.",

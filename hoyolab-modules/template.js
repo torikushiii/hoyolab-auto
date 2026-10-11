@@ -80,6 +80,18 @@ module.exports = class HoyoLab {
 		}
 
 		for (const account of accounts) {
+			if (!account.cookie && account.cookieKey !== undefined) {
+				const cookies = app.Config.get("cookies") ?? {};
+				const shared = Object.hasOwn(cookies, account.cookieKey) ? cookies[account.cookieKey] : undefined;
+				if (typeof shared === "string" && shared.length > 0) {
+					account.cookie = shared;
+				}
+				else {
+					app.Logger.warn("HoyoLab", t `Cookie key "${account.cookieKey}" for ${name} was not found in the cookies list. Skipping this account.`);
+					account.cookie = "";
+				}
+			}
+
 			if (typeof account.cookie === "object") {
 				throw new app.Error({
 					message: t("This cookie method is deprecated, please follow the new cookie guide again: https://gist.github.com/torikushiii/59eff33fc8ea89dbc0b2e7652db9d3fd")
