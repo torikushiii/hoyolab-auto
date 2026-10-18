@@ -715,6 +715,7 @@
         let honkaiAccountCount = 1;
         let tearsAccountCount = 1;
         let zenlessAccountCount = 1;
+        let gotifyPriorities = null;
 
         const importButton = document.getElementById('importConfigButton');
         if (importButton) {
@@ -835,6 +836,7 @@
             setInputValue(document.getElementById('gotifyUrl'), gotify.url);
             setInputValue(document.getElementById('gotifyToken'), gotify.token);
             setInputValue(document.getElementById('gotifyPriority'), gotify.priority ?? 5);
+            gotifyPriorities = gotify.priorities && typeof gotify.priorities === 'object' && !Array.isArray(gotify.priorities) ? gotify.priorities : null;
         }
 
         function applyCronConfig(crons) {
@@ -1211,6 +1213,7 @@
                         url: document.getElementById('gotifyUrl').value || document.getElementById('gotifyUrl').placeholder,
                         token: document.getElementById('gotifyToken').value || document.getElementById('gotifyToken').placeholder,
                         priority: gotifyPriority,
+                        ...(gotifyPriorities && { priorities: gotifyPriorities }),
                     }
                 ],
                 crons: {

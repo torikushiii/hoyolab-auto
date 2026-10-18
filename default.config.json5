@@ -40,6 +40,11 @@
             url: 'https://gotify.example.com', // Your Gotify server URL, including any reverse proxy path
             token: '(YOUR_GOTIFY_APP_TOKEN)', // Create an application in the Gotify web UI to get this token
             priority: 5, // Optional integer priority (default: 5)
+            // Optional per-notification priorities, see setup/GOTIFY.md for all types
+            // priorities: {
+            //     stamina: 7,
+            //     mimo: 2,
+            // },
         },
     ],
     crons: {

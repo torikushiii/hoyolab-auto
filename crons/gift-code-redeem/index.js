@@ -38,7 +38,10 @@ const notifyExpiredLogin = async (account, notificationKey) => {
 				await platform.send(escapedMessage);
 			}
 			else {
-				await platform.send(message.embed, { content: platform.createUserMention(account.discord) });
+				await platform.send(message.embed, {
+					content: platform.createUserMention(account.discord),
+					notificationType: "cookie"
+				});
 			}
 			notified.add(platform.id);
 			await app.Cache.set({

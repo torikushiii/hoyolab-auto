@@ -5,9 +5,26 @@ const formatText = (value) => String(value).replace(/<t:(\d+)(?::[tTdDfFR])?>/g,
 	return Number.isNaN(date.getTime()) ? match : date.toISOString();
 });
 
+const NOTIFICATION_TYPES = [
+	"checkIn",
+	"codeRedeem",
+	"cookie",
+	"dailies",
+	"expedition",
+	"giftCodeRedeem",
+	"hilichurl",
+	"howlScratchCard",
+	"mimo",
+	"realmCurrency",
+	"shopStatus",
+	"stamina",
+	"weeklies"
+];
+
 module.exports = class Gotify extends require("./template.js") {
 	#messageURL;
 	#priority;
+	#priorities;
 
 	constructor (config) {
 		super("gotify", config);
@@ -34,6 +51,23 @@ module.exports = class Gotify extends require("./template.js") {
 		if (!Number.isSafeInteger(this.#priority)) {
 			throw new app.Error({ message: t("Gotify priority must be an integer.") });
 		}
+
+		const priorities = config.priorities ?? {};
+		if (typeof priorities !== "object" || Array.isArray(priorities)) {
+			throw new app.Error({ message: t("Gotify priorities must be an object of notification types and priorities.") });
+		}
+		for (const [type, priority] of Object.entries(priorities)) {
+			if (!NOTIFICATION_TYPES.includes(type)) {
+				throw new app.Error({
+					message: t `Unknown Gotify notification type "${type}".`,
+					args: { allowed: NOTIFICATION_TYPES }
+				});
+			}
+			if (!Number.isSafeInteger(priority)) {
+				throw new app.Error({ message: t("Gotify priority must be an integer.") });
+			}
+		}
+		this.#priorities = { ...priorities };
 
 		serverURL.pathname = `${serverURL.pathname.replace(/\/+$/, "")}/message`;
 		this.#messageURL = serverURL.toString();
@@ -69,7 +103,10 @@ module.exports = class Gotify extends require("./template.js") {
 		if (message.trim().length === 0) {
 			throw new app.Error({ message: t("Gotify messages must not be empty.") });
 		}
-		const priority = options.priority ?? this.#priority;
+		const typePriority = Object.hasOwn(this.#priorities, options.notificationType ?? "")
+			? this.#priorities[options.notificationType]
+			: undefined;
+		const priority = options.priority ?? typePriority ?? this.#priority;
 		if (!Number.isSafeInteger(priority)) {
 			throw new app.Error({ message: t("Gotify priority must be an integer.") });
 		}

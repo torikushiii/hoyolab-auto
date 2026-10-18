@@ -17,6 +17,8 @@
 			"Invalid Gotify server URL. Use an HTTP or HTTPS URL without credentials, query parameters, or a fragment.": "URL del server Gotify non valido. Usa un URL HTTP o HTTPS senza credenziali, parametri di query o frammenti.",
 			"No Gotify application token provided.": "Nessun token dell’applicazione Gotify fornito.",
 			"Gotify priority must be an integer.": "La priorità Gotify deve essere un numero intero.",
+			"Gotify priorities must be an object of notification types and priorities.": "Le priorità Gotify devono essere un oggetto di tipi di notifica e priorità.",
+			"Unknown Gotify notification type \"{0}\".": "Tipo di notifica Gotify sconosciuto \"{0}\".",
 			"Gotify messages must be strings or notification objects.": "I messaggi Gotify devono essere stringhe o oggetti di notifica.",
 			"Gotify messages must not be empty.": "I messaggi Gotify non devono essere vuoti.",
 			"Failed to send Gotify notification": "Invio della notifica Gotify non riuscito",

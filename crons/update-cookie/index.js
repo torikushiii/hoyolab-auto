@@ -41,7 +41,8 @@ const notify = async (accountId, destination, recovered) => {
 			description,
 			timestamp: new Date()
 		}, {
-			content: [...mentions].join(" ")
+			content: [...mentions].join(" "),
+			notificationType: "cookie"
 		});
 	}
 };

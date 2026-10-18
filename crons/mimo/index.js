@@ -85,7 +85,8 @@ module.exports = {
 								await destination.send(embed, {
 									content: destination.createUserMention(account.discord),
 									author: account.assets?.author,
-									icon: account.assets?.logo
+									icon: account.assets?.logo,
+									notificationType: "mimo"
 								});
 							}
 
@@ -233,7 +234,8 @@ module.exports = {
 							await destination.send(embed, {
 								...(userId && { content: userId }),
 								author: data.assets.author,
-								icon: data.assets.logo
+								icon: data.assets.logo,
+								notificationType: "mimo"
 							});
 						}
 					}

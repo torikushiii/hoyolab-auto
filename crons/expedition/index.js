@@ -70,7 +70,8 @@ module.exports = {
 					await destination.send(embed, {
 						content: userId,
 						author: data.assets.author,
-						icon: data.assets.logo
+						icon: data.assets.logo,
+						notificationType: "expedition"
 					});
 				}
 

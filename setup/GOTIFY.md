@@ -36,6 +36,33 @@ notifications and cannot be used to send them. Your Gotify client determines how
 the configured [priority](https://gotify.net/docs/priority) affects sounds and
 notification visibility. Messages use Markdown to preserve notification formatting.
 
+## Per-notification priorities
+
+Use `priorities` to override the priority for specific notification types.
+Types that are not listed use `priority`.
+
+```json5
+{
+    id: 4,
+    active: true,
+    type: 'gotify',
+    url: 'https://gotify.example.com',
+    token: 'YOUR_GOTIFY_APP_TOKEN',
+    priority: 3,
+    priorities: {
+        mimo: 2,
+        stamina: 7,
+        dailies: 8,
+    },
+},
+```
+
+Available types: `checkIn`, `codeRedeem`, `cookie`, `dailies`, `expedition`,
+`giftCodeRedeem`, `hilichurl`, `howlScratchCard`, `mimo`, `realmCurrency`,
+`shopStatus`, `stamina`, and `weeklies`. `cookie` covers expired login and
+cookie refresh alerts. An unknown type stops the application at startup so
+typos are caught early. The startup test notification always uses `priority`.
+
 Gotify receives outbound notifications; commands remain available through the
 existing Discord and Telegram bots.
 

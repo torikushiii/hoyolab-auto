@@ -158,7 +158,8 @@ module.exports = {
 						await destination.send(embed, {
 							...(userId && { content: userId }),
 							author: data.assets.author,
-							icon: data.assets.logo
+							icon: data.assets.logo,
+							notificationType: "hilichurl"
 						});
 					}
 				}

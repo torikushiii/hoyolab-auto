@@ -70,7 +70,8 @@ module.exports = {
 			for (const destination of app.Platform.getEmbedPlatforms(platforms)) {
 				await destination.send(embed, {
 					author: message.assets.author,
-					icon: message.assets.logo
+					icon: message.assets.logo,
+					notificationType: "checkIn"
 				});
 			}
 

@@ -53,7 +53,7 @@ module.exports = {
 				await telegram.send(escapedMessage);
 			}
 			for (const destination of app.Platform.getEmbedPlatforms(platforms)) {
-				await destination.send(message.embed);
+				await destination.send(message.embed, { notificationType: "codeRedeem" });
 			}
 		}
 
@@ -73,7 +73,10 @@ module.exports = {
 					}
 					else {
 						const userId = [-2006, -2017].includes(data.retcode) ? null : platform.createUserMention(data.account.discord);
-						await platform.send(message.embed, { content: userId });
+						await platform.send(message.embed, {
+							content: userId,
+							notificationType: data.loginExpired ? "cookie" : "codeRedeem"
+						});
 					}
 					notified.add(platform.id);
 					await app.Cache.set({
@@ -96,7 +99,7 @@ module.exports = {
 				await telegram.send(escapedMessage);
 			}
 			for (const destination of app.Platform.getEmbedPlatforms()) {
-				await destination.send(message.embed);
+				await destination.send(message.embed, { notificationType: "codeRedeem" });
 			}
 		}
 	}

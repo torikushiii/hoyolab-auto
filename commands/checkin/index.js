@@ -135,7 +135,8 @@ module.exports = {
 				for (const embed of embeds) {
 					await webhook.send(embed, {
 						author: "HoyoLab Auto",
-						icon: embed.author?.icon_url
+						icon: embed.author?.icon_url,
+						notificationType: "checkIn"
 					});
 				}
 			}
