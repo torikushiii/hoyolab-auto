@@ -58,7 +58,7 @@ for (const language of [undefined, "it-it"]) {
 			assert.equal(request.headers.origin, "https://act.hoyolab.com");
 			assert.equal(request.headers.referer, "https://act.hoyolab.com/");
 			assert.equal(request.headers.accept, "application/json, text/plain, */*");
-			assert.match(request.headers["user-agent"], /Android.*wv.*miHoYoBBSOversea\/4\.20\.0/);
+			assert.match(request.headers["user-agent"], /Android.*wv.*miHoYoBBSOversea\/4\.21\.0/);
 			assert.equal(request.headers["x-requested-with"], "com.mihoyo.hoyolab");
 			assert.equal(request.headers["x-rpc-client_type"], 2);
 			assert.equal(request.headers["x-rpc-language"], language ?? "en-us");
@@ -137,7 +137,7 @@ for (const language of [undefined, "it-it"]) {
 			assert.equal(request.headers.origin, "https://www.hoyolab.com");
 			assert.equal(request.headers.referer, "https://www.hoyolab.com/");
 			assert.equal(request.headers["x-rpc-client_type"], 4);
-			assert.equal(request.headers["x-rpc-app_version"], "4.20.0");
+			assert.equal(request.headers["x-rpc-app_version"], "4.21.0");
 			assert.equal(request.headers["x-rpc-language"], language ?? "en-us");
 			assert.match(request.headers["user-agent"], /Windows NT/);
 			for (const name of ["ds", "x-requested-with", "x-rpc-platform", "x-rpc-device_id", "x-rpc-device_fp"]) {

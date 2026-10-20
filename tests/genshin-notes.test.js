@@ -95,12 +95,12 @@ const assertRequest = (request, notes, language = "en-us", expectedCookie = cook
 	assert.equal(request.headers.accept, "application/json, text/plain, */*");
 	assert.equal(request.headers["x-rpc-client_type"], 5);
 	assert.equal(request.headers["x-rpc-platform"], notes ? 2 : 4);
-	assert.equal(request.headers["x-rpc-app_version"], notes ? "4.20.0" : "1.5.0");
+	assert.equal(request.headers["x-rpc-app_version"], notes ? "4.21.0" : "1.5.0");
 	assert.equal(request.headers["x-rpc-language"], language);
 	assert.equal(request.headers["x-rpc-lang"], language);
 	assert.equal(request.headers["x-rpc-env"], "default");
 	assert.equal(request.headers["x-requested-with"], notes ? "com.mihoyo.hoyolab" : undefined);
-	assert.match(request.headers["user-agent"], notes ? /Android.*wv.*miHoYoBBSOversea\/4\.20\.0/ : /Windows NT/);
+	assert.match(request.headers["user-agent"], notes ? /Android.*wv.*miHoYoBBSOversea\/4\.21\.0/ : /Windows NT/);
 	for (const header of ["ds", "x-rpc-signgame", "x-rpc-page", "x-rpc-device_id", "x-rpc-device_fp"]) {
 		assert.equal(request.headers[header], undefined, header);
 	}

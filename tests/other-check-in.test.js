@@ -53,11 +53,11 @@ for (const [folder, platform, route, signgame, actId] of games) {
 			assert.equal(request.headers.origin, "https://act.hoyolab.com");
 			assert.equal(request.headers.referer, "https://act.hoyolab.com/");
 			assert.equal(request.headers.accept, "application/json, text/plain, */*");
-			assert.match(request.headers["user-agent"], /Android.*wv.*miHoYoBBSOversea\/4\.20\.0/);
+			assert.match(request.headers["user-agent"], /Android.*wv.*miHoYoBBSOversea\/4\.21\.0/);
 			assert.equal(request.headers["x-requested-with"], "com.mihoyo.hoyolab");
 			assert.equal(request.headers["x-rpc-signgame"], signgame);
 			assert.equal(request.headers["x-rpc-client_type"], appRpc ? 5 : undefined);
-			assert.equal(request.headers["x-rpc-app_version"], appRpc ? "4.20.0" : undefined);
+			assert.equal(request.headers["x-rpc-app_version"], appRpc ? "4.21.0" : undefined);
 			assert.equal(request.headers["x-rpc-platform"], appRpc ? 2 : undefined);
 			for (const header of ["ds", "x-rpc-language", "x-rpc-lang", "x-rpc-env", "x-rpc-page", "x-rpc-device_id", "x-rpc-device_fp"]) {
 				assert.equal(request.headers[header], undefined, header);

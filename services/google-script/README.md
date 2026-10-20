@@ -34,7 +34,7 @@
      ![image](https://github.com/torikushiii/hoyolab-auto/assets/21153445/4a0a5a30-c990-41f2-802e-1ba6f45c0c43)
 
 3. **Configuration:**
-   - Set `config.language` to a locale matching the catalog, such as `"it-it"` for Italian, or leave `"en-us"` for English. Missing catalogs and messages fall back to English. This Apps Script setting only localizes software messages; its API requests remain unchanged.
+   - Set `config.language` to a locale matching the catalog, such as `"it-it"` for Italian, or leave `"en-us"` for English. Missing catalogs and messages fall back to English without changing the API locale. HoYoLAB requests use the full configured locale; code redemption uses its primary language.
    - **Paste your `cookie`:** In the config object, add the following (replace placeholders with your actual data):
 
      ```javascript
@@ -85,6 +85,8 @@
 
      Check-in and redemption use different tokens, so successful check-in does not prove that redemption credentials are valid. Replace the affected account's cookie when alerted. This Apps Script does not refresh cookies using `stoken`.
 
+     HSR and ZZZ browser redemption also require `_MHYUUID` in the configured cookie. If it is missing, acquire a new cookie; redemption makes no HTTP request and the code remains eligible for a later attempt. Genshin redemption uses the browser gift GET endpoint; HSR and ZZZ use JSON POST risk endpoints.
+
      Redeemed codes are now tracked per game account. When updating from a version with shared code history, current codes may be attempted once again for each account because the old history cannot identify which account redeemed them.
 
    - **Save the Project:** Click on the floppy disk icon to save your project.
@@ -124,5 +126,7 @@ To stop it, run `removeCookieKeepAlive` from the editor. Trigger setup and remov
 
 ### Important Notes
 
+- Account discovery uses game-specific Game Record APIs; HSR and Honkai Impact 3rd discovery use basic desktop DS. Check-in uses the desktop Genshin or per-game WebView contract without DS and confirms the post-claim status before reporting success.
+- Request construction, cookie requirements and result handling are tested offline. The actual Google Apps Script transport and backend acceptance have not been verified live.
 - **Authorization:** The first time you run the script, it will ask for authorization to access your Google account.
 - **Logs:** View the execution logs by clicking on the "Executions" icon (play button symbol) in the Apps Script sidebar.

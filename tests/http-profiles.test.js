@@ -97,13 +97,13 @@ test("desktop, WebView, Game Record and native identities remain distinct", asyn
 	}
 	assert.match(desktop["user-agent"], /Windows NT/);
 	assertAbsent(desktop, ["x-requested-with"]);
-	assert.match(webview["user-agent"], /wv\).*miHoYoBBSOversea\/4\.20\.0/);
+	assert.match(webview["user-agent"], /wv\).*miHoYoBBSOversea\/4\.21\.0/);
 	assert.equal(webview["x-requested-with"], "com.mihoyo.hoyolab");
 	assert.equal(recordDesktop["user-agent"], desktop["user-agent"]);
 	assert.equal(recordDesktop["x-rpc-app_version"], "1.5.0");
 	assert.equal(String(recordDesktop["x-rpc-platform"]), "4");
 	assert.equal(recordWebview["user-agent"], webview["user-agent"]);
-	assert.equal(recordWebview["x-rpc-app_version"], "4.20.0");
+	assert.equal(recordWebview["x-rpc-app_version"], "4.21.0");
 	assert.equal(String(recordWebview["x-rpc-platform"]), "2");
 	for (const headers of [recordDesktop, recordWebview]) {
 		assert.equal(String(headers["x-rpc-client_type"]), "5");
@@ -114,7 +114,7 @@ test("desktop, WebView, Game Record and native identities remain distinct", asyn
 		assert.equal(headers.referer, "https://act.hoyolab.com/");
 	}
 	assert.equal(zzz["user-agent"], webview["user-agent"]);
-	assert.equal(zzz["x-rpc-app_version"], "4.20.0");
+	assert.equal(zzz["x-rpc-app_version"], "4.21.0");
 	assert.equal(String(zzz["x-rpc-platform"]), "2");
 	assertAbsent(zzz, ["x-rpc-client_type", "x-rpc-env"]);
 	assert.equal(native["user-agent"], "okhttp/4.12.0");

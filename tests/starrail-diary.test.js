@@ -93,7 +93,7 @@ const assertRequest = (request, month, language = "en-us") => {
 	assert.equal(request.headers.referer, "https://act.hoyolab.com/");
 	assert.equal(request.headers.accept, "application/json, text/plain, */*");
 	assert.equal(request.headers["x-requested-with"], "com.mihoyo.hoyolab");
-	assert.match(request.headers["user-agent"], /Android.*wv.*miHoYoBBSOversea\/4\.20\.0/);
+	assert.match(request.headers["user-agent"], /Android.*wv.*miHoYoBBSOversea\/4\.21\.0/);
 	assert.equal(request.headers.ds, undefined);
 	assert.deepEqual(Object.keys(request.headers).filter(key => key.startsWith("x-rpc-")), []);
 };

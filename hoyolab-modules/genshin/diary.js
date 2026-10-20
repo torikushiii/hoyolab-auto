@@ -98,7 +98,7 @@ module.exports = class Diary {
 			throw new Error("Diary API request failed");
 		}
 
-		const data = response.body.data;
+		const data = response.body.data?.month_data;
 		const validAmount = value => Number.isFinite(value) && value >= 0;
 		if (!data || !validAmount(data.current_primogems) || !validAmount(data.current_mora)
 			|| !Array.isArray(data.group_by)

@@ -47,11 +47,16 @@ reduced headless identity has not been validated against the backend. Native
 community signing and Passport signing are separate from desktop basic DS, which
 remains explicitly used by HSR/HI3 Game Record.
 
-Genshin/HSR Diary use monthly summaries without DS. HSR checks `data_month`
+Genshin/HSR Diary read the nested `month_data` summaries without DS. HSR checks `data_month`
 against the requested month. HSR/ZZZ browser redemption uses POST risk endpoints
 and requires the configured cookie's `_MHYUUID`, preserved across cookie refresh.
 Check-in descriptors keep per-game query/body differences; Genshin, HSR, ZZZ and
 HI3 verify post-claim status.
+
+The standalone [Google Apps Script](../../services/google-script/README.md)
+uses the same per-game discovery, check-in and browser redemption contracts
+through `UrlFetchApp`. Its own HTTP tests stub Google services; they do not
+validate the deployed Google transport or backend acceptance.
 
 Offline tests exercise effective URLs, serialized bodies, headers, signing,
 locale/setup compatibility and synthetic response lifecycles without account

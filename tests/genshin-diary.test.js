@@ -58,13 +58,17 @@ const setup = async (t, language) => {
 
 const summary = (overrides = {}) => ({ body: { retcode: 0,
 	data: {
-		current_primogems: 100,
-		current_mora: 5000,
-		group_by: [
-			{ action_id: 1, action: "Avventura", num: 40, percent: 40 },
-			{ action_id: 2, action: "Missioni", num: 60, percent: 60 }
-		],
-		...overrides
+		month: 10,
+		data_month: 10,
+		month_data: {
+			current_primogems: 100,
+			current_mora: 5000,
+			group_by: [
+				{ action_id: 1, action: "Avventura", num: 40, percent: 40 },
+				{ action_id: 2, action: "Missioni", num: 60, percent: 60 }
+			],
+			...overrides
+		}
 	} } });
 
 const assertRequest = (request, month, language = "en-us") => {
@@ -80,7 +84,7 @@ const assertRequest = (request, month, language = "en-us") => {
 	assert.equal(request.headers.referer, "https://act.hoyolab.com/");
 	assert.equal(request.headers.accept, "application/json, text/plain, */*");
 	assert.equal(request.headers["x-requested-with"], "com.mihoyo.hoyolab");
-	assert.match(request.headers["user-agent"], /Android.*wv.*miHoYoBBSOversea\/4\.20\.0/);
+	assert.match(request.headers["user-agent"], /Android.*wv.*miHoYoBBSOversea\/4\.21\.0/);
 	assert.equal(request.headers.ds, undefined);
 	assert.deepEqual(Object.keys(request.headers).filter(key => key.startsWith("x-rpc-")), []);
 };
@@ -121,6 +125,7 @@ for (const [name, response] of [
 	["HTTP error", { statusCode: 403, body: { retcode: 0 } }],
 	["API error", { body: { retcode: -100 } }],
 	["missing data", { body: { retcode: 0 } }],
+	["missing month_data", { body: { retcode: 0, data: { current_primogems: 100, current_mora: 5000, group_by: []} } }],
 	["missing groups", summary({ group_by: undefined })],
 	["unavailable non-empty historical groups", summary({ group_by: []})],
 	["invalid group", summary({ group_by: [null]})],

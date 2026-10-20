@@ -1,6 +1,6 @@
-/* global PropertiesService, UrlFetchApp, Utilities, HoyoLabI18n */
+/* global PropertiesService, UrlFetchApp, Utilities, HoyoLabI18n, ScriptApp */
 const config = {
-	language: "en-us", // Software language; API requests are unchanged.
+	language: "en-us", // Software and HoYoLAB language
 	enableCodeRedemption: false, // Set to true to enable automatic code redemption
 	notifyOnRedeemFailure: false, // Set to true to also report codes that failed to redeem
 	genshin: {
@@ -74,9 +74,9 @@ const DEFAULT_CONSTANTS = {
 			icon: "https://fastcdn.hoyoverse.com/static-resource-v2/2024/04/12/b700cce2ac4c68a520b15cafa86a03f0_2812765778371293568.png"
 		},
 		url: {
-			info: "https://sg-hk4e-api.hoyolab.com/event/sol/info",
-			home: "https://sg-hk4e-api.hoyolab.com/event/sol/home",
-			sign: "https://sg-hk4e-api.hoyolab.com/event/sol/sign"
+			info: "https://sg-act-public-api.hoyolab.com/event/sol/info",
+			home: "https://sg-act-public-api.hoyolab.com/event/sol/home",
+			sign: "https://sg-act-public-api.hoyolab.com/event/sol/sign"
 		}
 	},
 	honkai: {
@@ -91,9 +91,9 @@ const DEFAULT_CONSTANTS = {
 			icon: "https://fastcdn.hoyoverse.com/static-resource-v2/2024/02/29/3d96534fd7a35a725f7884e6137346d1_3942255444511793944.png"
 		},
 		url: {
-			info: "https://sg-public-api.hoyolab.com/event/mani/info",
-			home: "https://sg-public-api.hoyolab.com/event/mani/home",
-			sign: "https://sg-public-api.hoyolab.com/event/mani/sign"
+			info: "https://sg-act-public-api.hoyolab.com/event/mani/info",
+			home: "https://sg-act-public-api.hoyolab.com/event/mani/home",
+			sign: "https://sg-act-public-api.hoyolab.com/event/mani/sign"
 		}
 	},
 	starrail: {
@@ -108,9 +108,9 @@ const DEFAULT_CONSTANTS = {
 			icon: "https://fastcdn.hoyoverse.com/static-resource-v2/2024/04/12/74330de1ee71ada37bbba7b72775c9d3_1883015313866544428.png"
 		},
 		url: {
-			info: "https://sg-public-api.hoyolab.com/event/luna/os/info",
-			home: "https://sg-public-api.hoyolab.com/event/luna/os/home",
-			sign: "https://sg-public-api.hoyolab.com/event/luna/os/sign"
+			info: "https://sg-act-public-api.hoyolab.com/event/luna/hkrpg/os/info",
+			home: "https://sg-act-public-api.hoyolab.com/event/luna/hkrpg/os/home",
+			sign: "https://sg-act-public-api.hoyolab.com/event/luna/hkrpg/os/sign"
 		}
 	},
 	zenless: {
@@ -125,9 +125,9 @@ const DEFAULT_CONSTANTS = {
 			icon: "https://hyl-static-res-prod.hoyolab.com/communityweb/business/nap.png"
 		},
 		url: {
-			info: "https://sg-public-api.hoyolab.com/event/luna/zzz/os/info",
-			home: "https://sg-public-api.hoyolab.com/event/luna/zzz/os/home",
-			sign: "https://sg-public-api.hoyolab.com/event/luna/zzz/os/sign"
+			info: "https://sg-act-public-api.hoyolab.com/event/luna/zzz/os/info",
+			home: "https://sg-act-public-api.hoyolab.com/event/luna/zzz/os/home",
+			sign: "https://sg-act-public-api.hoyolab.com/event/luna/zzz/os/sign"
 		}
 	}
 };
@@ -153,6 +153,30 @@ const RETRYABLE_REDEEM_RETCODES = [
 	-1071, // cookie invalid or expired
 	-2016 // redemption cooldown
 ];
+
+// Match the operation-specific browser/WebView contracts used by the Node bot.
+const HTTP_APP_VERSION = "4.21.0";
+const HTTP_DESKTOP_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36";
+const HTTP_WEBVIEW_USER_AGENT = `Mozilla/5.0 (Linux; Android 17; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/149.0.0.0 Mobile Safari/537.36 miHoYoBBSOversea/${HTTP_APP_VERSION}`;
+
+function getApiLanguage () {
+	return config.language || "en-us";
+}
+
+function encodeQuery (params) {
+	return Object.entries(params).map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join("&");
+}
+
+// Basic desktop DS is used only by HSR/HI3 discovery, never check-in/redemption.
+function generateDesktopDS () {
+	const timestamp = Math.floor(Date.now() / 1000);
+	const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	const nonce = Array.from({ length: 6 }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join("");
+	const preimage = `salt=6s25p5ox5y14umn1p61aqyyvbvvl3lrt&t=${timestamp}&r=${nonce}`;
+	const digest = Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, preimage)
+		.map(byte => (byte & 255).toString(16).padStart(2, "0")).join("");
+	return `${timestamp},${nonce},${digest}`;
+}
 
 function isAuthenticationError (data) {
 	return [-100, -10001, -1071].includes(data.retcode)
@@ -301,6 +325,12 @@ class Game {
 					continue;
 				}
 
+				const confirmation = await this.getSignInfo(cookie);
+				if (!confirmation.success || confirmation.data.isSigned !== true || confirmation.data.today !== data.today) {
+					console.warn(`${this.fullName}:CheckIn`, "Check-in could not be confirmed for today");
+					continue;
+				}
+
 				updateAuthenticationAlert(this, cookie, "check-in", false);
 				console.info(
 					`${this.fullName}:CheckIn`,
@@ -309,7 +339,7 @@ class Game {
 
 				success.push({
 					platform: this.name,
-					total: data.total + 1,
+					total: confirmation.data.total,
 					result: t(this.config.successMessage),
 					assets: { ...this.config.assets },
 					account: {
@@ -332,16 +362,27 @@ class Game {
 
 	async getAccountDetails (cookieData, ltuid) {
 		try {
-			const options = {
-				method: "GET",
-				muteHttpExceptions: true,
-				headers: {
-					"User-Agent": this.userAgent,
-					Cookie: cookieData
-				}
-			};
-
-			const url = `https://bbs-api-os.hoyolab.com/game_record/card/wapi/getGameRecordCard?uid=${ltuid}`;
+			const headers = this.getRequestHeaders(cookieData, this.name === "zenless");
+			headers["x-rpc-app_version"] = this.name === "zenless" ? HTTP_APP_VERSION : "1.5.0";
+			headers["x-rpc-language"] = getApiLanguage();
+			if (this.name !== "honkai") {
+				headers["x-rpc-platform"] = this.name === "zenless" ? "2" : "4";
+			}
+			if (this.name === "genshin" || this.name === "zenless") {
+				headers["x-rpc-lang"] = getApiLanguage();
+			}
+			if (this.name !== "zenless") {
+				headers["x-rpc-client_type"] = "5";
+			}
+			if (this.name === "genshin") {
+				headers["x-rpc-env"] = "default";
+			}
+			if (this.name === "starrail" || this.name === "honkai") {
+				headers.DS = generateDesktopDS();
+			}
+			const options = { method: "GET", muteHttpExceptions: true, headers };
+			const path = this.name === "honkai" || this.name === "zenless" ? "/game_record" : "/event/game_record";
+			const url = `https://sg-act-public-api.hoyolab.com${path}/card/wapi/getGameRecordCard?${encodeQuery({ uid: ltuid })}`;
 			const response = await UrlFetchApp.fetch(url, options);
 			const data = JSON.parse(response.getContentText());
 			if (isAuthenticationError(data)) {
@@ -375,19 +416,26 @@ class Game {
 	async sign (cookieData) {
 		try {
 			const payload = { act_id: this.config.ACT_ID };
+			const headers = this.getCheckInHeaders(cookieData);
+			const bodyLanguage = this.name === "starrail" || this.name === "zenless";
+			if (bodyLanguage) {
+				payload.lang = getApiLanguage();
+				headers["x-rpc-client_type"] = "5";
+				headers["x-rpc-app_version"] = HTTP_APP_VERSION;
+				headers["x-rpc-platform"] = "2";
+			}
+			else if (this.name === "genshin") {
+				headers["x-rpc-platform"] = "4";
+			}
 			const options = {
 				method: "POST",
 				muteHttpExceptions: true,
 				contentType: "application/json",
-				headers: {
-					"User-Agent": this.userAgent,
-					Cookie: cookieData,
-					"x-rpc-signgame": this.getSignGameHeader()
-				},
+				headers,
 				payload: JSON.stringify(payload)
 			};
-
-			const response = UrlFetchApp.fetch(this.config.url.sign, options);
+			const url = this.config.url.sign + (bodyLanguage ? "" : `?${encodeQuery({ lang: getApiLanguage() })}`);
+			const response = UrlFetchApp.fetch(url, options);
 			const data = JSON.parse(response.getContentText());
 			if (isAuthenticationError(data)) {
 				updateAuthenticationAlert(this, cookieData, "check-in", true);
@@ -414,6 +462,8 @@ class Game {
 				return "hk4e";
 			case "zenless":
 				return "zzz";
+			case "honkai":
+				return "bh3";
 			default:
 				return "";
 		}
@@ -421,14 +471,10 @@ class Game {
 
 	async getSignInfo (cookieData) {
 		try {
-			const url = `${this.config.url.info}?act_id=${this.config.ACT_ID}`;
+			const url = `${this.config.url.info}?${encodeQuery({ act_id: this.config.ACT_ID, lang: getApiLanguage() })}`;
 			const response = await UrlFetchApp.fetch(url, {
 				muteHttpExceptions: true,
-				headers: {
-					"User-Agent": this.userAgent,
-					Cookie: cookieData,
-					"x-rpc-signgame": this.getSignGameHeader()
-				}
+				headers: this.getCheckInHeaders(cookieData)
 			});
 			const data = JSON.parse(response.getContentText());
 			if (isAuthenticationError(data)) {
@@ -441,6 +487,12 @@ class Game {
 					t("Failed to get sign info."),
 					data
 				);
+				return { success: false };
+			}
+			const info = data.data;
+			if (!info || typeof info.is_sign !== "boolean" || !Number.isInteger(info.total_sign_day)
+				|| info.total_sign_day < (info.is_sign ? 1 : 0) || typeof info.today !== "string" || !info.today) {
+				console.warn(`${this.fullName}:getSignInfo`, "Invalid sign info received");
 				return { success: false };
 			}
 
@@ -461,14 +513,10 @@ class Game {
 
 	async getAwardsData (cookieData) {
 		try {
-			const url = `${this.config.url.home}?act_id=${this.config.ACT_ID}`;
+			const url = `${this.config.url.home}?${encodeQuery({ act_id: this.config.ACT_ID, lang: getApiLanguage() })}`;
 			const response = await UrlFetchApp.fetch(url, {
 				muteHttpExceptions: true,
-				headers: {
-					"User-Agent": this.userAgent,
-					Cookie: cookieData,
-					"x-rpc-signgame": this.getSignGameHeader()
-				}
+				headers: this.getCheckInHeaders(cookieData)
 			});
 			const data = JSON.parse(response.getContentText());
 			if (isAuthenticationError(data)) {
@@ -527,8 +575,19 @@ class Game {
 		}
 	}
 
-	get userAgent () {
-		return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36";
+	getRequestHeaders (cookie, webview = false) {
+		return {
+			Accept: "application/json, text/plain, */*",
+			Origin: "https://act.hoyolab.com",
+			Referer: "https://act.hoyolab.com/",
+			"User-Agent": webview ? HTTP_WEBVIEW_USER_AGENT : HTTP_DESKTOP_USER_AGENT,
+			Cookie: cookie,
+			...(webview ? { "x-requested-with": "com.mihoyo.hoyolab" } : {})
+		};
+	}
+
+	getCheckInHeaders (cookie) {
+		return { ...this.getRequestHeaders(cookie, this.name !== "genshin"), "x-rpc-signgame": this.getSignGameHeader() };
 	}
 
 	getAccountLabel (account) {
@@ -616,18 +675,13 @@ class Game {
 			? codeEntry.rewards
 			: [];
 
-		const url = this.getRedemptionUrl(account, code);
-		const options = {
-			method: this.name === "starrail" ? "POST" : "GET",
-			muteHttpExceptions: true,
-			headers: {
-				"User-Agent": this.userAgent,
-				Cookie: account.cookie
-			}
-		};
+		const request = this.getRedemptionRequest(account, code);
+		if (request.error) {
+			return { code, rewards, success: false, retryable: true, message: request.error };
+		}
 
 		try {
-			const response = await UrlFetchApp.fetch(url, options);
+			const response = await UrlFetchApp.fetch(request.url, request.options);
 			const statusCode = response.getResponseCode();
 
 			if (statusCode !== 200) {
@@ -688,30 +742,40 @@ class Game {
 		}
 	}
 
-	getRedemptionUrl (account, code) {
-		const baseUrl = this.getBaseRedemptionUrl();
-		const internalRegion = this.mapToInternalRegion(account.region);
-		const params = [
-			`t=${Date.now()}`,
-			`lang=en`,
-			`uid=${account.uid}`,
-			`region=${internalRegion}`,
-			`cdkey=${code}`
-		];
-
-		switch (this.name) {
-			case "genshin":
-				params.push("sLangKey=en-us", "game_biz=hk4e_global");
-				break;
-			case "starrail":
-				params.push("game_biz=hkrpg_global");
-				break;
-			case "zenless":
-				params.push("game_biz=nap_global");
-				break;
+	getRedemptionRequest (account, code) {
+		const lang = getApiLanguage().split("-")[0];
+		const region = this.mapToInternalRegion(account.region);
+		const origin = {
+			genshin: "https://genshin.hoyoverse.com",
+			starrail: "https://hsr.hoyoverse.com",
+			zenless: "https://zenless.hoyoverse.com"
+		}[this.name];
+		const headers = { ...this.getRequestHeaders(account.cookie), Origin: origin, Referer: `${origin}/` };
+		const options = { method: "GET", muteHttpExceptions: true, headers };
+		const params = {
+			uid: account.uid,
+			region,
+			cdkey: code,
+			game_biz: { genshin: "hk4e_global", starrail: "hkrpg_global", zenless: "nap_global" }[this.name],
+			lang
+		};
+		const url = this.getBaseRedemptionUrl();
+		if (this.name === "genshin") {
+			return { url: `${url}?${encodeQuery({ ...params, sLangKey: "en-us" })}`, options };
 		}
-
-		return `${baseUrl}?${params.join("&")}`;
+		const deviceUuid = account.cookie.match(/(?:^|;\s*)_MHYUUID=([^;]+)/)?.[1];
+		if (!deviceUuid) {
+			return { error: "Missing _MHYUUID required for browser redemption. Please configure a newly acquired cookie." };
+		}
+		return {
+			url,
+			options: {
+				...options,
+				method: "POST",
+				contentType: "application/json",
+				payload: JSON.stringify({ t: Date.now(), ...params, platform: "4", device_uuid: deviceUuid })
+			}
+		};
 	}
 
 	mapToInternalRegion (region) {
@@ -751,9 +815,9 @@ class Game {
 
 	getBaseRedemptionUrl () {
 		switch (this.name) {
-			case "genshin": return "https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey";
-			case "starrail": return "https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkeyRisk";
-			case "zenless": return "https://public-operation-nap.hoyoverse.com/common/apicdkey/api/webExchangeCdkey";
+			case "genshin": return "https://public-operation-hk4e.hoyoverse.com/common/apicdkey/api/webExchangeCdkey";
+			case "starrail": return "https://public-operation-hkrpg.hoyoverse.com/common/apicdkey/api/webExchangeCdkeyRisk";
+			case "zenless": return "https://public-operation-nap.hoyoverse.com/common/apicdkey/api/webExchangeCdkeyRisk";
 			default: throw new Error(t `Unknown game: ${this.name}`);
 		}
 	}
