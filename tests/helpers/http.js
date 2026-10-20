@@ -17,8 +17,8 @@ const createHttpHarness = async (t, config = {}) => {
 		global.app = previousApp;
 	});
 
-	// Legacy object definitions read Config at require time, just as at app startup.
-	for (const path of ["../../gots/index.js", "../../gots/hoyolab/index.js", "../../gots/hoyo-client/index.js"]) {
+	// Reload the registry with this test configuration, matching app startup.
+	for (const path of ["../../gots/index.js"]) {
 		delete require.cache[require.resolve(path)];
 	}
 	const definitions = require("../../gots/index.js");

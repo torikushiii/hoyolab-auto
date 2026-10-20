@@ -67,7 +67,7 @@ test("contexts retain Global transport, configured retry, timeout and logging ho
 		userAgent: "synthetic-global-agent",
 		retry: { attempts: 2, delayMs: 17, timeoutMs: 1234 }
 	});
-	for (const profile of [...profiles, "HoYoLab", "HoyoClient"]) {
+	for (const profile of [...profiles, "HoYoLabPassport"]) {
 		await Got(profile, { url });
 	}
 	for (const { transport } of requests) {
@@ -178,22 +178,7 @@ test("DS and endpoint headers are opt-in and do not leak across requests or prof
 	assertAbsent(requests.at(-1).headers, ["ds", "cookie", "x-rpc-client_type", "x-rpc-page"]);
 });
 
-test("legacy profiles preserve their effective headers and per-request DS", async (t) => {
-	const { Got, requests } = await createHttpHarness(t, { language: "it-it" });
-	for (const profile of ["HoYoLab", "HoyoClient"]) {
-		await Got(profile, { url, headers: { DS: "synthetic-legacy-signature" } });
-	}
-	for (const { headers } of requests) {
-		assert.equal(headers.referer, "https://act.hoyolab.com");
-		assert.equal(String(headers["x-rpc-client_type"]), "5");
-		assert.equal(headers["x-rpc-language"], "it-it");
-		assert.equal(headers.ds, "synthetic-legacy-signature");
-		assertAbsent(headers, ["origin", "x-rpc-platform", "x-rpc-lang"]);
-	}
-	assert.equal(requests[0].headers["x-rpc-app_version"], "1.5.0");
-	assert.match(requests[0].headers["user-agent"], /Chrome\/125\.0\.0\.0/);
-	assertAbsent(requests[0].headers, ["x-requested-with"]);
-	assert.equal(requests[1].headers["x-rpc-app_version"], "2.54.0");
-	assert.match(requests[1].headers["user-agent"], /miHoYoBBSOversea\/2\.54\.0/);
-	assert.equal(requests[1].headers["x-requested-with"], "com.mihoyo.hoyolab");
+test("unused global legacy profiles are no longer registered", () => {
+	const definitions = require("../gots/index.js");
+	assert.equal(definitions.some(({ name }) => name === "HoYoLab" || name === "HoyoClient"), false);
 });

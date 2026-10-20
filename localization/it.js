@@ -4,6 +4,10 @@
 		language: "it",
 		locale: "it-IT",
 		messages: {
+			"Primo income comparison is unavailable because last month had no income.": "Confronto delle Primogemme non disponibile perché il mese scorso non ci sono state entrate.",
+			"Jades income comparison is unavailable because last month had no income.": "Confronto delle Giade non disponibile perché il mese scorso non ci sono state entrate.",
+			"No income recorded.": "Nessuna entrata registrata.",
+			"Enable Realtime Notes in HoYoLAB's Genshin Impact Battle Chronicle settings to access your game data.": "Abilita le Note in tempo reale nelle impostazioni dei Risultati di battaglia di Genshin Impact su HoYoLAB per accedere ai dati di gioco.",
 			"Gotify notifications:": "Notifiche Gotify:",
 			"Enable notifications to your Gotify server.": "Abilita le notifiche sul tuo server Gotify.",
 			"Gotify server URL:": "URL del server Gotify:",

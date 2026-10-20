@@ -11,7 +11,7 @@ const { t } = require("../localization/index.js");
  */
 
 const { setTimeout: sleep } = require("node:timers/promises");
-const MIMO_BASE_URL = "https://sg-public-api.hoyolab.com/event/e2023mimotravel";
+const { buildMimoRequest } = require("./mimo-request.js");
 
 // Task status enum matching HoYoLab API
 const MimoTaskStatus = {
@@ -80,34 +80,8 @@ module.exports = class TravelingMimo {
 		this.#isGenshin = (instance.gameId === 2);
 	}
 
-	#buildEndpoint (endpoint) {
-		if (this.#isGenshin) {
-			return `${MIMO_BASE_URL}/qiuqiu/${endpoint.replace(/-/g, "_")}`;
-		}
-		return `${MIMO_BASE_URL}/${endpoint}`;
-	}
-
 	async #request (endpoint, options = {}) {
-		const { method = "GET", params = {}, data = null, cookie } = options;
-
-		const url = this.#buildEndpoint(endpoint);
-
-		const requestOptions = {
-			url,
-			responseType: "json",
-			throwHttpErrors: false,
-			headers: {
-				Cookie: cookie
-			}
-		};
-
-		if (method === "GET") {
-			requestOptions.searchParams = params;
-		}
-		else {
-			requestOptions.method = "POST";
-			requestOptions.json = data || params;
-		}
+		const request = buildMimoRequest(this.#gameId, endpoint, options);
 
 		// Retry logic with exponential backoff for rate limits
 		const maxRetries = 10;
@@ -115,7 +89,7 @@ module.exports = class TravelingMimo {
 		const maxDelay = 30000; // 30s max delay
 
 		for (let attempt = 1; attempt <= maxRetries; attempt++) {
-			const res = await app.Got("HoYoLab", requestOptions);
+			const res = await app.Got(request.profile, request.options);
 
 			// Check for rate limit errors:
 			// - retcode -500004 = VisitsTooFrequently (JSON response)

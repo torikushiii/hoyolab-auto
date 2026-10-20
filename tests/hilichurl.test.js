@@ -68,19 +68,109 @@ for (const language of [undefined, "it-it"]) {
 	});
 }
 
-test("native ongoing tasks are reported, completed tasks of any type are claimed", async (t) => {
-	const { workshop, replies, requests, logs, delays } = await setup(t);
-	replies.push(info(), ok({ task_list: [task(1, 101), task(2, 102), task(3, 101, 1), task(4, 102, 1), task(5, 1), task(6, 2), task(7, 999), task(8, 1, 3)]}), ok(), ok(), ok(), ok(), ok(), ok(), info(40), shop());
+test("upstream task coverage waits before timed desktop completion and claims finished tasks", async (t) => {
+	const { workshop, replies, requests, delays } = await setup(t, "it-it");
+	const tasks = [
+		{ ...task(1, 101), read_seconds: 3 },
+		{ ...task(2, 102), read_seconds: 8 },
+		task(3, 101, 1),
+		task(4, 102, 1),
+		task(5, 1),
+		task(6, 2),
+		task(7, 999),
+		task(8, 1, 3),
+		task(9, 4),
+		task(10, 10),
+		task(11, 6)
+	];
+	replies.push(info(), ok({ task_list: tasks }), ...Array.from({ length: 14 }, () => ok()), info(60), shop());
+	const finish = workshop.finishTask.bind(workshop);
+	const waitsAtFinish = [];
+	workshop.finishTask = async (...args) => {
+		waitsAtFinish.push([...delays]);
+		return finish(...args);
+	};
 	const result = await workshop.run(account);
 	assert.equal(result.success, true);
-	assert.deepEqual(result.data.tasksFinished, ["Synthetic task 5", "Synthetic task 6"]);
-	assert.deepEqual(result.data.tasksClaimed.map(item => item.name), [3, 4, 5, 6].map(id => `Synthetic task ${id}`));
-	assert.equal(result.data.points, 40);
-	assert.deepEqual(requests.filter(r => r.method === "POST").map(r => [r.url.pathname.split("/").pop(), JSON.parse(r.body).task_id]), [
-		["receive_point", 3], ["receive_point", 4], ["finish_task", 5], ["receive_point", 5], ["finish_task", 6], ["receive_point", 6]
+	assert.deepEqual(result.data.tasksFinished, [1, 2, 5, 6, 9, 10].map(id => `Synthetic task ${id}`));
+	assert.deepEqual(result.data.tasksClaimed.map(item => item.name), [1, 2, 3, 4, 5, 6, 9, 10].map(id => `Synthetic task ${id}`));
+	assert.equal(result.data.points, 60);
+	assert.deepEqual(waitsAtFinish[0], [4000]);
+	assert.deepEqual(waitsAtFinish[1], [4000, 1000, 1000, 9000]);
+	const posts = requests.filter(r => r.method === "POST");
+	assert.deepEqual(posts.map(r => [r.url.pathname.split("/").pop(), JSON.parse(r.body).task_id]), [
+		["finish_task", 1],
+		["receive_point", 1],
+		["finish_task", 2],
+		["receive_point", 2],
+		["receive_point", 3],
+		["receive_point", 4],
+		["finish_task", 5],
+		["receive_point", 5],
+		["finish_task", 6],
+		["receive_point", 6],
+		["finish_task", 9],
+		["receive_point", 9],
+		["finish_task", 10],
+		["receive_point", 10]
 	]);
-	assert.equal(logs.filter(args => String(args[1]).includes("Automatic completion is unsupported")).length, 2);
-	assert.deepEqual(delays, new Array(6).fill(1000));
+	for (const request of posts) {
+		const timedFinish = request.url.pathname.endsWith("/finish_task") && [1, 2].includes(JSON.parse(request.body).task_id);
+		assert.equal(request.url.search, timedFinish ? "" : "?lang=it-it");
+		assert.equal(request.headers.origin, timedFinish ? "https://www.hoyolab.com" : "https://act.hoyolab.com");
+		assert.equal(request.headers["x-rpc-client_type"], timedFinish ? 4 : 2);
+		assert.equal(request.headers["x-requested-with"], timedFinish ? undefined : "com.mihoyo.hoyolab");
+		assert.equal(request.headers.ds, undefined);
+	}
+	assert.deepEqual(delays, [4000, 1000, 1000, 9000, ...new Array(12).fill(1000)]);
+});
+
+for (const language of [undefined, "it-it"]) {
+	for (const taskType of [101, 102]) {
+		test(`timed completion uses dedicated desktop headers (${taskType}, ${language ?? "default"})`, async t => {
+			const { workshop, replies, requests } = await setup(t, language);
+			replies.push(ok());
+			assert.deepEqual(await workshop.finishTask(account, 88, 999, taskType), { success: true });
+			const [request] = requests;
+			assert.equal(request.url.href, "https://sg-public-api.hoyolab.com/event/e2023mimotravel/qiuqiu/finish_task");
+			assert.deepEqual(JSON.parse(request.body), { task_id: 88, game_id: 2, version_id: 999 });
+			assert.equal(request.headers.origin, "https://www.hoyolab.com");
+			assert.equal(request.headers.referer, "https://www.hoyolab.com/");
+			assert.equal(request.headers["x-rpc-client_type"], 4);
+			assert.equal(request.headers["x-rpc-app_version"], "4.20.0");
+			assert.equal(request.headers["x-rpc-language"], language ?? "en-us");
+			assert.match(request.headers["user-agent"], /Windows NT/);
+			for (const name of ["ds", "x-requested-with", "x-rpc-platform", "x-rpc-device_id", "x-rpc-device_fp"]) {
+				assert.equal(request.headers[name], undefined);
+			}
+		});
+	}
+}
+
+for (const readSeconds of [undefined, 0, -1]) {
+	test(`timed task preserves upstream behavior without a positive read duration (${readSeconds})`, async t => {
+		const { workshop, replies, requests, delays } = await setup(t);
+		replies.push(info(), ok({ task_list: [{ ...task(1, 101), read_seconds: readSeconds }]}), ok(), ok(), info(), shop());
+		const result = await workshop.run(account);
+		assert.equal(result.data.tasksFinished.length, 1);
+		assert.deepEqual(delays, [1000, 1000]);
+		assert.equal(requests[2].headers["x-rpc-client_type"], 4);
+	});
+}
+
+test("timed completion failure does not claim a reward and retries preserve desktop context", async t => {
+	const { workshop, replies, requests, delays } = await setup(t);
+	t.mock.method(Math, "random", () => 0.5);
+	replies.push(info(), ok({ task_list: [{ ...task(1, 102), read_seconds: 2 }]}), { statusCode: 429 }, { body: { retcode: -1, message: "Synthetic failure" } }, info(), shop());
+	const result = await workshop.run(account);
+	assert.deepEqual(result.data.tasksFinished, []);
+	assert.deepEqual(result.data.tasksClaimed, []);
+	const posts = requests.filter(request => request.method === "POST");
+	assert.equal(posts.length, 2);
+	assert.equal(posts[0].url.href, posts[1].url.href);
+	assert.equal(posts[0].body, posts[1].body);
+	assert.deepEqual(posts[0].headers, posts[1].headers);
+	assert.deepEqual(delays, [3000, 750, 1000]);
 });
 
 for (const failure of [{ body: { retcode: -500004 } }, { statusCode: 429 }, { body: "Too Many Requests" }]) {

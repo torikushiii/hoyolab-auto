@@ -35,6 +35,12 @@ const createSetup = () => {
 		};
 	};
 	const context = {
+		HoyoLabI18n: require("../localization/index.js"),
+		// This adapter tests values and import/export; rendering is covered separately.
+		updateLanguage: () => {},
+		setLocalizedText: (element, source, ...values) => {
+			element.textContent = require("../localization/index.js").t(source, ...values);
+		},
 		JSON5,
 		Blob,
 		URL: { createObjectURL: (blob) => {

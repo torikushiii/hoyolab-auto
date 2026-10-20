@@ -144,7 +144,8 @@ WebView requests without DS. The configured locale is sent in GET queries and
 in sign JSON for HSR/ZZZ/Themis, or the sign query for Honkai Impact 3rd.
 Successful official check-ins and post-sign states have been observed for HSR,
 ZZZ, and Honkai Impact 3rd; the application confirms their status after claiming.
-Tears of Themis still lacks a successful linked-character capture.
+Tears of Themis has successful official-client observations; the precise
+headless WebView claim request remains unverified.
 
 Genshin account discovery and Realtime Notes use the current Game Record APIs.
 If Notes reports error `10102`, enable Realtime Notes in HoYoLAB's Genshin Impact
@@ -158,12 +159,14 @@ with omitted browser metadata has not been verified live.
 ZZZ account discovery and Realtime Notes use the current Game Record WebView
 APIs without DS, preserving the configured locale and existing Notes/cache output.
 
-Hilichurl Workshop uses the event WebView API with the configured full locale in
-the query, including task completion, reward claims, and exchanges. Timed reading
-and video tasks (types `101`/`102`) are logged as unsupported for automatic
-completion; complete them in HoYoLAB and automation can collect their available
-rewards. Successful cosmetic exchanges may return no redemption code. Point-cost
-exchanges have not been validated against a successful official-client capture.
+Hilichurl Workshop automatically completes task types `1`, `2`, `4`, `10`,
+`101`, and `102`. Reading and video tasks (`101`/`102`) wait for the supplied
+`read_seconds` plus one second when positive, then use the desktop event API;
+other task operations use the event WebView API. Available rewards from completed
+tasks can still be collected regardless of type. Successful cosmetic exchanges
+may return no redemption code; successful official point-cost exchanges have
+also been observed. The timed headless flow is covered by offline tests; backend
+acceptance and the sufficiency of the waiting period remain unverified live.
 
 ### Cache File Location
 
@@ -359,7 +362,7 @@ Public codes, event rewards, and manual redemptions share a per-account cooldown
 
 Honkai: Star Rail and Zenless Zone Zero redemption also use their captured browser gift endpoints. Their POST requests require the configured cookie's `_MHYUUID` value as both the browser identity cookie and `device_uuid`; if it is missing, redemption is skipped and the account needs a newly acquired cookie. Other account features remain available.
 
-Run `npm test` for offline HTTP request-contract, result/cache, and setup locale round-trip tests, and `npm run lint` for lint checks. The tests use synthetic data and do not require account cookies or network access. See [HTTP request contexts](gots/hoyolab-contexts/README.md) for profile selection, remaining legacy callers, and validation limits.
+Run `npm test` for offline HTTP request-contract, result/cache, and setup locale round-trip tests, and `npm run lint` for lint checks. The tests use synthetic data and do not require account cookies or network access. See [HTTP request contexts](gots/hoyolab-contexts/README.md) for profile selection, Passport refresh, the internal qiuqiu lottery exception, and validation limits.
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change. If there are any bugs, please open an issue.
 

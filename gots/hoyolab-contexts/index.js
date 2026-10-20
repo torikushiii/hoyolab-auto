@@ -104,6 +104,25 @@ module.exports = [
 		})
 	},
 	{
+		name: "HoYoLabPassport",
+		parent: "Global",
+		optionsType: "function",
+		options: () => ({
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+				"User-Agent": "okhttp/4.12.0",
+				"x-rpc-client_type": 2,
+				"x-rpc-app_id": "c9oqaq3s3gu8",
+				"x-rpc-game_biz": "bbs_oversea",
+				"x-rpc-package_name": "com.mihoyo.hoyolab",
+				"x-rpc-sdk_version": "2.3.0",
+				"x-rpc-app_version": APP_VERSION,
+				"x-rpc-language": encodeURIComponent(getLanguage())
+			}
+		})
+	},
+	{
 		name: "HoYoLabNative",
 		parent: "Global",
 		optionsType: "function",

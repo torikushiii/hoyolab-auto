@@ -1,11 +1,10 @@
 const { t } = require("../localization/index.js");
 
-const crypto = require("node:crypto");
+const { requestPassportRefresh } = require("./passport-request.js");
 
 const DataCache = require("./cache.js");
 const CustomHoyoError = require("./error-messages.js");
 
-const APP_LOGIN_SALT = "IZPgfb0dRPtBeLuFkdDznSZ6f4wWt6y2";
 const REFRESH_API = "https://sg-public-api.hoyoverse.com/account/ma-passport/token/getBySToken";
 
 const parseCookie = (cookie, separator = ";") => {
@@ -23,16 +22,6 @@ const parseCookie = (cookie, separator = ";") => {
 const stringifyCookie = (cookie, separator = ";") => Object.entries(cookie)
 	.map(([key, value]) => `${key}=${value}`)
 	.join(`${separator} `);
-
-const generateDynamicSecret = () => {
-	const timestamp = Math.floor(Date.now() / 1000);
-	const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	const random = Array.from({ length: 6 }, () => alphabet[crypto.randomInt(alphabet.length)]).join("");
-	const hash = crypto.createHash("md5")
-		.update(`salt=${APP_LOGIN_SALT}&t=${timestamp}&r=${random}`)
-		.digest("hex");
-	return `${timestamp},${random},${hash}`;
-};
 
 module.exports = class HoyoLab {
 	#id;
@@ -670,20 +659,7 @@ module.exports = class HoyoLab {
 			return { success: false, reason: t("No stoken configured") };
 		}
 
-		const res = await app.Got("HoYoLab", {
-			url: this.webAPI,
-			method: "POST",
-			responseType: "json",
-			throwHttpErrors: false,
-			json: {
-				dst_token_types: [2, 4]
-			},
-			headers: {
-				ds: generateDynamicSecret(),
-				"x-rpc-app_id": "c9oqaq3s3gu8",
-				Cookie: accountData.refreshCookie
-			}
-		});
+		const res = await requestPassportRefresh(this.webAPI, accountData.refreshCookie);
 
 		if (res.statusCode !== 200) {
 			app.Logger.log(`${this.fullName}:UpdateCookie`, {

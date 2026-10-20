@@ -211,7 +211,7 @@ test("check-in keeps API locale, headers and sign body independent from software
 			Got: async (profile, options) => {
 				requests.push({ profile, options });
 				const data = options.url.endsWith("info")
-					? { total_sign_day: 0, today: "2026-09-13", is_sign: false }
+					? { total_sign_day: requests.length === 4 ? 1 : 0, today: "2026-09-13", is_sign: requests.length === 4 }
 					: { awards: [{ name: "Daily Activity", cnt: 20, icon: "test-icon" }]};
 				return { statusCode: 200, body: { retcode: 0, data } };
 			}
@@ -223,16 +223,14 @@ test("check-in keeps API locale, headers and sign body independent from software
 		assert.equal(result.result, language === "it-it"
 			? "Congratulazioni, Viaggiatore! Hai effettuato il check-in di oggi~"
 			: instance.config.successMessage);
-		assert.equal(requests.length, 3);
+		assert.equal(requests.length, 4);
 		for (const [index, { profile, options }] of requests.entries()) {
-			assert.equal(profile, "HoYoLab");
-			assert.deepEqual(options, {
-				url: ["/event/sol/info", "/event/sol/home", "/event/sol/sign"][index],
-				...(index === 2 ? { method: "POST" } : {}),
-				responseType: "json",
-				searchParams: { lang: language || "en-us", act_id: "test-act" },
-				headers: { Cookie: "test-cookie", "x-rpc-signgame": "hk4e" }
-			});
+			assert.equal(profile, "HoYoLabDesktopWeb");
+			assert.equal(options.url, ["/event/sol/info", "/event/sol/home", "/event/sol/sign", "/event/sol/info"][index]);
+			assert.equal(options.headers.Cookie, "test-cookie");
+			assert.equal(options.searchParams.lang, language || "en-us");
+			assert.deepEqual(options.json, index === 2 ? { act_id: "test-act" } : undefined);
+			assert.equal(options.searchParams.act_id, index === 2 ? undefined : "test-act");
 		}
 		assert.ok(logs.some(args => args[1].includes(language === "it-it" ? "Ricompensa di oggi" : "Today's Reward")));
 	}
@@ -417,7 +415,8 @@ test("the setup index discovers only existing catalog files with Node filename p
 	}
 });
 
-test("Star Rail diary cache stores source categories across language changes", async () => {
+test("Star Rail diary cache stores source categories across language changes", async (context) => {
+	context.mock.method(require("node:timers/promises"), "setTimeout", async () => {});
 	const Diary = require("../hoyolab-modules/starrail/diary.js");
 	let cached;
 	let fetches = 0;
@@ -425,12 +424,9 @@ test("Star Rail diary cache stores source categories across language changes", a
 		Cache: { get: async () => cached, set: async ({ value }) => { cached = value; } }
 	};
 	const diary = new Diary({ name: "starrail", config: { assets: {} } });
-	diary.fetchResultsForType = async () => {
+	diary.fetchMonth = async () => {
 		fetches++;
-		return {
-			currentMonthResults: [{ action: "universe_point", num: 100 }],
-			lastMonthResults: [{ action: "universe_point", num: 50 }]
-		};
+		return { jades: { totalNum: 100, actionPercentages: [{ category: "Simulated Universe", total: 100, percentage: "100" }]}, pass: 0 };
 	};
 	setLanguage("it-it");
 	const first = await diary.diary({ uid: "test" });
