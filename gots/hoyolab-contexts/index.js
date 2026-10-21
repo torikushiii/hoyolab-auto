@@ -1,6 +1,6 @@
 const { getLanguage } = require("./language.js");
 
-// Shared by the new Android identities; legacy profiles retain their versions.
+// Android identities share the app version; desktop Game Record keeps its own.
 const { APP_VERSION } = require("./constants.js");
 const DESKTOP_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36";
 const WEBVIEW_USER_AGENT = `Mozilla/5.0 (Linux; Android 17; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/149.0.0.0 Mobile Safari/537.36 miHoYoBBSOversea/${APP_VERSION}`;
@@ -119,20 +119,6 @@ module.exports = [
 				"x-rpc-sdk_version": "2.3.0",
 				"x-rpc-app_version": APP_VERSION,
 				"x-rpc-language": encodeURIComponent(getLanguage())
-			}
-		})
-	},
-	{
-		name: "HoYoLabNative",
-		parent: "Global",
-		optionsType: "function",
-		options: () => ({
-			headers: {
-				"User-Agent": "okhttp/4.12.0",
-				Referer: "https://app.hoyolab.com",
-				"x-rpc-client_type": 2,
-				"x-rpc-app_version": APP_VERSION,
-				"x-rpc-language": getLanguage()
 			}
 		})
 	}

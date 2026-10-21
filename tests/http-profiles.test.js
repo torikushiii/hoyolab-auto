@@ -8,7 +8,6 @@ const profiles = [
 	"HoYoLabAppWebView",
 	"HoYoLabGameRecordDesktopWeb",
 	"HoYoLabGameRecordAppWebView",
-	"HoYoLabNative",
 	"HoYoLabZZZGameRecordAppWebView",
 	"HoYoLabHSRGameRecordDesktopWeb",
 	"HoYoLabHI3GameRecordDesktopWeb"
@@ -46,7 +45,7 @@ test("real Got serialization and synthetic responses work without network", asyn
 
 test("capture observes endpoint hooks after inherited hooks and JSON serialization", async (t) => {
 	const { Got, requests } = await createHttpHarness(t);
-	await Got("HoYoLabNative", {
+	await Got("HoYoLabPassport", {
 		url,
 		method: "POST",
 		json: { value: "synthetic" },
@@ -86,12 +85,13 @@ test("contexts retain Global transport, configured retry, timeout and logging ho
 	assert.equal(logs.length, 2);
 });
 
-test("desktop, WebView, Game Record and native identities remain distinct", async (t) => {
+test("desktop, WebView, Game Record and Passport identities remain distinct", async (t) => {
 	const { Got, requests } = await createHttpHarness(t);
-	for (const profile of profiles) {
+	for (const profile of [...profiles, "HoYoLabPassport"]) {
 		await Got(profile, { url });
 	}
-	const [desktop, webview, recordDesktop, recordWebview, native, zzz] = requests.map((request) => request.headers);
+	const [desktop, webview, recordDesktop, recordWebview, zzz] = requests.map((request) => request.headers);
+	const passport = requests.at(-1).headers;
 	for (const headers of [desktop, webview]) {
 		assert.equal(Object.keys(headers).some((name) => name.startsWith("x-rpc-")), false);
 	}
@@ -117,11 +117,10 @@ test("desktop, WebView, Game Record and native identities remain distinct", asyn
 	assert.equal(zzz["x-rpc-app_version"], "4.21.0");
 	assert.equal(String(zzz["x-rpc-platform"]), "2");
 	assertAbsent(zzz, ["x-rpc-client_type", "x-rpc-env"]);
-	assert.equal(native["user-agent"], "okhttp/4.12.0");
-	assert.equal(native.referer, "https://app.hoyolab.com");
-	assert.equal(String(native["x-rpc-client_type"]), "2");
-	assert.equal(native["x-rpc-app_version"], recordWebview["x-rpc-app_version"]);
-	assertAbsent(native, ["origin", "x-requested-with", "x-rpc-platform", "x-rpc-lang", "x-rpc-env"]);
+	assert.equal(passport["user-agent"], "okhttp/4.12.0");
+	assert.equal(String(passport["x-rpc-client_type"]), "2");
+	assert.equal(passport["x-rpc-app_version"], recordWebview["x-rpc-app_version"]);
+	assertAbsent(passport, ["origin", "referer", "x-requested-with", "x-rpc-platform", "x-rpc-lang", "x-rpc-env"]);
 	for (const { headers, url: requestUrl, body, transport } of requests) {
 		assertAbsent(headers, ["ds", "cookie", "x-rpc-page", "x-rpc-device_id", "x-rpc-device_fp", "x-rpc-signgame"]);
 		assert.equal(requestUrl.search, "");
@@ -144,14 +143,15 @@ for (const [language, full, short] of [
 		for (const profile of profiles) {
 			await Got(profile, {
 				url,
-				searchParams: { lang: profile === "HoYoLabNative" ? getLanguageOnly() : getLanguage() }
+				searchParams: { lang: getLanguage() }
 			});
 		}
 		for (const [index, { headers, url: requestUrl }] of requests.entries()) {
-			assert.equal(requestUrl.searchParams.get("lang"), index === 4 ? short : full);
+			assert.equal(requestUrl.searchParams.get("lang"), full);
 			assert.equal(headers["x-rpc-language"], index >= 2 ? full : undefined);
-			assert.equal(headers["x-rpc-lang"], index === 2 || index === 3 || index === 5 ? full : undefined);
+			assert.equal(headers["x-rpc-lang"], index === 2 || index === 3 || index === 4 ? full : undefined);
 		}
+		assert.equal(getLanguageOnly(), short);
 		assert.equal(config.language, language);
 	});
 }
@@ -178,7 +178,7 @@ test("DS and endpoint headers are opt-in and do not leak across requests or prof
 	assertAbsent(requests.at(-1).headers, ["ds", "cookie", "x-rpc-client_type", "x-rpc-page"]);
 });
 
-test("unused global legacy profiles are no longer registered", () => {
+test("unused and legacy profiles are no longer registered", () => {
 	const definitions = require("../gots/index.js");
-	assert.equal(definitions.some(({ name }) => name === "HoYoLab" || name === "HoyoClient"), false);
+	assert.equal(definitions.some(({ name }) => ["HoYoLab", "HoyoClient", "FakeAgent", "HoYoLabNative"].includes(name)), false);
 });

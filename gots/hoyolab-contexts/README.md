@@ -14,7 +14,6 @@ cookie and endpoint-specific headers explicitly.
 | `HoYoLabHSRGameRecordDesktopWeb` | HSR desktop Game Record; client 5, app 1.5.0, platform 4, full RPC language |
 | `HoYoLabHI3GameRecordDesktopWeb` | HI3 desktop Game Record; client 5, app 1.5.0, full RPC language; no platform |
 | `HoYoLabPassport` | Dedicated Passport SDK metadata; full configured language |
-| `HoYoLabNative` | Android OkHttp foundation; no production caller |
 
 `language.js` preserves the configured preference with fallback `en-us`.
 `getLanguageOnly()` extracts the primary language for browser redemption. Neither
@@ -43,8 +42,8 @@ lifecycle. Its dedicated signer hashes the exact serialized JSON body with an
 empty signed query. SDK/app constants and the configured language are sent;
 Android device/fingerprint, regional routing state, age and challenge metadata
 are omitted because the application has no legitimate values for them. This
-reduced headless identity has not been validated against the backend. Native
-community signing and Passport signing are separate from desktop basic DS, which
+reduced headless identity has not been validated against the backend.
+Passport signing is separate from desktop basic DS, which
 remains explicitly used by HSR/HI3 Game Record.
 
 Genshin/HSR Diary read the nested `month_data` summaries without DS. HSR checks `data_month`
