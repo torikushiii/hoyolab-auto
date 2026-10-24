@@ -402,7 +402,6 @@ module.exports = class HilichurlWorkshop {
 					const shouldRedeem = accountData.redeemCode && (accountData.hilichurl?.redeem !== false);
 
 					if (code && shouldRedeem) {
-						await sleep(5000);
 						const redeemResult = await this.#instance.redeemCode(accountData, code);
 						if (redeemResult.success) {
 							results.codesRedeemed.push(code);

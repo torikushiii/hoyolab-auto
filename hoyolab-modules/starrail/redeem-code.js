@@ -1,4 +1,5 @@
 const { t } = require("../../localization/index.js");
+const redemptionRequest = require("../redemption-request.js");
 
 module.exports = class RedeemCode {
 	/** @type {import("../template")} */
@@ -19,7 +20,7 @@ module.exports = class RedeemCode {
 			]
 		});
 
-		const res = await app.Got("HoYoLab", {
+		const res = await redemptionRequest({
 			url: this.#instance.config.url.redemption,
 			method: "POST",
 			responseType: "json",
@@ -35,7 +36,7 @@ module.exports = class RedeemCode {
 			headers: {
 				Cookie: cookieData
 			}
-		});
+		}, { persist: true });
 
 		if (res.statusCode !== 200) {
 			app.Logger.log(`${this.#instance.fullName}:RedeemCode`, {

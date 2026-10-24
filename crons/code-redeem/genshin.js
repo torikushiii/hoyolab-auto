@@ -1,4 +1,5 @@
 const { t } = require("../../localization/index.js");
+const redemptionRequest = require("../../hoyolab-modules/redemption-request.js");
 
 let version;
 
@@ -54,7 +55,7 @@ const redeemCodes = async (accountData, code) => {
 		whitelist: ["cookie_token_v2", "account_mid_v2", "account_id_v2", "cookie_token", "account_id"]
 	});
 
-	const res = await app.Got("HoYoLab", {
+	const res = await redemptionRequest({
 		url: "https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey",
 		searchParams: {
 			uid: accountData.uid,

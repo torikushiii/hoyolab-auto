@@ -9,6 +9,7 @@ The script will auto-generate a `cache.json` file in this directory once it has 
 - Game account data (stamina, expeditions, etc.)
 - API response data to reduce server load
 - Temporary data to improve application performance
+- Reward and manually entered codes waiting for redemption after a temporary failure. The code redemption job retries these while `redeemCode` is enabled for the account, even if no new public codes are available.
 
 ### Cache File Location
 - **Standard Installation**: `./data/cache.json`
@@ -19,6 +20,7 @@ The script will auto-generate a `cache.json` file in this directory once it has 
 - The cache file will be **recreated if deleted**
 - Cache data expires automatically based on configured intervals
 - You can safely delete the cache file to reset all cached data
+- Deleting the cache also removes pending reward codes. Redeem any failed reward codes first if you want to keep their rewards.
 - Ensure this directory has **write permissions** for the application
 
 ### Troubleshooting
