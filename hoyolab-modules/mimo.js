@@ -987,7 +987,6 @@ module.exports = class TravelingMimo {
 					const shouldRedeem = accountData.redeemCode && (accountData.mimo?.redeem !== false);
 
 					if (shouldRedeem) {
-						await sleep(5000);
 						const redeemResult = await this.#instance.redeemCode(accountData, code);
 						if (redeemResult.success) {
 							results.codesRedeemed.push(code);
@@ -1101,7 +1100,6 @@ module.exports = class TravelingMimo {
 					if (drawResult.data.code) {
 						const shouldRedeemDraw = accountData.redeemCode && (accountData.mimo?.redeemDraw !== false);
 						if (shouldRedeemDraw) {
-							await sleep(5000);
 							const redeemResult = await this.#instance.redeemCode(accountData, drawResult.data.code);
 							if (redeemResult.success) {
 								results.codesRedeemed.push(drawResult.data.code);

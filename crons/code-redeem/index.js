@@ -30,8 +30,6 @@ module.exports = {
 			app.Logger.debug("CodeRedeem", {
 				message: t("No codes found")
 			});
-
-			return;
 		}
 
 		const result = await checkAndRedeem(codes);
