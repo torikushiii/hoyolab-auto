@@ -200,12 +200,53 @@ test("pending codes are deduplicated against the public feed and respect redeemC
 	assert.equal((await h.request.getPendingCodes("nap_global", account)).length, 0);
 });
 
-for (const retcode of [0, -2001, -2003, -2006, -2017, -100]) {
+for (const [retcode, message, kept] of [
+	[0, "OK", false],
+	[-2001, "Expired", false],
+	[-2003, "Invalid", false],
+	[-2006, "Usage limit", false],
+	[-2017, "Already used", false],
+	[-2011, "Level too low", false],
+	[-1071, "Not logged in", true],
+	[-100, "Please log in", true]
+]) {
 	test(`pending code handling for retcode ${retcode}`, async () => {
 		const h = harness();
-		h.state.respond = async () => response(retcode);
+		h.state.respond = async () => response(retcode, message);
 		await h.request(options("REWARD"), { persist: true });
 		assert.equal(h.calls.length, 1);
-		assert.equal((await h.request.getPendingCodes("nap_global", account)).length, retcode === -100 ? 1 : 0);
+		assert.equal((await h.request.getPendingCodes("nap_global", account)).length, kept ? 1 : 0);
 	});
 }
+
+test("permanently failed saved codes are not retried by later runs", async () => {
+	const h = harness();
+	h.state.respond = async () => ({ statusCode: 502 });
+	await h.request(options("REWARD"), { persist: true });
+	const cron = h.load("crons/code-redeem/utils.js");
+	h.state.respond = async () => response(-2011, "Level too low");
+	await cron.checkAndRedeem({});
+	await cron.checkAndRedeem({});
+	assert.equal(h.calls.length, 2);
+	assert.equal((await h.request.getPendingCodes("nap_global", account)).length, 0);
+});
+
+test("the scheduled job skips a saved code that another request redeems first", async () => {
+	const h = harness();
+	let release;
+	const blocked = new Promise(resolve => {
+		release = resolve;
+	});
+	h.state.respond = async () => await blocked;
+	const reward = h.request(options("REWARD"), { persist: true });
+	while ((await h.request.getPendingCodes("nap_global", account)).length === 0) {
+		await new Promise(resolve => setImmediate(resolve));
+	}
+	const run = h.load("crons/code-redeem/utils.js").checkAndRedeem({});
+	release(response());
+	await reward;
+	const result = await run;
+	assert.equal(h.calls.length, 1);
+	assert.equal(result.success.length, 0);
+	assert.equal(result.failed.length, 0);
+});

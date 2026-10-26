@@ -1,7 +1,7 @@
 const { t } = require("../../localization/index.js");
 
 const crypto = require("node:crypto");
-const { getPendingCodes, FINAL_REDEMPTION_ERRORS } = require("../../hoyolab-modules/redemption-request.js");
+const { getPendingCodes, waitForQueue, FINAL_REDEMPTION_ERRORS } = require("../../hoyolab-modules/redemption-request.js");
 
 const GAME_CONFIG = [
 	{
@@ -193,6 +193,7 @@ const checkAndRedeem = async (codes) => {
 
 			const savedCodes = await getPendingCodes(game.gameBiz, account);
 			const accountCodes = new Map(pendingCodes.map(code => [formatCodeValue(code), code]));
+			const publicCodes = new Set(accountCodes.keys());
 			for (const code of savedCodes) {
 				accountCodes.set(code, accountCodes.get(code) ?? { code, rewards: []});
 			}
@@ -217,6 +218,14 @@ const checkAndRedeem = async (codes) => {
 				const normalized = formatCodeValue(code);
 				if (completedCodes.has(normalized) && !savedCodes.includes(normalized)) {
 					continue;
+				}
+
+				if (savedCodes.includes(normalized) && !publicCodes.has(normalized)) {
+					await waitForQueue(game.gameBiz, account);
+					const stillPending = await getPendingCodes(game.gameBiz, account);
+					if (!stillPending.includes(normalized)) {
+						continue;
+					}
 				}
 
 				let result;

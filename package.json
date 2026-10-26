@@ -11,7 +11,6 @@
     "test": "node --test tests/*.test.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test:redemption": "node --test test/redemption-request.test.js",
     "presetup:windows": "npm run localization:index",
     "presetup:linux": "npm run localization:index",
     "setup:windows": "start setup/config/index.html",

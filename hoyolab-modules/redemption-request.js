@@ -4,7 +4,13 @@ const FINAL_REDEMPTION_ERRORS = new Set([-2001, -2003, -2006, -2017]);
 const queues = new Map();
 const pendingWrites = new Map();
 const nextRequestAt = new Map();
+const TEMPORARY_REDEMPTION_ERRORS = new Set([-1071, -2016]);
 const REQUEST_INTERVAL = 6000;
+
+const isTemporaryFailure = (res) => res.statusCode !== 200
+	|| typeof res.body?.retcode !== "number"
+	|| TEMPORARY_REDEMPTION_ERRORS.has(res.body.retcode)
+	|| app.HoyoLab.isExpiredLogin(res.body.message);
 
 const accountKey = (gameBiz, account) => `${gameBiz}:${account.region}:${account.uid}`;
 const pendingKey = (key) => `redemption:pending:${key}`;
@@ -71,7 +77,7 @@ const redemptionRequest = async (options, { persist = false } = {}) => {
 			nextRequestAt.set(key, Date.now() + Math.max(REQUEST_INTERVAL, cooldown));
 		}
 
-		if (res.statusCode === 200 && (res.body?.retcode === 0 || FINAL_REDEMPTION_ERRORS.has(res.body?.retcode))) {
+		if (!isTemporaryFailure(res)) {
 			await updatePending(key, code, false);
 		}
 		return res;
@@ -87,6 +93,18 @@ const redemptionRequest = async (options, { persist = false } = {}) => {
 	}
 };
 
+const waitForQueue = async (gameBiz, account) => {
+	const key = accountKey(gameBiz, account);
+	let previous;
+	let current = queues.get(key);
+	while (current && current !== previous) {
+		await current.catch(() => {});
+		previous = current;
+		current = queues.get(key);
+	}
+};
+
 module.exports = redemptionRequest;
 module.exports.getPendingCodes = getPendingCodes;
+module.exports.waitForQueue = waitForQueue;
 module.exports.FINAL_REDEMPTION_ERRORS = FINAL_REDEMPTION_ERRORS;
