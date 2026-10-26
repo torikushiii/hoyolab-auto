@@ -4,7 +4,7 @@ const FINAL_REDEMPTION_ERRORS = new Set([-2001, -2003, -2006, -2017]);
 const queues = new Map();
 const pendingWrites = new Map();
 const nextRequestAt = new Map();
-const TEMPORARY_REDEMPTION_ERRORS = new Set([-1071, -2016]);
+const TEMPORARY_REDEMPTION_ERRORS = new Set([-1048, -1071, -2016]);
 const REQUEST_INTERVAL = 6000;
 
 const isTemporaryFailure = (res) => res.statusCode !== 200

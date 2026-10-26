@@ -207,6 +207,7 @@ for (const [retcode, message, kept] of [
 	[-2006, "Usage limit", false],
 	[-2017, "Already used", false],
 	[-2011, "Level too low", false],
+	[-1048, "API system is busy, please try again later.", true],
 	[-1071, "Not logged in", true],
 	[-100, "Please log in", true]
 ]) {
@@ -218,6 +219,21 @@ for (const [retcode, message, kept] of [
 		assert.equal((await h.request.getPendingCodes("nap_global", account)).length, kept ? 1 : 0);
 	});
 }
+
+test("server-busy reward codes stay pending until a later run succeeds", async () => {
+	const h = harness();
+	h.state.respond = async () => response(-1048, "API system is busy, please try again later.");
+	await h.request(options("REWARD"), { persist: true });
+	const cron = h.load("crons/code-redeem/utils.js");
+	const failed = await cron.checkAndRedeem({});
+	assert.equal(failed.failed.length, 1);
+	assert.equal((await h.request.getPendingCodes("nap_global", account)).length, 1);
+	h.state.respond = async () => response();
+	const retried = await cron.checkAndRedeem({});
+	assert.equal(retried.success.length, 1);
+	assert.equal(h.calls.length, 3);
+	assert.equal((await h.request.getPendingCodes("nap_global", account)).length, 0);
+});
 
 test("permanently failed saved codes are not retried by later runs", async () => {
 	const h = harness();
