@@ -1,6 +1,7 @@
 const { t } = require("../../localization/index.js");
 const checkInDescriptor = require("./check-in-descriptor.js");
 const CheckIn = require("./check-in.js");
+const { getRole, redeemCode } = require("./redemption-request.js");
 
 const DEFAULT_CONSTANTS = {
 	ACT_ID: checkInDescriptor.actId,
@@ -44,18 +45,38 @@ module.exports = class TearsOfThemis extends require("../template.js") {
 		for (const account of accounts) {
 			const cookieData = account.cookie;
 			const ltuid = account.ltuid;
+			let discovery;
+			// Check-in only needs ltoken; missing redemption credentials must not break it.
+			if (/cookie_token_v2=/.test(cookieData)) {
+				try {
+					discovery = await getRole(account);
+				}
+				catch {
+					// Transport diagnostics belong to Got; never log the cookie or raw response.
+				}
+			}
+			const role = discovery?.success ? discovery.role : null;
+			if (!role) {
+				app.Logger.warn(this.fullName, t("Could not load the Tears of Themis character. Check-in remains available; restart the bot after restoring the linked account and redemption cookie."));
+			}
 
 			this.#logo = "https://hyl-static-res-prod.hoyolab.com/communityweb/business/nxx_hoyoverse.png";
 			this.#color = 0xFF8300;
 
 			this.accounts.push({
 				platform: this.name,
-				uid: ltuid,
-				nickname: "",
-				region: "Global",
+				uid: role ? String(role.game_uid) : ltuid,
+				ltuid,
+				nickname: role?.nickname ?? "",
+				region: role?.region ?? "Global",
 				timezone: "GLOBAL",
-				level: "",
+				level: role?.level ?? "",
+				redemptionRoleAvailable: Boolean(role),
+				// Keep existing pending/completed/login cache keys across the UI identity change.
+				redemptionQueueAccount: { uid: ltuid, region: "Global" },
 				cookie: cookieData,
+				redeemCode: account.redeemCode,
+				redeemCodeConfigured: account.redeemCodeConfigured,
 				game: {
 					name: "Tears of Themis",
 					short: "ToT"
@@ -70,12 +91,17 @@ module.exports = class TearsOfThemis extends require("../template.js") {
 			});
 
 			accountList++;
-			app.Logger.info(this.fullName, t `Logged into account ${accountList} [${ltuid}] (Tears of Themis)`);
+			app.Logger.info(this.fullName, t `Logged into account ${accountList} [${role?.game_uid ?? ltuid}] (Tears of Themis)`);
 		}
 	}
 
 	get logo () { return this.#logo; }
 	get color () { return this.#color; }
+
+	async redeemCode (accountData, code) {
+		const result = await redeemCode(accountData, code);
+		return result.success ? { success: true } : { success: false, message: result.reason };
+	}
 
 	async checkIn (accountData) {
 		const ci = new CheckIn(this, {

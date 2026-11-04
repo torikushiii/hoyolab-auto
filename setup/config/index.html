@@ -402,6 +402,12 @@
 
                 <label for="tearsCookie" data-i18n="Cookie:">Cookie:</label>
                 <input type="text" id="tearsCookie" placeholder="">
+                <label for="tearsredeemCode" data-i18n="redeemCode:">redeemCode:</label>
+                <select id="tearsredeemCode">
+                    <option value="false" data-i18n="false">false</option>
+                    <option value="true" data-i18n="true">true</option>
+                    <option value="manual" data-i18n="Manual redemption notifications">Manual redemption notifications</option>
+                </select>
             </div>
         </div>
     </div>
@@ -1020,6 +1026,7 @@
         function fillTearsAccount(accountElement, data) {
             const entry = data || {};
             setInputValue(accountElement.querySelector('input[id*="tearsCookie"]'), entry.cookie);
+            setBooleanSelectValue(accountElement.querySelector('select[id*="tearsredeemCode"]'), entry.redeemCode, 'manual');
         }
 
         function fillGenshinAccount(accountElement, data) {
@@ -1332,6 +1339,9 @@
             tearsAccounts.forEach(accountElement => {
                 const accountData = {
                     cookie: accountElement.querySelector('input[id*="tearsCookie"]').value || '',
+                    ...(accountElement.querySelector('select[id*="tearsredeemCode"]').value !== 'manual' && {
+                        redeemCode: accountElement.querySelector('select[id*="tearsredeemCode"]').value === 'true',
+                    }),
                 };
                 config.accounts[1].data.push(accountData);
             });

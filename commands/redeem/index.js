@@ -11,7 +11,8 @@ module.exports = {
 			choices: [
 				{ name: "Genshin Impact", value: "genshin" },
 				{ name: "Honkai: Star Rail", value: "starrail" },
-				{ name: "Zenless Zone Zero", value: "nap" }
+				{ name: "Zenless Zone Zero", value: "nap" },
+				{ name: "Tears of Themis", value: "tot" }
 			],
 			required: true
 		},
@@ -20,7 +21,9 @@ module.exports = {
 			description: t("Select the account you want to check notes for."),
 			type: "string",
 			required: true,
-			accounts: true
+			accounts: true,
+			redemption: true,
+			accountBlacklist: ["honkai"]
 		},
 		{
 			name: "code",
@@ -32,8 +35,7 @@ module.exports = {
 	run: (async function redeem (context, game, uid, code) {
 		const { interaction } = context;
 		const supportedGames = app.HoyoLab.supportedGames({ blacklist: [
-			"honkai",
-			"tot"
+			"honkai"
 		]});
 
 		if (supportedGames.length === 0) {

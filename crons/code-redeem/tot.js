@@ -1,4 +1,5 @@
 const { t } = require("../../localization/index.js");
+const { redeemCode } = require("../../hoyolab-modules/termis/redemption-request.js");
 
 let version;
 const ENDPOINT = "https://api.ennead.cc/mihoyo/themis/codes";
@@ -51,5 +52,6 @@ const fetchData = async () => {
 };
 
 module.exports = {
-	fetchData
+	fetchData,
+	redeemCodes: (account, code) => redeemCode(account, code.code)
 };

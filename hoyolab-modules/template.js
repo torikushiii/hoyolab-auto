@@ -94,11 +94,18 @@ module.exports = class HoyoLab {
 
 			if (this.#name === "honkai" || this.#name === "tot") {
 				const parsedCookie = this.#parseCookie(account.cookie);
+				if (this.#name === "tot" && account.redeemCode !== undefined && typeof account.redeemCode !== "boolean") {
+					throw new app.Error({ message: t("Invalid redeemCode provided for HoyoLab expected boolean.") });
+				}
 				this.#data.push({
 					cookie: parsedCookie.cookie,
 					ltuid: parsedCookie.ltuid,
 					redemptionDeviceUuid: parsedCookie.redemptionDeviceUuid,
 					refreshCookie: parsedCookie.refreshCookie,
+					...(this.#name === "tot" && {
+						redeemCode: account.redeemCode === undefined ? undefined : account.redeemCode && parsedCookie.codeRedeem,
+						redeemCodeConfigured: account.redeemCode
+					}),
 					allowedPlatforms: account.allowedPlatforms ?? null
 				});
 				break;
@@ -499,6 +506,9 @@ module.exports = class HoyoLab {
 
 		const platform = HoyoLab.get(game);
 		const [account] = accountData;
+		if (account.redemptionRoleAvailable === false) {
+			return { success: false, data: { reason: t("No linked Tears of Themis character found. Link your game character to this HoYoverse account first.") } };
+		}
 
 		let res = await platform.redeemCode(account, code);
 		if (!res.success && HoyoLab.isExpiredLogin(res.message) && await HoyoLab.refreshStoredCookies(account.cookie)) {
@@ -580,6 +590,9 @@ module.exports = class HoyoLab {
 
 	static getRegion (region) {
 		switch (region) {
+			case "glb_prod_wd01":
+			case "Global":
+				return "Global";
 			case "os_cht":
 			case "prod_gf_sg":
 			case "prod_official_cht":

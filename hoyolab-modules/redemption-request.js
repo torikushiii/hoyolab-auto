@@ -12,7 +12,11 @@ const isTemporaryFailure = (res) => res.statusCode !== 200
 	|| TEMPORARY_REDEMPTION_ERRORS.has(res.body.retcode)
 	|| app.HoyoLab.isExpiredLogin(res.body.message);
 
-const accountKey = (gameBiz, account) => `${gameBiz}:${account.region}:${account.uid}`;
+const getRedemptionAccount = (account) => account.redemptionQueueAccount ?? account;
+const accountKey = (gameBiz, account) => {
+	const identity = getRedemptionAccount(account);
+	return `${gameBiz}:${identity.region}:${identity.uid}`;
+};
 const pendingKey = (key) => `redemption:pending:${key}`;
 
 const getPendingCodes = async (gameBiz, account) => {
@@ -42,10 +46,10 @@ const updatePending = async (key, code, add) => {
 };
 
 // Public codes, event rewards and manual redemptions share the same account cooldown.
-const redemptionRequest = async (options, { persist = false, profile = "HoYoLabDesktopWeb" } = {}) => {
+const redemptionRequest = async (options, { persist = false, profile = "HoYoLabDesktopWeb", queueAccount } = {}) => {
 	const params = options.json ?? options.searchParams;
 	const payloadKey = options.json ? "json" : "searchParams";
-	const key = accountKey(params.game_biz, params);
+	const key = accountKey(params.game_biz, queueAccount ?? params);
 	const code = String(params.cdkey).toUpperCase();
 	const previous = queues.get(key) ?? Promise.resolve();
 	const saved = persist ? updatePending(key, code, true) : Promise.resolve();
@@ -109,3 +113,4 @@ module.exports = redemptionRequest;
 module.exports.getPendingCodes = getPendingCodes;
 module.exports.waitForQueue = waitForQueue;
 module.exports.FINAL_REDEMPTION_ERRORS = FINAL_REDEMPTION_ERRORS;
+module.exports.getRedemptionAccount = getRedemptionAccount;

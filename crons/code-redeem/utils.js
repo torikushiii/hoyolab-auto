@@ -1,7 +1,7 @@
 const { t } = require("../../localization/index.js");
 
 const crypto = require("node:crypto");
-const { getPendingCodes, waitForQueue, FINAL_REDEMPTION_ERRORS } = require("../../hoyolab-modules/redemption-request.js");
+const { getPendingCodes, waitForQueue, getRedemptionAccount, FINAL_REDEMPTION_ERRORS } = require("../../hoyolab-modules/redemption-request.js");
 
 const GAME_CONFIG = [
 	{
@@ -45,12 +45,14 @@ const GAME_CONFIG = [
 	},
 	{
 		key: "tot",
+		gameBiz: "nxx_global",
 		modulePath: "./tot",
 		cacheKey: "tot-code",
 		accountFilter: "tot",
 		platform: "tot",
-		redeemable: false,
-		manualReason: t("Redeem this code from the in-game Exchange menu.")
+		redeemable: true,
+		manualReason: t("Redeem this code from the in-game Exchange menu."),
+		redemptionLink: "https://tot.hoyoverse.com/gift/"
 	}
 ];
 
@@ -155,8 +157,10 @@ const checkAndRedeem = async (codes) => {
 			whitelist: game.accountFilter
 		});
 
-		if (game.redeemable === false) {
-			const manualEligibleAccounts = accounts.filter(acc => acc.redeemCode !== false);
+		if (game.redeemable === false || game.key === "tot") {
+			const manualEligibleAccounts = accounts.filter(acc => acc.redeemCode !== false && (game.key !== "tot" || acc.redeemCode === undefined));
+			const manualCacheKey = `${game.cacheKey}:manual`;
+			const notifiedCodes = new Set(await getCachedCodes(manualCacheKey));
 			if (manualEligibleAccounts.length > 0) {
 				const sampleAccount = manualEligibleAccounts[0];
 				const platform = app.HoyoLab.get(sampleAccount.platform ?? game.accountFilter);
@@ -164,6 +168,9 @@ const checkAndRedeem = async (codes) => {
 				const accountAssets = sampleAccount.assets ?? {};
 
 				for (const code of pendingCodes) {
+					if (game.key === "tot" && notifiedCodes.has(formatCodeValue(code))) {
+						continue;
+					}
 					manual.push({
 						gameKey: game.key,
 						gameName: sampleAccount.game?.name ?? platformAssets.game ?? game.key.toUpperCase(),
@@ -179,15 +186,20 @@ const checkAndRedeem = async (codes) => {
 				}
 			}
 
-			await appendCodesToCache(game.cacheKey, pendingCodes);
-			continue;
+			if (manualEligibleAccounts.length > 0 && game.key === "tot") {
+				await appendCodesToCache(manualCacheKey, pendingCodes);
+			}
+			if (game.redeemable === false || !accounts.some(acc => acc.redeemCode === true)) {
+				await appendCodesToCache(game.cacheKey, pendingCodes);
+				continue;
+			}
 		}
 
 		const { redeemCodes } = require(game.modulePath);
 		const completedByAccount = [];
 
 		for (const account of accounts) {
-			if (account.redeemCode === false) {
+			if (account.redeemCode === false || account.redemptionRoleAvailable === false || (game.key === "tot" && account.redeemCode !== true)) {
 				continue;
 			}
 
@@ -201,7 +213,8 @@ const checkAndRedeem = async (codes) => {
 				continue;
 			}
 
-			const accountCacheKey = `${game.cacheKey}:${account.region}:${account.uid}`;
+			const identity = getRedemptionAccount(account);
+			const accountCacheKey = `${game.cacheKey}:${identity.region}:${identity.uid}`;
 			const completedCodes = new Set(await getCachedCodes(accountCacheKey));
 			completedByAccount.push(completedCodes);
 			const loginCacheKey = `${accountCacheKey}:expired-login`;

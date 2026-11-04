@@ -4,6 +4,13 @@
 		language: "it",
 		locale: "it-IT",
 		messages: {
+			"Could not load the Tears of Themis character. Check-in remains available; restart the bot after restoring the linked account and redemption cookie.": "Impossibile caricare il personaggio di Tears of Themis. Il check-in resta disponibile; riavvia il bot dopo aver ripristinato il collegamento dell’account e il cookie per il riscatto.",
+			"The Tears of Themis character has changed. Restart the bot and select the account again.": "Il personaggio di Tears of Themis è cambiato. Riavvia il bot e seleziona nuovamente l’account.",
+			"Manual redemption notifications": "Notifiche per il riscatto manuale",
+			"Could not load the Tears of Themis character. Please try again later.": "Impossibile caricare il personaggio di Tears of Themis. Riprova più tardi.",
+			"No linked Tears of Themis character found. Link your game character to this HoYoverse account first.": "Nessun personaggio di Tears of Themis collegato. Collega prima il personaggio a questo account HoYoverse.",
+			"Redemption request failed; will retry on the next run.": "Richiesta di riscatto non riuscita; verrà riprovata alla prossima esecuzione.",
+			"Invalid redeemCode provided for HoyoLab expected boolean.": "Valore redeemCode non valido per HoyoLab: è richiesto un booleano.",
 			"Primo income comparison is unavailable because last month had no income.": "Confronto delle Primogemme non disponibile perché il mese scorso non ci sono state entrate.",
 			"Jades income comparison is unavailable because last month had no income.": "Confronto delle Giade non disponibile perché il mese scorso non ci sono state entrate.",
 			"No income recorded.": "Nessuna entrata registrata.",

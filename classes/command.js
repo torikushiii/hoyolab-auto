@@ -86,7 +86,8 @@ module.exports = class Command extends require("./template.js") {
 			switch (param.type) {
 				case "string":
 					if (param.accounts) {
-						const accounts = app.HoyoLab.getActiveAccounts({ blacklist: ["honkai", "tot"]});
+						const accounts = app.HoyoLab.getActiveAccounts({ blacklist: param.accountBlacklist ?? ["honkai", "tot"]})
+							.filter(account => !param.redemption || account.redemptionRoleAvailable !== false);
 
 						if (accounts.length === 0) {
 							continue;

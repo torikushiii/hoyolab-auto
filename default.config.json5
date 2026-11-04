@@ -94,7 +94,8 @@
             type: 'termis',
             data: [
                 {
-                    cookie: ''
+                    cookie: '',
+                    redeemCode: false, // Automatically redeem new Tears of Themis codes via the gift website
                 }
             ]
         },

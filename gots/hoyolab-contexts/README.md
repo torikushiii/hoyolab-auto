@@ -49,6 +49,15 @@ remains explicitly used by HSR/HI3 Game Record.
 Genshin/HSR Diary read the nested `month_data` summaries without DS. HSR checks `data_month`
 against the requested month. HSR/ZZZ browser redemption uses POST risk endpoints
 and requires the configured cookie's `_MHYUUID`, preserved across cookie refresh.
+Tears of Themis automatic and command redemption use DesktopWeb GET requests: cookie-token
+role discovery with the full RPC locale, followed by the gift endpoint with
+the short locale (Chinese variants preserved) in query and RPC header. It sends
+the discovered game UID without DS or invented device fields. Login loads that
+UID, nickname and region for account selectors and notifications; redemption
+checks the selected character again. Internal cache keys retain their existing
+HoYoLAB account identity so pending/completed codes survive this change. Failed
+login discovery leaves check-in available and omits the account from redemption
+selectors; restore the linked account/cookie and restart to reload it.
 Check-in descriptors keep per-game query/body differences; Genshin, HSR, ZZZ and
 HI3 verify post-claim status.
 

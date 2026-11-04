@@ -64,6 +64,20 @@ const createSetup = () => {
 	return { context, exportedText: () => download.text() };
 };
 
+test("setup preserves Tears of Themis redemption opt-in across import/export", async () => {
+	const setup = createSetup();
+	for (const value of [true, false, undefined]) {
+		setup.context.importConfigFromText(JSON5.stringify({
+			accounts: [{ type: "termis", active: true, data: [{ cookie: "synthetic-cookie", ...(value !== undefined && { redeemCode: value }) }]}]
+		}));
+		setup.context.generateConfig();
+		const result = JSON5.parse(await setup.exportedText()).accounts.find(item => item.type === "termis");
+		assert.equal(result.active, true);
+		assert.equal(result.data[0].cookie, "synthetic-cookie");
+		assert.equal(result.data[0].redeemCode, value);
+	}
+});
+
 for (const [language, expected, short] of [
 	[undefined, "en-us", "en"],
 	["it-it", "it-it", "it"],
