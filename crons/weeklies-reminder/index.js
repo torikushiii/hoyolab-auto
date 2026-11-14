@@ -183,6 +183,6 @@ module.exports = {
 	description: t("Reminds you to complete your weeklies."),
 	code: (async function weekliesReminder () {
 		// eslint-disable-next-line object-curly-spacing
-		await RegionalTaskManager.executeTasks();
+		await RegionalTaskManager.executeTasks({ blacklist: ["honkai", "tot"] });
 	})
 };

@@ -78,6 +78,8 @@ to an IANA timezone such as `America/New_York` to use local time with daylight-s
   - **Code Redeems**: Search for codes and redeem them automatically.
   - **Traveling Mimo**: Automatically complete Mimo tasks, claim points, and exchange for Polychrome.
 
+Weekly reminders only run for Genshin Impact, Honkai: Star Rail, and Zenless Zone Zero.
+
 ## Prerequisites
 - [Git](https://git-scm.com/downloads)
 - [Node.js](https://nodejs.org/en/)
