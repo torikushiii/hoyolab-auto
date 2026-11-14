@@ -326,7 +326,7 @@ const buildMessage = (status, data) => {
 			if (data.loginExpired) {
 				detailLines.push(t("Update your HoYoLAB cookie or restore automatic cookie refresh. Pending codes will be retried after the cookie is renewed."));
 			}
-			includeManualLink = Boolean(redeemLink);
+			includeManualLink = Boolean(redeemLink) && ![-2006, -2017].includes(data.retcode);
 			break;
 		case "manual":
 			messageTitle = t("Code Found - Manual Redemption Required");

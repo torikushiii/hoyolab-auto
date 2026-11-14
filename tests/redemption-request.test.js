@@ -223,6 +223,28 @@ for (const [retcode, message, kept] of [
 	});
 }
 
+for (const game of ["genshin", "starrail", "nap", "tot"]) {
+	for (const retcode of [-2006, -2017, -2011, undefined]) {
+		test(`${game}: redemption notification manual link for retcode ${retcode}`, () => {
+			const h = harness();
+			const { buildMessage } = h.load("crons/code-redeem/utils.js");
+			const reason = "Synthetic backend reason";
+			const message = buildMessage("failed", {
+				account: { ...account, platform: game },
+				code: { code: "REWARD" },
+				reason,
+				retcode
+			});
+			for (const text of [message.telegram, message.embed.description]) {
+				assert.ok(text.includes(reason));
+				assert.ok(text.includes("REWARD"));
+				assert.equal(text.includes("Manually Redeem Here"), ![-2006, -2017].includes(retcode));
+				assert.equal(text.includes("https://"), ![-2006, -2017].includes(retcode));
+			}
+		});
+	}
+}
+
 test("server-busy reward codes stay pending until a later run succeeds", async () => {
 	const h = harness();
 	h.state.respond = async () => response(-1048, "API system is busy, please try again later.");
