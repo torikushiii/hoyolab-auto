@@ -82,6 +82,8 @@ Notes:
 
 4. **Manual `redeem` command** (`HoyoLab.redeemCode` in `hoyolab-modules/template.js`, used by Discord `/redeem` and Telegram): loops over `redeemTargets` in order and calls the game's `redeemCode` once per server, with `redeemTargets` cleared so step 3 does not reroute it. The command reports success only if every server succeeded; otherwise the reply lists each server's result. The command has no option to pick servers; it always uses the config.
 
+5. **Manual `backfill` command** (`commands/backfill`, `backfillAccount` in `crons/code-redeem/utils.js`): Discord `/backfill game account` (or Telegram `backfill <game> <uid>`) fetches the game's active codes and runs the same per-target redemption as step 2 with backfill on, for one account, right away. It works for every redeemable game, with or without `redeemRegions`. The reply lists each server's redeemed, already used or expired, and failed codes.
+
 5. The redemption request itself is unchanged: `webExchangeCdkey` already takes `uid` and `region`.
 
 `redeemTargets` is never pushed into `platform.accounts` as separate accounts. Check-in and reminders iterate that list, so extra entries would cause duplicate check-ins and notifications.
