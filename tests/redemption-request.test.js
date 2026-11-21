@@ -292,3 +292,25 @@ test("single-use codes go to the main server", async () => {
 	await rewardCodes.redeemCode({ ...account, redeemTargets: [{ uid: "201", region: "os_asia" }, { uid: "301", region: "os_euro" }]}, "MIMO");
 	assert.deepEqual(h.calls.map(call => [call.searchParams.uid, call.searchParams.region]), [["201", "os_asia"]]);
 });
+
+test("manual redeem command redeems on every configured server, main server first", async () => {
+	const HoyoLab = require("../hoyolab-modules/template.js");
+	const calls = [];
+	const platform = { redeemCode: async (acc) => {
+		calls.push([acc.uid, acc.region, acc.redeemTargets]);
+		return acc.region === "os_euro" ? { success: false, message: "Already in use" } : { success: true, message: "OK" };
+	} };
+	const targets = [{ uid: "201", region: "os_asia" }, { uid: "301", region: "os_euro" }];
+	const original = { get: HoyoLab.get, getActiveAccounts: HoyoLab.getActiveAccounts };
+	HoyoLab.get = () => platform;
+	HoyoLab.getActiveAccounts = () => [{ ...account, redeemTargets: targets }];
+	try {
+		const res = await HoyoLab.redeemCode("genshin", "123", "CODE");
+		assert.deepEqual(calls, [["201", "os_asia", undefined], ["301", "os_euro", undefined]]);
+		assert.equal(res.success, false);
+		assert.equal(res.data.reason, "SEA (201): OK; EU (301): Already in use");
+	}
+	finally {
+		Object.assign(HoyoLab, original);
+	}
+});

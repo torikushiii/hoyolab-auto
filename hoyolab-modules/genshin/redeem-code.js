@@ -10,7 +10,7 @@ module.exports = class RedeemCode {
 	}
 
 	async redeemCode (accountData, code) {
-		// Single-use codes (Mimo, Hilichurl, manual command) go to the main server only. See docs/REDEEM_REGIONS.md.
+		// Single-use codes (Mimo, Hilichurl) go to the main server only. See docs/REDEEM_REGIONS.md.
 		accountData = { ...accountData, ...accountData.redeemTargets?.[0] };
 		const cookieData = app.HoyoLab.parseCookie(accountData.cookie, {
 			whitelist: [

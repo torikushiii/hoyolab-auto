@@ -2,7 +2,7 @@
 
 One HoYoLAB account can own a character on every server (America, Europe, Asia, TW/HK/MO). By default codes are only redeemed on the character shown on the HoYoLAB game record card.
 
-- `mainRegion` picks your main server. It is redeemed on first and receives single-use codes.
+- `mainRegion` picks your main server. It is redeemed on first and is the only server that receives single-use codes (Mimo, Hilichurl).
 - `redeemRegions` adds extra servers that also receive public codes.
 
 Currently supported for **Genshin Impact** only.
@@ -54,7 +54,7 @@ Notes:
 |---|---|
 | Public codes (`code-redeem` job) | Main server first, then each `redeemRegions` server in order |
 | Traveling Mimo / Hilichurl Workshop codes | Main server only (single-use codes) |
-| Manual Discord/Telegram `redeem` command | Main server only |
+| Manual Discord/Telegram `redeem` command | Main server first, then each `redeemRegions` server in order |
 | Google Apps Script service (`services/google-script`) | Not supported, card character only |
 
 ## How It Works
@@ -76,9 +76,11 @@ Notes:
 
    If the card character is not in `redeemTargets`, an extra `pendingOnly` copy is added. It only retries codes already queued for the card character (for example from before `mainRegion` was changed) and never redeems public codes.
 
-3. **Single-use codes** (`hoyolab-modules/genshin/redeem-code.js`): `redeemCode` overrides `uid`/`region` with `redeemTargets[0]`, so Mimo, Hilichurl and manual redemptions go to the main server.
+3. **Single-use codes** (`hoyolab-modules/genshin/redeem-code.js`): `redeemCode` overrides `uid`/`region` with `redeemTargets[0]`, so Mimo and Hilichurl codes go to the main server.
 
-4. The redemption request itself is unchanged: `webExchangeCdkey` already takes `uid` and `region`.
+4. **Manual `redeem` command** (`HoyoLab.redeemCode` in `hoyolab-modules/template.js`, used by Discord `/redeem` and Telegram): loops over `redeemTargets` in order and calls the game's `redeemCode` once per server, with `redeemTargets` cleared so step 3 does not reroute it. The command reports success only if every server succeeded; otherwise the reply lists each server's result. The command has no option to pick servers; it always uses the config.
+
+5. The redemption request itself is unchanged: `webExchangeCdkey` already takes `uid` and `region`.
 
 `redeemTargets` is never pushed into `platform.accounts` as separate accounts. Check-in and reminders iterate that list, so extra entries would cause duplicate check-ins and notifications.
 
