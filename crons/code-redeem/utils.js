@@ -1,7 +1,7 @@
 const { t } = require("../../localization/index.js");
 
 const crypto = require("node:crypto");
-const { getPendingCodes, waitForQueue, FINAL_REDEMPTION_ERRORS } = require("../../hoyolab-modules/redemption-request.js");
+const { getPendingCodes, waitForQueue, FINAL_REDEMPTION_ERRORS, TEMPORARY_REDEMPTION_ERRORS } = require("../../hoyolab-modules/redemption-request.js");
 
 const GAME_CONFIG = [
 	{
@@ -279,7 +279,10 @@ const checkAndRedeem = async (codes) => {
 					break;
 				}
 
-				if (result.success || FINAL_REDEMPTION_ERRORS.has(result.retcode)) {
+				const backfillDone = backfillCodes.has(normalized)
+					&& typeof result.retcode === "number"
+					&& !TEMPORARY_REDEMPTION_ERRORS.has(result.retcode);
+				if (result.success || FINAL_REDEMPTION_ERRORS.has(result.retcode) || backfillDone) {
 					completedCodes.add(normalized);
 					await app.Cache.set({
 						key: accountCacheKey,

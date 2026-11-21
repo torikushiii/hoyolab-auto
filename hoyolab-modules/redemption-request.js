@@ -108,3 +108,4 @@ module.exports = redemptionRequest;
 module.exports.getPendingCodes = getPendingCodes;
 module.exports.waitForQueue = waitForQueue;
 module.exports.FINAL_REDEMPTION_ERRORS = FINAL_REDEMPTION_ERRORS;
+module.exports.TEMPORARY_REDEMPTION_ERRORS = TEMPORARY_REDEMPTION_ERRORS;
