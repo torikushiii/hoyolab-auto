@@ -16,7 +16,7 @@ const harness = (store = new Map()) => {
 	let now = 0;
 	const calls = [];
 	const modules = new Map();
-	const state = { respond: async () => response(), accounts: [{ ...account, platform: "nap" }]};
+	const state = { respond: async () => response(), accounts: [{ ...account, platform: "nap" }], active: []};
 	const app = {
 		Cache: {
 			get: async key => structuredClone(store.get(key)),
@@ -37,7 +37,7 @@ const harness = (store = new Map()) => {
 		Platform: { getForAccount: () => [], getEmbedPlatforms: () => []},
 		Got: async (name, data) => {
 			if (name === "API") {
-				return { statusCode: 200, body: { active: []} };
+				return { statusCode: 200, body: { active: state.active } };
 			}
 			calls.push({ at: now, ...data });
 			return await state.respond(data);
@@ -265,4 +265,93 @@ test("the scheduled job skips a saved code that another request redeems first", 
 	assert.equal(h.calls.length, 1);
 	assert.equal(result.success.length, 0);
 	assert.equal(result.failed.length, 0);
+});
+
+test("redeemRegions redeems public codes once per selected server, main server first", async () => {
+	const h = harness(new Map([["genshin-code", ["OLD"]]]));
+	h.state.accounts = [{
+		...account,
+		platform: "genshin",
+		redeemTargets: [
+			{ uid: "201", region: "os_asia" },
+			{ uid: "301", region: "os_euro" }
+		]
+	}];
+	const cron = h.load("crons/code-redeem/utils.js");
+	const result = await cron.checkAndRedeem({ genshin: [{ code: "PUBLIC" }]});
+	assert.deepEqual(h.calls.map(call => [call.searchParams.uid, call.searchParams.region]), [["201", "os_asia"], ["301", "os_euro"]]);
+	assert.equal(result.success.length, 2);
+	await cron.checkAndRedeem({ genshin: [{ code: "PUBLIC" }]});
+	assert.equal(h.calls.length, 2);
+});
+
+test("redeemRegions backfills active codes on new servers and stays silent when a server already used them", async () => {
+	const h = harness(new Map([["genshin-code", ["OLD", "SEEN"]], ["genshin-code:os_asia:201", ["SEEN"]]]));
+	h.state.accounts = [{
+		...account,
+		platform: "genshin",
+		redeemTargets: [
+			{ uid: "201", region: "os_asia" },
+			{ uid: "301", region: "os_euro" }
+		]
+	}];
+	h.state.respond = async (data) => data.searchParams.cdkey === "OLD" ? response(-2017, "Already in use") : response();
+	const cron = h.load("crons/code-redeem/utils.js");
+	const result = await cron.checkAndRedeem({ genshin: [{ code: "SEEN" }, { code: "OLD" }]});
+	assert.deepEqual(h.calls.map(call => [call.searchParams.region, call.searchParams.cdkey]), [["os_asia", "OLD"], ["os_euro", "SEEN"], ["os_euro", "OLD"]]);
+	assert.equal(result.success.length, 1);
+	assert.equal(result.failed.length, 0);
+	await cron.checkAndRedeem({ genshin: [{ code: "SEEN" }, { code: "OLD" }]});
+	assert.equal(h.calls.length, 3);
+});
+
+test("manual backfill redeems missing active codes on every server of one account", async () => {
+	const h = harness(new Map([["genshin-code:os_asia:201", ["SEEN"]]]));
+	h.state.active = [{ code: "SEEN" }, { code: "OLD" }];
+	h.state.accounts = [{
+		...account,
+		platform: "genshin",
+		redeemTargets: [
+			{ uid: "201", region: "os_asia" },
+			{ uid: "301", region: "os_euro" }
+		]
+	}];
+	h.state.respond = async (data) => data.searchParams.cdkey === "OLD" && data.searchParams.region === "os_asia" ? response(-2017, "Already in use") : response();
+	const { targets } = await h.load("crons/code-redeem/utils.js").backfillAccount("genshin", "123");
+	const codes = list => list.map(i => i.code.code);
+	assert.deepEqual(JSON.parse(JSON.stringify(targets.map(i => [i.account.region, codes(i.success), codes(i.skipped), i.failed.length]))), [
+		["os_asia", [], ["OLD"], 0],
+		["os_euro", ["SEEN", "OLD"], [], 0],
+		["test", [], [], 0]
+	]);
+});
+
+test("single-use codes go to the main server", async () => {
+	const h = harness();
+	const RewardCode = h.load("hoyolab-modules/genshin/redeem-code.js");
+	const rewardCodes = new RewardCode({ config: { url: { redemption: "https://example.test/redeem" } } });
+	await rewardCodes.redeemCode({ ...account, redeemTargets: [{ uid: "201", region: "os_asia" }, { uid: "301", region: "os_euro" }]}, "MIMO");
+	assert.deepEqual(h.calls.map(call => [call.searchParams.uid, call.searchParams.region]), [["201", "os_asia"]]);
+});
+
+test("manual redeem command redeems on every configured server, main server first", async () => {
+	const HoyoLab = require("../hoyolab-modules/template.js");
+	const calls = [];
+	const platform = { redeemCode: async (acc) => {
+		calls.push([acc.uid, acc.region, acc.redeemTargets]);
+		return acc.region === "os_euro" ? { success: false, message: "Already in use" } : { success: true, message: "OK" };
+	} };
+	const targets = [{ uid: "201", region: "os_asia" }, { uid: "301", region: "os_euro" }];
+	const original = { get: HoyoLab.get, getActiveAccounts: HoyoLab.getActiveAccounts };
+	HoyoLab.get = () => platform;
+	HoyoLab.getActiveAccounts = () => [{ ...account, redeemTargets: targets }];
+	try {
+		const res = await HoyoLab.redeemCode("genshin", "123", "CODE");
+		assert.deepEqual(calls, [["201", "os_asia", undefined], ["301", "os_euro", undefined]]);
+		assert.equal(res.success, false);
+		assert.equal(res.data.reason, "SEA (201): OK; EU (301): Already in use");
+	}
+	finally {
+		Object.assign(HoyoLab, original);
+	}
 });

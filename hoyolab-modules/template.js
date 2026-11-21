@@ -219,6 +219,24 @@ module.exports = class HoyoLab {
 				});
 			}
 
+			const { mainRegion, redeemRegions } = account;
+			if (mainRegion !== undefined && typeof mainRegion !== "string") {
+				throw new app.Error({
+					message: t("Invalid mainRegion provided for HoyoLab expected string."),
+					args: {
+						mainRegion
+					}
+				});
+			}
+			if (redeemRegions !== undefined && (!Array.isArray(redeemRegions) || redeemRegions.some(i => typeof i !== "string"))) {
+				throw new app.Error({
+					message: t("Invalid redeemRegions provided for HoyoLab expected array of strings."),
+					args: {
+						redeemRegions
+					}
+				});
+			}
+
 			const parsedCookie = this.#parseCookie(account.cookie);
 
 			this.#data.push({
@@ -227,6 +245,8 @@ module.exports = class HoyoLab {
 				refreshCookie: parsedCookie.refreshCookie,
 				redeemCode: parsedCookie.codeRedeem !== false ? redeemCode : parsedCookie.codeRedeem,
 				redeemCodeConfigured: redeemCode,
+				mainRegion: mainRegion ?? "default",
+				redeemRegions: redeemRegions ?? [],
 				shopStatus,
 				realm,
 				dailiesCheck,
@@ -503,22 +523,32 @@ module.exports = class HoyoLab {
 		const platform = HoyoLab.get(game);
 		const [account] = accountData;
 
-		let res = await platform.redeemCode(account, code);
-		if (!res.success && HoyoLab.isExpiredLogin(res.message) && await HoyoLab.refreshStoredCookies(account.cookie)) {
-			res = await platform.redeemCode(account, code);
+		// Manual redemption goes to every configured server (mainRegion first, then redeemRegions). See docs/REDEEM_REGIONS.md.
+		const targets = account.redeemTargets ?? [{}];
+		const results = [];
+		for (const target of targets) {
+			// redeemTargets is cleared so the game's redeemCode does not reroute this target to the main server.
+			const redeem = () => platform.redeemCode({ ...account, ...target, redeemTargets: undefined }, code);
+			let res = await redeem();
+			if (!res.success && HoyoLab.isExpiredLogin(res.message) && await HoyoLab.refreshStoredCookies(account.cookie)) {
+				res = await redeem();
+			}
+			results.push({ target, res });
 		}
-		if (res.success) {
+
+		if (results.every(({ res }) => res.success)) {
 			return { success: true };
 		}
-		else {
-			return {
-				success: false,
-				data: {
-					code,
-					reason: res.message
-				}
-			};
-		}
+
+		return {
+			success: false,
+			data: {
+				code,
+				reason: (results.length === 1)
+					? results[0].res.message
+					: results.map(({ target, res }) => `${HoyoLab.getRegion(target.region)} (${target.uid}): ${res.message ?? t("Failed to redeem code")}`).join("; ")
+			}
+		};
 	}
 
 	static getActiveAccounts (options = {}) {

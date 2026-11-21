@@ -23,7 +23,8 @@ const DEFAULT_CONSTANTS = {
 		sign: "https://sg-hk4e-api.hoyolab.com/event/sol/sign",
 		notes: "https://bbs-api-os.mihoyo.com/game_record/genshin/api/dailyNote",
 		diary: "https://sg-hk4e-api.hoyolab.com/event/ysledgeros/month_detail",
-		redemption: "https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey"
+		redemption: "https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey",
+		roles: "https://api-account-os.hoyoverse.com/account/binding/api/getUserGameRolesByCookie"
 	}
 };
 
@@ -115,6 +116,7 @@ module.exports = class Genshin extends require("../template.js") {
 			this.#color = 0x0099FF;
 
 			const offset = app.HoyoLab.getRegion(data.region);
+			const redeemTargets = await this.#getRedeemTargets(account, data);
 			this.accounts.push({
 				platform: this.name,
 				uid: data.game_role_id,
@@ -124,6 +126,7 @@ module.exports = class Genshin extends require("../template.js") {
 				level: data.level,
 				redeemCode: account.redeemCode,
 				redeemCodeConfigured: account.redeemCodeConfigured,
+				redeemTargets,
 				dailiesCheck: account.dailiesCheck,
 				weekliesCheck: account.weekliesCheck,
 				cookie: cookieData,
@@ -166,6 +169,74 @@ module.exports = class Genshin extends require("../template.js") {
 			const region = app.HoyoLab.getRegion(data.region);
 			app.Logger.info(this.fullName, t `Logged into (${data.game_role_id}) ${data.nickname} (${region})`);
 		}
+	}
+
+	// Characters that receive auto-redeemed codes, main server first. See docs/REDEEM_REGIONS.md.
+	// Returns null when neither mainRegion nor redeemRegions is configured, so redemption keeps using the card character only.
+	async #getRedeemTargets (account, card) {
+		const mainRegion = account.mainRegion ?? "default";
+		const regions = account.redeemRegions;
+		if (mainRegion === "default" && regions.length === 0) {
+			return null;
+		}
+
+		const { body, statusCode } = await app.Got("HoYoLab", {
+			url: this.config.url.roles,
+			responseType: "json",
+			throwHttpErrors: false,
+			searchParams: {
+				game_biz: "hk4e_global"
+			},
+			headers: {
+				Cookie: app.HoyoLab.parseCookie(account.cookie, {
+					whitelist: ["cookie_token_v2", "account_mid_v2", "account_id_v2", "cookie_token", "account_id"]
+				})
+			}
+		});
+
+		const roles = body?.data?.list;
+		if (statusCode !== 200 || body?.retcode !== 0 || !Array.isArray(roles)) {
+			app.Logger.warn(this.fullName, {
+				message: t `Could not fetch Genshin characters for redeemRegions, redeeming codes on (${card.game_role_id}) only`,
+				args: { statusCode, retcode: body?.retcode, message: body?.message }
+			});
+			return null;
+		}
+
+		const toTarget = role => ({
+			uid: role.game_uid,
+			nickname: role.nickname,
+			region: role.region,
+			level: role.level
+		});
+
+		let main = { uid: card.game_role_id, nickname: card.nickname, region: card.region, level: card.level };
+		if (mainRegion !== "default") {
+			const role = roles.find(i => i.region === mainRegion);
+			if (role) {
+				main = toTarget(role);
+			}
+			else {
+				app.Logger.warn(this.fullName, t `No Genshin character found on ${mainRegion}, using (${card.game_role_id}) as main redemption server`);
+			}
+		}
+
+		const targets = [main];
+		for (const region of regions) {
+			if (region === main.region) {
+				continue;
+			}
+
+			const role = roles.find(i => i.region === region);
+			if (!role) {
+				app.Logger.warn(this.fullName, t `No Genshin character found on ${region} for (${card.game_role_id}), skipping it for code redemption`);
+				continue;
+			}
+
+			targets.push(toTarget(role));
+		}
+
+		return targets;
 	}
 
 	get logo () { return this.#logo; }
