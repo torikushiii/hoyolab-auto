@@ -142,17 +142,18 @@ const getPausedEntries = (account, notificationKey, codes, completedCodes) => [
 		.map(code => ({ account, code, loginExpired: true, notificationKey: `${notificationKey}:${formatCodeValue(code)}` }))
 ];
 
-// redeemRegions: one redemption entry per selected server character, sharing the account's cookie and notification settings.
-// See docs/REDEEM_REGIONS.md.
 const expandRedeemTargets = (account) => {
 	if (!Array.isArray(account.redeemTargets)) {
 		return [account];
 	}
 
-	const targets = account.redeemTargets.map(target => ({ ...account, ...target, backfill: true }));
-	// The card character is not selected but may still hold retries queued by Mimo/Hilichurl redemptions.
+	const withCurrentCookie = target => Object.defineProperty(target, "cookie", {
+		enumerable: true,
+		get: () => account.cookie
+	});
+	const targets = account.redeemTargets.map(target => withCurrentCookie({ ...account, ...target, backfill: true }));
 	if (!account.redeemTargets.some(target => target.uid === account.uid && target.region === account.region)) {
-		targets.push({ ...account, pendingOnly: true });
+		targets.push(withCurrentCookie({ ...account, pendingOnly: true }));
 	}
 
 	return targets;
@@ -210,7 +211,6 @@ const checkAndRedeem = async (codes) => {
 
 			const savedCodes = await getPendingCodes(game.gameBiz, account);
 			const accountCodes = new Map(account.pendingOnly ? [] : pendingCodes.map(code => [formatCodeValue(code), code]));
-			// backfill: redeemRegions targets also get every active code they have not completed, so new or re-added servers catch up.
 			const backfillCodes = new Set();
 			if (account.backfill) {
 				for (const code of activeCodes) {
@@ -293,7 +293,6 @@ const checkAndRedeem = async (codes) => {
 				if (result.success) {
 					success.push({ account, code });
 				}
-				// Backfill retries codes this server may already have used (e.g. "already in use"), so final errors stay silent.
 				else if (!(backfillCodes.has(normalized) && FINAL_REDEMPTION_ERRORS.has(result.retcode))) {
 					failed.push({
 						account,
@@ -462,6 +461,5 @@ module.exports = {
 	fetchCodes,
 	checkAndRedeem,
 	buildMessage,
-	expandRedeemTargets,
 	getRedemptionCookieHash
 };

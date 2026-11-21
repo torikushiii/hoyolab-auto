@@ -171,8 +171,6 @@ module.exports = class Genshin extends require("../template.js") {
 		}
 	}
 
-	// Characters that receive auto-redeemed codes, main server first. See docs/REDEEM_REGIONS.md.
-	// Returns null when neither mainRegion nor redeemRegions is configured, so redemption keeps using the card character only.
 	async #getRedeemTargets (account, card) {
 		const mainRegion = account.mainRegion ?? "default";
 		const regions = account.redeemRegions;
@@ -180,25 +178,32 @@ module.exports = class Genshin extends require("../template.js") {
 			return null;
 		}
 
-		const { body, statusCode } = await app.Got("HoYoLab", {
-			url: this.config.url.roles,
-			responseType: "json",
-			throwHttpErrors: false,
-			searchParams: {
-				game_biz: "hk4e_global"
-			},
-			headers: {
-				Cookie: app.HoyoLab.parseCookie(account.cookie, {
-					whitelist: ["cookie_token_v2", "account_mid_v2", "account_id_v2", "cookie_token", "account_id"]
-				})
-			}
-		});
+		let res;
+		try {
+			res = await app.Got("HoYoLab", {
+				url: this.config.url.roles,
+				responseType: "json",
+				throwHttpErrors: false,
+				searchParams: {
+					game_biz: "hk4e_global"
+				},
+				headers: {
+					Cookie: app.HoyoLab.parseCookie(account.cookie, {
+						whitelist: ["cookie_token_v2", "account_mid_v2", "account_id_v2", "cookie_token", "account_id"]
+					})
+				}
+			});
+		}
+		catch (e) {
+			res = { error: e.message };
+		}
 
+		const { body, statusCode, error } = res;
 		const roles = body?.data?.list;
 		if (statusCode !== 200 || body?.retcode !== 0 || !Array.isArray(roles)) {
 			app.Logger.warn(this.fullName, {
 				message: t `Could not fetch Genshin characters for redeemRegions, redeeming codes on (${card.game_role_id}) only`,
-				args: { statusCode, retcode: body?.retcode, message: body?.message }
+				args: { statusCode, retcode: body?.retcode, message: body?.message ?? error }
 			});
 			return null;
 		}
@@ -222,7 +227,7 @@ module.exports = class Genshin extends require("../template.js") {
 		}
 
 		const targets = [main];
-		for (const region of regions) {
+		for (const region of new Set(regions)) {
 			if (region === main.region) {
 				continue;
 			}

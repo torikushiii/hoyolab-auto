@@ -523,15 +523,22 @@ module.exports = class HoyoLab {
 		const platform = HoyoLab.get(game);
 		const [account] = accountData;
 
-		// Manual redemption goes to every configured server (mainRegion first, then redeemRegions). See docs/REDEEM_REGIONS.md.
 		const targets = account.redeemTargets ?? [{}];
 		const results = [];
 		for (const target of targets) {
-			// redeemTargets is cleared so the game's redeemCode does not reroute this target to the main server.
 			const redeem = () => platform.redeemCode({ ...account, ...target, redeemTargets: undefined }, code);
-			let res = await redeem();
-			if (!res.success && HoyoLab.isExpiredLogin(res.message) && await HoyoLab.refreshStoredCookies(account.cookie)) {
+			let res;
+			try {
 				res = await redeem();
+				if (!res.success && HoyoLab.isExpiredLogin(res.message) && await HoyoLab.refreshStoredCookies(account.cookie)) {
+					res = await redeem();
+				}
+			}
+			catch (e) {
+				if (targets.length === 1) {
+					throw e;
+				}
+				res = { success: false, message: e.message };
 			}
 			results.push({ target, res });
 		}
