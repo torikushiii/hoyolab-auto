@@ -105,11 +105,9 @@
             data: [
                 {
                     cookie: '',
-                    // Enable this if you want to automatically redeem codes
-                    // Please note that if you have one account with characters in multiple servers
-                    // the code will be redeemed but you won't get the reward
-                    // so please be careful when enabling this, and only enable it on the account that you want to redeem the code
-                    redeemCode: false,
+                    redeemCode: false, // Auto-redeem codes. Multiple servers? Set mainRegion/redeemRegions below
+                    mainRegion: 'default', // Server to redeem on first, 'default' = HoYoLAB card character. See docs/REDEEM_REGIONS.md
+                    redeemRegions: [], // Extra servers to also redeem on, e.g. ['os_usa', 'os_asia']
                     dailiesCheck: true, // Enable this if you want to get reminded to do your daily commissions
                     weekliesCheck: true, // Enable this if you want to get reminded to do your weeklies
                     realm: {

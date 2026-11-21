@@ -1,7 +1,7 @@
 const { t } = require("../../localization/index.js");
 
 const crypto = require("node:crypto");
-const { getPendingCodes, waitForQueue, FINAL_REDEMPTION_ERRORS } = require("../../hoyolab-modules/redemption-request.js");
+const { getPendingCodes, waitForQueue, FINAL_REDEMPTION_ERRORS, TEMPORARY_REDEMPTION_ERRORS } = require("../../hoyolab-modules/redemption-request.js");
 
 const GAME_CONFIG = [
 	{
@@ -142,6 +142,23 @@ const getPausedEntries = (account, notificationKey, codes, completedCodes) => [
 		.map(code => ({ account, code, loginExpired: true, notificationKey: `${notificationKey}:${formatCodeValue(code)}` }))
 ];
 
+const expandRedeemTargets = (account) => {
+	if (!Array.isArray(account.redeemTargets)) {
+		return [account];
+	}
+
+	const withCurrentCookie = target => Object.defineProperty(target, "cookie", {
+		enumerable: true,
+		get: () => account.cookie
+	});
+	const targets = account.redeemTargets.map(target => withCurrentCookie({ ...account, ...target, backfill: true }));
+	if (!account.redeemTargets.some(target => target.uid === account.uid && target.region === account.region)) {
+		targets.push(withCurrentCookie({ ...account, pendingOnly: true }));
+	}
+
+	return targets;
+};
+
 const checkAndRedeem = async (codes) => {
 	const newCodes = await checkCachedCodes(codes);
 
@@ -151,6 +168,7 @@ const checkAndRedeem = async (codes) => {
 
 	for (const game of GAME_CONFIG) {
 		const pendingCodes = newCodes[game.key] ?? [];
+		const activeCodes = Array.isArray(codes[game.key]) ? codes[game.key] : [];
 		const accounts = app.HoyoLab.getActiveAccounts({
 			whitelist: game.accountFilter
 		});
@@ -186,13 +204,23 @@ const checkAndRedeem = async (codes) => {
 		const { redeemCodes } = require(game.modulePath);
 		const completedByAccount = [];
 
-		for (const account of accounts) {
+		for (const account of accounts.flatMap(expandRedeemTargets)) {
 			if (account.redeemCode === false) {
 				continue;
 			}
 
 			const savedCodes = await getPendingCodes(game.gameBiz, account);
-			const accountCodes = new Map(pendingCodes.map(code => [formatCodeValue(code), code]));
+			const accountCodes = new Map(account.pendingOnly ? [] : pendingCodes.map(code => [formatCodeValue(code), code]));
+			const backfillCodes = new Set();
+			if (account.backfill) {
+				for (const code of activeCodes) {
+					const normalized = formatCodeValue(code);
+					if (normalized && !accountCodes.has(normalized)) {
+						accountCodes.set(normalized, code);
+						backfillCodes.add(normalized);
+					}
+				}
+			}
 			const publicCodes = new Set(accountCodes.keys());
 			for (const code of savedCodes) {
 				accountCodes.set(code, accountCodes.get(code) ?? { code, rewards: []});
@@ -203,7 +231,9 @@ const checkAndRedeem = async (codes) => {
 
 			const accountCacheKey = `${game.cacheKey}:${account.region}:${account.uid}`;
 			const completedCodes = new Set(await getCachedCodes(accountCacheKey));
-			completedByAccount.push(completedCodes);
+			if (!account.pendingOnly) {
+				completedByAccount.push(completedCodes);
+			}
 			const loginCacheKey = `${accountCacheKey}:expired-login`;
 			const pausedCookieHash = await app.Cache.get(loginCacheKey);
 			if (pausedCookieHash) {
@@ -249,7 +279,10 @@ const checkAndRedeem = async (codes) => {
 					break;
 				}
 
-				if (result.success || FINAL_REDEMPTION_ERRORS.has(result.retcode)) {
+				const backfillDone = backfillCodes.has(normalized)
+					&& typeof result.retcode === "number"
+					&& !TEMPORARY_REDEMPTION_ERRORS.has(result.retcode);
+				if (result.success || FINAL_REDEMPTION_ERRORS.has(result.retcode) || backfillDone) {
 					completedCodes.add(normalized);
 					await app.Cache.set({
 						key: accountCacheKey,
@@ -260,7 +293,7 @@ const checkAndRedeem = async (codes) => {
 				if (result.success) {
 					success.push({ account, code });
 				}
-				else {
+				else if (!(backfillCodes.has(normalized) && FINAL_REDEMPTION_ERRORS.has(result.retcode))) {
 					failed.push({
 						account,
 						code,

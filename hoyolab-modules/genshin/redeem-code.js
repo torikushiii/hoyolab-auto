@@ -10,6 +10,7 @@ module.exports = class RedeemCode {
 	}
 
 	async redeemCode (accountData, code) {
+		accountData = { ...accountData, ...accountData.redeemTargets?.[0] };
 		const cookieData = app.HoyoLab.parseCookie(accountData.cookie, {
 			whitelist: [
 				"cookie_token_v2",
