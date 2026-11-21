@@ -74,6 +74,8 @@ Notes:
    - pending-retry queue and rate limit (`redemption-request.js` keys by `game_biz:region:uid`)
    - success/failure notifications (cookie, `discord` and `allowedPlatforms` are shared)
 
+   Each target also gets a **backfill**: every currently active code that is not in its completed-code cache is tried, not only codes new to the global `<game>-code` list. This lets a newly added or re-added server catch up on codes released before it was listed. If the server already used a backfilled code, the final error (for example "already in use") marks it completed without a failure notification.
+
    If the card character is not in `redeemTargets`, an extra `pendingOnly` copy is added. It only retries codes already queued for the card character (for example from before `mainRegion` was changed) and never redeems public codes.
 
 3. **Single-use codes** (`hoyolab-modules/genshin/redeem-code.js`): `redeemCode` overrides `uid`/`region` with `redeemTargets[0]`, so Mimo and Hilichurl codes go to the main server.

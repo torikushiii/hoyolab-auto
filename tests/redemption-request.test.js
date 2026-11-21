@@ -285,6 +285,26 @@ test("redeemRegions redeems public codes once per selected server, main server f
 	assert.equal(h.calls.length, 2);
 });
 
+test("redeemRegions backfills active codes on new servers and stays silent when a server already used them", async () => {
+	const h = harness(new Map([["genshin-code", ["OLD", "SEEN"]], ["genshin-code:os_asia:201", ["SEEN"]]]));
+	h.state.accounts = [{
+		...account,
+		platform: "genshin",
+		redeemTargets: [
+			{ uid: "201", region: "os_asia" },
+			{ uid: "301", region: "os_euro" }
+		]
+	}];
+	h.state.respond = async (data) => data.searchParams.cdkey === "OLD" ? response(-2017, "Already in use") : response();
+	const cron = h.load("crons/code-redeem/utils.js");
+	const result = await cron.checkAndRedeem({ genshin: [{ code: "SEEN" }, { code: "OLD" }]});
+	assert.deepEqual(h.calls.map(call => [call.searchParams.region, call.searchParams.cdkey]), [["os_asia", "OLD"], ["os_euro", "SEEN"], ["os_euro", "OLD"]]);
+	assert.equal(result.success.length, 1);
+	assert.equal(result.failed.length, 0);
+	await cron.checkAndRedeem({ genshin: [{ code: "SEEN" }, { code: "OLD" }]});
+	assert.equal(h.calls.length, 3);
+});
+
 test("single-use codes go to the main server", async () => {
 	const h = harness();
 	const RewardCode = h.load("hoyolab-modules/genshin/redeem-code.js");

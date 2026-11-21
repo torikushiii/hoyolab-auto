@@ -149,7 +149,7 @@ const expandRedeemTargets = (account) => {
 		return [account];
 	}
 
-	const targets = account.redeemTargets.map(target => ({ ...account, ...target }));
+	const targets = account.redeemTargets.map(target => ({ ...account, ...target, backfill: true }));
 	// The card character is not selected but may still hold retries queued by Mimo/Hilichurl redemptions.
 	if (!account.redeemTargets.some(target => target.uid === account.uid && target.region === account.region)) {
 		targets.push({ ...account, pendingOnly: true });
@@ -167,6 +167,7 @@ const checkAndRedeem = async (codes) => {
 
 	for (const game of GAME_CONFIG) {
 		const pendingCodes = newCodes[game.key] ?? [];
+		const activeCodes = Array.isArray(codes[game.key]) ? codes[game.key] : [];
 		const accounts = app.HoyoLab.getActiveAccounts({
 			whitelist: game.accountFilter
 		});
@@ -209,6 +210,17 @@ const checkAndRedeem = async (codes) => {
 
 			const savedCodes = await getPendingCodes(game.gameBiz, account);
 			const accountCodes = new Map(account.pendingOnly ? [] : pendingCodes.map(code => [formatCodeValue(code), code]));
+			// backfill: redeemRegions targets also get every active code they have not completed, so new or re-added servers catch up.
+			const backfillCodes = new Set();
+			if (account.backfill) {
+				for (const code of activeCodes) {
+					const normalized = formatCodeValue(code);
+					if (normalized && !accountCodes.has(normalized)) {
+						accountCodes.set(normalized, code);
+						backfillCodes.add(normalized);
+					}
+				}
+			}
 			const publicCodes = new Set(accountCodes.keys());
 			for (const code of savedCodes) {
 				accountCodes.set(code, accountCodes.get(code) ?? { code, rewards: []});
@@ -278,7 +290,8 @@ const checkAndRedeem = async (codes) => {
 				if (result.success) {
 					success.push({ account, code });
 				}
-				else {
+				// Backfill retries codes this server may already have used (e.g. "already in use"), so final errors stay silent.
+				else if (!(backfillCodes.has(normalized) && FINAL_REDEMPTION_ERRORS.has(result.retcode))) {
 					failed.push({
 						account,
 						code,
