@@ -142,6 +142,22 @@ const getPausedEntries = (account, notificationKey, codes, completedCodes) => [
 		.map(code => ({ account, code, loginExpired: true, notificationKey: `${notificationKey}:${formatCodeValue(code)}` }))
 ];
 
+// redeemRegions: one redemption entry per selected server character, sharing the account's cookie and notification settings.
+// See docs/REDEEM_REGIONS.md.
+const expandRedeemTargets = (account) => {
+	if (!Array.isArray(account.redeemTargets)) {
+		return [account];
+	}
+
+	const targets = account.redeemTargets.map(target => ({ ...account, ...target }));
+	// The card character is not selected but may still hold retries queued by Mimo/Hilichurl redemptions.
+	if (!account.redeemTargets.some(target => target.uid === account.uid && target.region === account.region)) {
+		targets.push({ ...account, pendingOnly: true });
+	}
+
+	return targets;
+};
+
 const checkAndRedeem = async (codes) => {
 	const newCodes = await checkCachedCodes(codes);
 
@@ -186,13 +202,13 @@ const checkAndRedeem = async (codes) => {
 		const { redeemCodes } = require(game.modulePath);
 		const completedByAccount = [];
 
-		for (const account of accounts) {
+		for (const account of accounts.flatMap(expandRedeemTargets)) {
 			if (account.redeemCode === false) {
 				continue;
 			}
 
 			const savedCodes = await getPendingCodes(game.gameBiz, account);
-			const accountCodes = new Map(pendingCodes.map(code => [formatCodeValue(code), code]));
+			const accountCodes = new Map(account.pendingOnly ? [] : pendingCodes.map(code => [formatCodeValue(code), code]));
 			const publicCodes = new Set(accountCodes.keys());
 			for (const code of savedCodes) {
 				accountCodes.set(code, accountCodes.get(code) ?? { code, rewards: []});
@@ -203,7 +219,9 @@ const checkAndRedeem = async (codes) => {
 
 			const accountCacheKey = `${game.cacheKey}:${account.region}:${account.uid}`;
 			const completedCodes = new Set(await getCachedCodes(accountCacheKey));
-			completedByAccount.push(completedCodes);
+			if (!account.pendingOnly) {
+				completedByAccount.push(completedCodes);
+			}
 			const loginCacheKey = `${accountCacheKey}:expired-login`;
 			const pausedCookieHash = await app.Cache.get(loginCacheKey);
 			if (pausedCookieHash) {
@@ -428,5 +446,6 @@ module.exports = {
 	fetchCodes,
 	checkAndRedeem,
 	buildMessage,
+	expandRedeemTargets,
 	getRedemptionCookieHash
 };

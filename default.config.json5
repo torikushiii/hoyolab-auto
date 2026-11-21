@@ -110,6 +110,8 @@
                     // the code will be redeemed but you won't get the reward
                     // so please be careful when enabling this, and only enable it on the account that you want to redeem the code
                     redeemCode: false,
+                    mainRegion: 'default', // Server to redeem on first, 'default' = HoYoLAB card character. See docs/REDEEM_REGIONS.md
+                    redeemRegions: [], // Extra servers for public codes, e.g. ['os_usa', 'os_asia']
                     dailiesCheck: true, // Enable this if you want to get reminded to do your daily commissions
                     weekliesCheck: true, // Enable this if you want to get reminded to do your weeklies
                     realm: {

@@ -219,6 +219,24 @@ module.exports = class HoyoLab {
 				});
 			}
 
+			const { mainRegion, redeemRegions } = account;
+			if (mainRegion !== undefined && typeof mainRegion !== "string") {
+				throw new app.Error({
+					message: t("Invalid mainRegion provided for HoyoLab expected string."),
+					args: {
+						mainRegion
+					}
+				});
+			}
+			if (redeemRegions !== undefined && (!Array.isArray(redeemRegions) || redeemRegions.some(i => typeof i !== "string"))) {
+				throw new app.Error({
+					message: t("Invalid redeemRegions provided for HoyoLab expected array of strings."),
+					args: {
+						redeemRegions
+					}
+				});
+			}
+
 			const parsedCookie = this.#parseCookie(account.cookie);
 
 			this.#data.push({
@@ -227,6 +245,8 @@ module.exports = class HoyoLab {
 				refreshCookie: parsedCookie.refreshCookie,
 				redeemCode: parsedCookie.codeRedeem !== false ? redeemCode : parsedCookie.codeRedeem,
 				redeemCodeConfigured: redeemCode,
+				mainRegion: mainRegion ?? "default",
+				redeemRegions: redeemRegions ?? [],
 				shopStatus,
 				realm,
 				dailiesCheck,

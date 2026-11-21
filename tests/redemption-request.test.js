@@ -266,3 +266,29 @@ test("the scheduled job skips a saved code that another request redeems first", 
 	assert.equal(result.success.length, 0);
 	assert.equal(result.failed.length, 0);
 });
+
+test("redeemRegions redeems public codes once per selected server, main server first", async () => {
+	const h = harness(new Map([["genshin-code", ["OLD"]]]));
+	h.state.accounts = [{
+		...account,
+		platform: "genshin",
+		redeemTargets: [
+			{ uid: "201", region: "os_asia" },
+			{ uid: "301", region: "os_euro" }
+		]
+	}];
+	const cron = h.load("crons/code-redeem/utils.js");
+	const result = await cron.checkAndRedeem({ genshin: [{ code: "PUBLIC" }]});
+	assert.deepEqual(h.calls.map(call => [call.searchParams.uid, call.searchParams.region]), [["201", "os_asia"], ["301", "os_euro"]]);
+	assert.equal(result.success.length, 2);
+	await cron.checkAndRedeem({ genshin: [{ code: "PUBLIC" }]});
+	assert.equal(h.calls.length, 2);
+});
+
+test("single-use codes go to the main server", async () => {
+	const h = harness();
+	const RewardCode = h.load("hoyolab-modules/genshin/redeem-code.js");
+	const rewardCodes = new RewardCode({ config: { url: { redemption: "https://example.test/redeem" } } });
+	await rewardCodes.redeemCode({ ...account, redeemTargets: [{ uid: "201", region: "os_asia" }, { uid: "301", region: "os_euro" }]}, "MIMO");
+	assert.deepEqual(h.calls.map(call => [call.searchParams.uid, call.searchParams.region]), [["201", "os_asia"]]);
+});
