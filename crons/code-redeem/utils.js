@@ -158,107 +158,6 @@ const expandRedeemTargets = (account) => {
 	return targets;
 };
 
-// Redeems newCodes plus any saved retries on one account or redeemRegions target.
-// backfill also adds every active code missing from the target's completed-code cache, so new or re-added servers catch up.
-const redeemForAccount = async (game, account, { newCodes = [], activeCodes = [], backfill = false }) => {
-	const { redeemCodes } = require(game.modulePath);
-	const result = { success: [], failed: [], skipped: [], completedCodes: null };
-	const savedCodes = await getPendingCodes(game.gameBiz, account);
-	const accountCodes = new Map(account.pendingOnly ? [] : newCodes.map(code => [formatCodeValue(code), code]));
-	const backfillCodes = new Set();
-	if (backfill) {
-		for (const code of activeCodes) {
-			const normalized = formatCodeValue(code);
-			if (normalized && !accountCodes.has(normalized)) {
-				accountCodes.set(normalized, code);
-				backfillCodes.add(normalized);
-			}
-		}
-	}
-	const publicCodes = new Set(accountCodes.keys());
-	for (const code of savedCodes) {
-		accountCodes.set(code, accountCodes.get(code) ?? { code, rewards: []});
-	}
-	if (accountCodes.size === 0) {
-		return result;
-	}
-
-	const accountCacheKey = `${game.cacheKey}:${account.region}:${account.uid}`;
-	const completedCodes = new Set(await getCachedCodes(accountCacheKey));
-	result.completedCodes = completedCodes;
-	const loginCacheKey = `${accountCacheKey}:expired-login`;
-	const pausedCookieHash = await app.Cache.get(loginCacheKey);
-	if (pausedCookieHash) {
-		if (pausedCookieHash === getRedemptionCookieHash(account)) {
-			result.failed.push(...getPausedEntries(account, `${loginCacheKey}:${pausedCookieHash}`, [...accountCodes.values()], completedCodes));
-			return result;
-		}
-		await app.Cache.delete(loginCacheKey);
-	}
-
-	for (const code of accountCodes.values()) {
-		const normalized = formatCodeValue(code);
-		if (completedCodes.has(normalized) && !savedCodes.includes(normalized)) {
-			continue;
-		}
-
-		if (savedCodes.includes(normalized) && !publicCodes.has(normalized)) {
-			await waitForQueue(game.gameBiz, account);
-			const stillPending = await getPendingCodes(game.gameBiz, account);
-			if (!stillPending.includes(normalized)) {
-				continue;
-			}
-		}
-
-		let res;
-		try {
-			res = await redeemCodes(account, code);
-			if (!res.success && app.HoyoLab.isExpiredLogin(res.reason) && await app.HoyoLab.refreshStoredCookies(account.cookie)) {
-				res = null;
-				res = await redeemCodes(account, code);
-			}
-		}
-		catch {
-			if (!app.HoyoLab.isExpiredLogin(res?.reason)) {
-				res = { success: false, reason: "Redemption request failed; will retry on the next run." };
-			}
-		}
-
-		if (!res.success && app.HoyoLab.isExpiredLogin(res.reason)) {
-			const cookieHash = getRedemptionCookieHash(account);
-			await app.Cache.set({ key: loginCacheKey, value: cookieHash });
-			result.failed.push(...getPausedEntries(account, `${loginCacheKey}:${cookieHash}`, [...accountCodes.values()], completedCodes));
-			return result;
-		}
-
-		if (res.success || FINAL_REDEMPTION_ERRORS.has(res.retcode)) {
-			completedCodes.add(normalized);
-			await app.Cache.set({
-				key: accountCacheKey,
-				value: [...completedCodes]
-			});
-		}
-
-		if (res.success) {
-			result.success.push({ account, code });
-		}
-		// Backfill retries codes this server may already have used (e.g. "already in use"), so final errors are reported as skipped, not failed.
-		else if (backfillCodes.has(normalized) && FINAL_REDEMPTION_ERRORS.has(res.retcode)) {
-			result.skipped.push({ account, code, reason: res.reason });
-		}
-		else {
-			result.failed.push({
-				account,
-				code,
-				notificationKey: `${accountCacheKey}:failed:${normalized}`,
-				reason: res.reason,
-				retcode: res.retcode
-			});
-		}
-	}
-	return result;
-};
-
 const checkAndRedeem = async (codes) => {
 	const newCodes = await checkCachedCodes(codes);
 
@@ -301,6 +200,7 @@ const checkAndRedeem = async (codes) => {
 			continue;
 		}
 
+		const { redeemCodes } = require(game.modulePath);
 		const completedByAccount = [];
 
 		for (const account of accounts.flatMap(expandRedeemTargets)) {
@@ -308,11 +208,98 @@ const checkAndRedeem = async (codes) => {
 				continue;
 			}
 
-			const result = await redeemForAccount(game, account, { newCodes: pendingCodes, activeCodes, backfill: account.backfill });
-			success.push(...result.success);
-			failed.push(...result.failed);
-			if (result.completedCodes && !account.pendingOnly) {
-				completedByAccount.push(result.completedCodes);
+			const savedCodes = await getPendingCodes(game.gameBiz, account);
+			const accountCodes = new Map(account.pendingOnly ? [] : pendingCodes.map(code => [formatCodeValue(code), code]));
+			// backfill: redeemRegions targets also get every active code they have not completed, so new or re-added servers catch up.
+			const backfillCodes = new Set();
+			if (account.backfill) {
+				for (const code of activeCodes) {
+					const normalized = formatCodeValue(code);
+					if (normalized && !accountCodes.has(normalized)) {
+						accountCodes.set(normalized, code);
+						backfillCodes.add(normalized);
+					}
+				}
+			}
+			const publicCodes = new Set(accountCodes.keys());
+			for (const code of savedCodes) {
+				accountCodes.set(code, accountCodes.get(code) ?? { code, rewards: []});
+			}
+			if (accountCodes.size === 0) {
+				continue;
+			}
+
+			const accountCacheKey = `${game.cacheKey}:${account.region}:${account.uid}`;
+			const completedCodes = new Set(await getCachedCodes(accountCacheKey));
+			if (!account.pendingOnly) {
+				completedByAccount.push(completedCodes);
+			}
+			const loginCacheKey = `${accountCacheKey}:expired-login`;
+			const pausedCookieHash = await app.Cache.get(loginCacheKey);
+			if (pausedCookieHash) {
+				if (pausedCookieHash === getRedemptionCookieHash(account)) {
+					failed.push(...getPausedEntries(account, `${loginCacheKey}:${pausedCookieHash}`, [...accountCodes.values()], completedCodes));
+					continue;
+				}
+				await app.Cache.delete(loginCacheKey);
+			}
+
+			for (const code of accountCodes.values()) {
+				const normalized = formatCodeValue(code);
+				if (completedCodes.has(normalized) && !savedCodes.includes(normalized)) {
+					continue;
+				}
+
+				if (savedCodes.includes(normalized) && !publicCodes.has(normalized)) {
+					await waitForQueue(game.gameBiz, account);
+					const stillPending = await getPendingCodes(game.gameBiz, account);
+					if (!stillPending.includes(normalized)) {
+						continue;
+					}
+				}
+
+				let result;
+				try {
+					result = await redeemCodes(account, code);
+					if (!result.success && app.HoyoLab.isExpiredLogin(result.reason) && await app.HoyoLab.refreshStoredCookies(account.cookie)) {
+						result = null;
+						result = await redeemCodes(account, code);
+					}
+				}
+				catch {
+					if (!app.HoyoLab.isExpiredLogin(result?.reason)) {
+						result = { success: false, reason: "Redemption request failed; will retry on the next run." };
+					}
+				}
+
+				if (!result.success && app.HoyoLab.isExpiredLogin(result.reason)) {
+					const cookieHash = getRedemptionCookieHash(account);
+					await app.Cache.set({ key: loginCacheKey, value: cookieHash });
+					failed.push(...getPausedEntries(account, `${loginCacheKey}:${cookieHash}`, [...accountCodes.values()], completedCodes));
+					break;
+				}
+
+				if (result.success || FINAL_REDEMPTION_ERRORS.has(result.retcode)) {
+					completedCodes.add(normalized);
+					await app.Cache.set({
+						key: accountCacheKey,
+						value: [...completedCodes]
+					});
+				}
+
+				if (result.success) {
+					success.push({ account, code });
+				}
+				// Backfill retries codes this server may already have used (e.g. "already in use"), so final errors stay silent.
+				else if (!(backfillCodes.has(normalized) && FINAL_REDEMPTION_ERRORS.has(result.retcode))) {
+					failed.push({
+						account,
+						code,
+						notificationKey: `${accountCacheKey}:failed:${normalized}`,
+						reason: result.reason,
+						retcode: result.retcode
+					});
+				}
 			}
 		}
 
@@ -468,28 +455,9 @@ const checkCachedCodes = async (codes) => {
 	return newCodes;
 };
 
-// Manual backfill for one account: every active code it has not completed, on every redeemRegions target.
-const backfillAccount = async (platform, uid) => {
-	const game = GAME_CONFIG.find(i => i.redeemable && i.accountFilter === platform);
-	const [account] = app.HoyoLab.getActiveAccounts({ whitelist: platform, uid });
-	if (!game || !account) {
-		return null;
-	}
-
-	const activeCodes = await require(game.modulePath).fetchData();
-	const targets = [];
-	for (const target of expandRedeemTargets(account)) {
-		const result = await redeemForAccount(game, target, { activeCodes, backfill: !target.pendingOnly });
-		targets.push({ account: target, ...result });
-	}
-
-	return { activeCodes, targets };
-};
-
 module.exports = {
 	fetchCodes,
 	checkAndRedeem,
-	backfillAccount,
 	buildMessage,
 	expandRedeemTargets,
 	getRedemptionCookieHash

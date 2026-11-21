@@ -16,7 +16,7 @@ const harness = (store = new Map()) => {
 	let now = 0;
 	const calls = [];
 	const modules = new Map();
-	const state = { respond: async () => response(), accounts: [{ ...account, platform: "nap" }], active: []};
+	const state = { respond: async () => response(), accounts: [{ ...account, platform: "nap" }]};
 	const app = {
 		Cache: {
 			get: async key => structuredClone(store.get(key)),
@@ -37,7 +37,7 @@ const harness = (store = new Map()) => {
 		Platform: { getForAccount: () => [], getEmbedPlatforms: () => []},
 		Got: async (name, data) => {
 			if (name === "API") {
-				return { statusCode: 200, body: { active: state.active } };
+				return { statusCode: 200, body: { active: []} };
 			}
 			calls.push({ at: now, ...data });
 			return await state.respond(data);
@@ -303,27 +303,6 @@ test("redeemRegions backfills active codes on new servers and stays silent when 
 	assert.equal(result.failed.length, 0);
 	await cron.checkAndRedeem({ genshin: [{ code: "SEEN" }, { code: "OLD" }]});
 	assert.equal(h.calls.length, 3);
-});
-
-test("manual backfill redeems missing active codes on every server of one account", async () => {
-	const h = harness(new Map([["genshin-code:os_asia:201", ["SEEN"]]]));
-	h.state.active = [{ code: "SEEN" }, { code: "OLD" }];
-	h.state.accounts = [{
-		...account,
-		platform: "genshin",
-		redeemTargets: [
-			{ uid: "201", region: "os_asia" },
-			{ uid: "301", region: "os_euro" }
-		]
-	}];
-	h.state.respond = async (data) => data.searchParams.cdkey === "OLD" && data.searchParams.region === "os_asia" ? response(-2017, "Already in use") : response();
-	const { targets } = await h.load("crons/code-redeem/utils.js").backfillAccount("genshin", "123");
-	const codes = list => list.map(i => i.code.code);
-	assert.deepEqual(JSON.parse(JSON.stringify(targets.map(i => [i.account.region, codes(i.success), codes(i.skipped), i.failed.length]))), [
-		["os_asia", [], ["OLD"], 0],
-		["os_euro", ["SEEN", "OLD"], [], 0],
-		["test", [], [], 0]
-	]);
 });
 
 test("single-use codes go to the main server", async () => {
